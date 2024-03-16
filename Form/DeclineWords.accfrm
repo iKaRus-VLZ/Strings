@@ -1,0 +1,873 @@
+Version =20
+VersionRequired =20
+Checksum =120433984
+Begin Form
+    RecordSelectors = NotDefault
+    NavigationButtons = NotDefault
+    DividingLines = NotDefault
+    AllowDesignChanges = NotDefault
+    DefaultView =0
+    ScrollBars =0
+    RecordLocks =2
+    TabularCharSet =204
+    TabularFamily =0
+    PictureAlignment =2
+    DatasheetGridlinesBehavior =3
+    GridY =10
+    Width =6804
+    DatasheetFontHeight =10
+    ItemSuffix =38
+    Left =750
+    Top =2835
+    Right =7305
+    Bottom =7605
+    DatasheetGridlinesColor =12632256
+    Tag ="BackColor=Light"
+    RecSrcDt = Begin
+        0x0c1477270c51e540
+    End
+    GUID = Begin
+        0x191ff815a5b22647b208c58906c97a65
+    End
+    NameMap = Begin
+        0x0acc0e5500000000000000000000000000000000000000000c00000005000000 ,
+        0x0000000000000000000000000000
+    End
+    OnOpen ="[Event Procedure]"
+    DatasheetFontName ="Arial"
+    PrtMip = Begin
+        0x6801000068010000680100006801000000000000201c0000e010000001000000 ,
+        0x010000006801000000000000a10700000100000001000000
+    End
+    PrtDevMode = Begin
+        0x00000000000000009061040800000000205662baf77f0000335c03baf77f0000 ,
+        0x0104220b9c006c01032f00000100090000000000640001000f002c0102000100 ,
+        0x2c010200000041340067870500000000feffffffffffffff25ddf8adff7f0000 ,
+        0xc0c0c00000005802180000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000046500800 ,
+        0x4d53414343455353000000000000000000000000000000000000000000000000 ,
+        0xff3e03005802aa00ac00aa00ac00010000003100436f7572696572204e657700 ,
+        0x0000000000000000000000000000000000000000010001000200000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000009600 ,
+        0x4b002c0100800000
+    End
+    PrtDevNames = Begin
+        0x080015001f000100000000000000000000000000000000000000000000000046 ,
+        0x505231313a000000000000000000
+    End
+    OnResize ="[Event Procedure]"
+    FilterOnLoad =0
+    DatasheetGridlinesColor12 =12632256
+    PrtDevModeW = Begin
+        0x0000420300000000020000020000000040420a04000000000000000000000000 ,
+        0x880742030000000029000029000000008807420300000000301f0a0400000000 ,
+        0x0104220bdc006c01032f00000100090000000000640001000f002c0102000100 ,
+        0x2c01020000004100340000000000000009031000000000000000000000000000 ,
+        0x5002000000000000480200000000000001000000000000000000e20000000000 ,
+        0x2500000000005802180000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000046500800 ,
+        0x4d53414343455353000000000000000000000000000000000000000000000000 ,
+        0xff3e03005802aa00ac00aa00ac00010000003100436f7572696572204e657700 ,
+        0x0000000000000000000000000000000000000000010001000200000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000009600 ,
+        0x4b002c0100800000
+    End
+    PrtDevNamesW = Begin
+        0x040011001b000100000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000046005000520031003100 ,
+        0x3a00000000000000000000000000000000000000
+    End
+    NoSaveCTIWhenDisabled =1
+    Begin
+        Begin Label
+            BackStyle =0
+            TextFontCharSet =204
+            FontName ="Tahoma"
+        End
+        Begin Line
+            BorderLineStyle =0
+            Width =1701
+        End
+        Begin CommandButton
+            TextFontCharSet =204
+            Width =1701
+            Height =283
+            FontSize =8
+            FontWeight =400
+            ForeColor =-2147483630
+            FontName ="Tahoma"
+            BorderLineStyle =0
+        End
+        Begin CheckBox
+            SpecialEffect =2
+            BorderLineStyle =0
+            LabelX =230
+            LabelY =-30
+        End
+        Begin TextBox
+            FELineBreak = NotDefault
+            SpecialEffect =2
+            OldBorderStyle =0
+            TextFontCharSet =204
+            BorderLineStyle =0
+            Width =1701
+            LabelX =-1701
+            FontName ="Tahoma"
+            AsianLineBreak =255
+        End
+        Begin ComboBox
+            SpecialEffect =2
+            TextFontCharSet =204
+            BorderLineStyle =0
+            Width =1701
+            LabelX =-1701
+            FontName ="Tahoma"
+        End
+        Begin FormHeader
+            Height =566
+            BackColor =-2147483633
+            Name ="ЗаголовокФормы"
+            Tag ="BackColor=Dark"
+            GUID = Begin
+                0x110a1712062eb4479aa56f20b279ed8f
+            End
+            Begin
+                Begin Label
+                    OverlapFlags =93
+                    Left =103
+                    Top =103
+                    Width =6470
+                    Height =454
+                    FontSize =14
+                    FontWeight =700
+                    ForeColor =9605778
+                    Name ="lblTitle2"
+                    Caption ="Заголовок"
+                    Tag ="FontColor=Grey"
+                    GUID = Begin
+                        0xdc38abdb7770dd4aa3f602cbd2e0e016
+                    End
+                    LayoutCachedLeft =103
+                    LayoutCachedTop =103
+                    LayoutCachedWidth =6573
+                    LayoutCachedHeight =557
+                End
+                Begin Label
+                    OverlapFlags =223
+                    Left =60
+                    Top =60
+                    Width =6470
+                    Height =454
+                    FontSize =14
+                    FontWeight =700
+                    Name ="lblTitle"
+                    Caption ="Заголовок"
+                    Tag ="FontColor=White"
+                    GUID = Begin
+                        0x5cecb274c62bcb4795b8d2e2819e785d
+                    End
+                    LayoutCachedLeft =60
+                    LayoutCachedTop =60
+                    LayoutCachedWidth =6530
+                    LayoutCachedHeight =514
+                    ForeThemeColorIndex =0
+                End
+                Begin Line
+                    OverlapFlags =87
+                    SpecialEffect =5
+                    Left =70
+                    Top =510
+                    Width =6610
+                    Name ="Line01"
+                    GUID = Begin
+                        0x512df5abe36a174088d6b5df91be1c02
+                    End
+                    LayoutCachedLeft =70
+                    LayoutCachedTop =510
+                    LayoutCachedWidth =6680
+                    LayoutCachedHeight =510
+                End
+            End
+        End
+        Begin Section
+            Height =2760
+            BackColor =-2147483633
+            Name ="ОбластьДанных"
+            GUID = Begin
+                0xd8c826eae769504fb891378990d8f7ab
+            End
+            Begin
+                Begin TextBox
+                    OverlapFlags =85
+                    TextAlign =1
+                    IMESentenceMode =3
+                    Left =2356
+                    Top =60
+                    Width =4007
+                    ColumnOrder =0
+                    TabIndex =1
+                    Name ="txtInput"
+                    GUID = Begin
+                        0x38584272a07e734bafe2eb5530d46ad4
+                    End
+
+                    LayoutCachedLeft =2356
+                    LayoutCachedTop =60
+                    LayoutCachedWidth =6363
+                    LayoutCachedHeight =300
+                    Begin
+                        Begin Label
+                            OverlapFlags =85
+                            Left =108
+                            Top =60
+                            Width =2100
+                            Height =240
+                            FontWeight =700
+                            Name ="Надпись18"
+                            Caption ="Текст (им.п., ед.ч.):"
+                            GUID = Begin
+                                0xb21691bc58b7a24598313e56b081d03a
+                            End
+                            LayoutCachedLeft =108
+                            LayoutCachedTop =60
+                            LayoutCachedWidth =2208
+                            LayoutCachedHeight =300
+                        End
+                    End
+                End
+                Begin CheckBox
+                    OverlapFlags =85
+                    Left =724
+                    Top =390
+                    Width =272
+                    Height =230
+                    ColumnOrder =1
+                    TabIndex =2
+                    Name ="chkIsFIO"
+                    DefaultValue ="0"
+                    GUID = Begin
+                        0xeaff40ecf8a3564eb3cfefe910ce29fd
+                    End
+
+                    LayoutCachedLeft =724
+                    LayoutCachedTop =390
+                    LayoutCachedWidth =996
+                    LayoutCachedHeight =620
+                    Begin
+                        Begin Label
+                            OverlapFlags =85
+                            Left =108
+                            Top =345
+                            Width =510
+                            Height =240
+                            FontWeight =700
+                            Name ="Надпись25"
+                            Caption ="ФИО"
+                            GUID = Begin
+                                0x70ea83fd2eb3c9459dbc549264b7d19e
+                            End
+                            LayoutCachedLeft =108
+                            LayoutCachedTop =345
+                            LayoutCachedWidth =618
+                            LayoutCachedHeight =585
+                        End
+                    End
+                End
+                Begin TextBox
+                    OverlapFlags =215
+                    IMESentenceMode =3
+                    Left =5403
+                    Top =623
+                    Width =833
+                    ColumnOrder =2
+                    TabIndex =6
+                    Name ="txtSkipWords"
+                    GUID = Begin
+                        0xb5186f2e837e464f8b80874f94284647
+                    End
+
+                    LayoutCachedLeft =5403
+                    LayoutCachedTop =623
+                    LayoutCachedWidth =6236
+                    LayoutCachedHeight =863
+                    Begin
+                        Begin Label
+                            OverlapFlags =93
+                            Left =3858
+                            Top =630
+                            Width =1620
+                            Height =240
+                            Name ="Надпись32"
+                            Caption ="Не склонять слова"
+                            GUID = Begin
+                                0x63016edd537a3340abe92f270582047a
+                            End
+                            LayoutCachedLeft =3858
+                            LayoutCachedTop =630
+                            LayoutCachedWidth =5478
+                            LayoutCachedHeight =870
+                        End
+                    End
+                End
+                Begin ComboBox
+                    RowSourceTypeInt =1
+                    OldBorderStyle =0
+                    OverlapFlags =85
+                    IMESentenceMode =3
+                    ColumnCount =2
+                    ListWidth =1710
+                    Left =2356
+                    Top =623
+                    Width =1418
+                    ColumnOrder =3
+                    TabIndex =5
+                    GUID = Begin
+                        0x9336eead96a2f249bdd9ca05aee055a9
+                    End
+                    Name ="txtNewNumb"
+                    RowSourceType ="Value List"
+                    RowSource ="1;\"Единственное число\";2;\"Множественное число\""
+                    ColumnWidths ="0"
+                    DefaultValue ="1"
+
+                    LayoutCachedLeft =2356
+                    LayoutCachedTop =623
+                    LayoutCachedWidth =3774
+                    LayoutCachedHeight =863
+                    Begin
+                        Begin Label
+                            OverlapFlags =85
+                            Left =1143
+                            Top =623
+                            Width =1125
+                            Height =240
+                            Name ="Столбец1_подпись"
+                            Caption ="Число"
+                            GUID = Begin
+                                0x8b0757ae3f54b84998663b9ed69e7857
+                            End
+                            LayoutCachedLeft =1143
+                            LayoutCachedTop =623
+                            LayoutCachedWidth =2268
+                            LayoutCachedHeight =863
+                        End
+                    End
+                End
+                Begin ComboBox
+                    LimitToList = NotDefault
+                    Enabled = NotDefault
+                    RowSourceTypeInt =1
+                    OldBorderStyle =0
+                    OverlapFlags =85
+                    IMESentenceMode =3
+                    ColumnCount =2
+                    ListWidth =1710
+                    Left =2356
+                    Top =340
+                    Width =1418
+                    ColumnOrder =4
+                    TabIndex =3
+                    GUID = Begin
+                        0xe5d8aeaaddfdee4a9ebf4ba4eadd21c4
+                    End
+                    Name ="txtWordGender"
+                    RowSourceType ="Value List"
+                    RowSource ="0;\"не определен\";1;\"Мужской\";2;\"Женский\";3;\"Средний\""
+                    ColumnWidths ="0"
+                    DefaultValue ="0"
+
+                    LayoutCachedLeft =2356
+                    LayoutCachedTop =340
+                    LayoutCachedWidth =3774
+                    LayoutCachedHeight =580
+                    Begin
+                        Begin Label
+                            OverlapFlags =85
+                            Left =1143
+                            Top =340
+                            Width =540
+                            Height =240
+                            Name ="Надпись31"
+                            Caption ="Род"
+                            GUID = Begin
+                                0x8a5614986d97374cada5f7dee71a1a2e
+                            End
+                            LayoutCachedLeft =1143
+                            LayoutCachedTop =340
+                            LayoutCachedWidth =1683
+                            LayoutCachedHeight =580
+                        End
+                    End
+                End
+                Begin CommandButton
+                    OverlapFlags =85
+                    Left =6438
+                    Top =15
+                    Width =340
+                    Height =340
+                    Name ="cmdNew"
+                    Caption ="..."
+                    OnClick ="[Event Procedure]"
+                    PictureData = Begin
+                        0x2800000010000000100000000100040000000000800000000000000000000000 ,
+                        0x0000000000000000000000000000800000800000008080008000000080008000 ,
+                        0x8080000080808000c0c0c0000000ff00c0c0c00000ffff00ff000000c0c0c000 ,
+                        0xffff0000ffffff00dadadadadadadada00a00d00adadadad00d00a00dadadada ,
+                        0xadadadadadadadaddadadadadadadadaadadadadadadad00dadad7dadadad000 ,
+                        0xa7ad7c7dadad000d7c7ad7dadad000daa7adadadad000daddadadadad000dada ,
+                        0xada7adad000dadadda7c7ad000dadadaada7ad0b0dadadaddadad0b0dadadada ,
+                        0xadada70dadadadad
+                    End
+                    ObjectPalette = Begin
+                        0x000301000000000000000000
+                    End
+                    ControlTipText ="Нажми меня!"
+                    GUID = Begin
+                        0x71c7d9633d65b24da63028ca984f38bc
+                    End
+
+                    LayoutCachedLeft =6438
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =6778
+                    LayoutCachedHeight =355
+                    WebImagePaddingLeft =2
+                    WebImagePaddingTop =2
+                    WebImagePaddingRight =1
+                    WebImagePaddingBottom =1
+                End
+                Begin Line
+                    OverlapFlags =85
+                    SpecialEffect =5
+                    Left =60
+                    Top =915
+                    Width =6692
+                    Name ="Line02"
+                    GUID = Begin
+                        0x76e14ea536a6674fb9b4468eb9f9c81e
+                    End
+                    LayoutCachedLeft =60
+                    LayoutCachedTop =915
+                    LayoutCachedWidth =6752
+                    LayoutCachedHeight =915
+                End
+                Begin CheckBox
+                    OverlapFlags =85
+                    Left =5418
+                    Top =390
+                    Width =272
+                    Height =230
+                    TabIndex =4
+                    Name ="chkAnimate"
+                    DefaultValue ="0"
+                    GUID = Begin
+                        0xd48ef0b699cca545840929e4eb2d4342
+                    End
+
+                    LayoutCachedLeft =5418
+                    LayoutCachedTop =390
+                    LayoutCachedWidth =5690
+                    LayoutCachedHeight =620
+                    Begin
+                        Begin Label
+                            OverlapFlags =85
+                            Left =3858
+                            Top =345
+                            Width =1545
+                            Height =240
+                            Name ="Надпись37"
+                            Caption ="Одушевлённое"
+                            GUID = Begin
+                                0x17df67250805944486eb2708c68f8faf
+                            End
+                            LayoutCachedLeft =3858
+                            LayoutCachedTop =345
+                            LayoutCachedWidth =5403
+                            LayoutCachedHeight =585
+                        End
+                    End
+                End
+                Begin TextBox
+                    OverlapFlags =85
+                    IMESentenceMode =3
+                    Left =2338
+                    Top =1020
+                    Width =4417
+                    TabIndex =7
+                    Name ="txt0"
+                    GUID = Begin
+                        0x3dfc994ecc3ab547b7f4240626a0ba02
+                    End
+
+                    LayoutCachedLeft =2338
+                    LayoutCachedTop =1020
+                    LayoutCachedWidth =6755
+                    LayoutCachedHeight =1260
+                    Begin
+                        Begin Label
+                            OverlapFlags =85
+                            Left =60
+                            Top =1020
+                            Width =2100
+                            Height =240
+                            FontWeight =700
+                            Name ="lbl0"
+                            Caption ="0"
+                            GUID = Begin
+                                0x1fc03605d88b06469e3ee9eb328e8e72
+                            End
+                            LayoutCachedLeft =60
+                            LayoutCachedTop =1020
+                            LayoutCachedWidth =2160
+                            LayoutCachedHeight =1260
+                        End
+                    End
+                End
+                Begin TextBox
+                    OverlapFlags =85
+                    IMESentenceMode =3
+                    Left =2338
+                    Top =1316
+                    Width =4417
+                    TabIndex =8
+                    Name ="txt1"
+                    GUID = Begin
+                        0xe02b413b27a73f448f769775dd12bb09
+                    End
+
+                    LayoutCachedLeft =2338
+                    LayoutCachedTop =1316
+                    LayoutCachedWidth =6755
+                    LayoutCachedHeight =1556
+                    Begin
+                        Begin Label
+                            OverlapFlags =85
+                            Left =60
+                            Top =1316
+                            Width =2100
+                            Height =240
+                            FontWeight =700
+                            Name ="lbl1"
+                            Caption ="1"
+                            GUID = Begin
+                                0x5f0e188e5b199642aff575c2641ed7b0
+                            End
+                            LayoutCachedLeft =60
+                            LayoutCachedTop =1316
+                            LayoutCachedWidth =2160
+                            LayoutCachedHeight =1556
+                        End
+                    End
+                End
+                Begin TextBox
+                    OverlapFlags =85
+                    IMESentenceMode =3
+                    Left =2338
+                    Top =1612
+                    Width =4417
+                    TabIndex =9
+                    Name ="txt2"
+                    GUID = Begin
+                        0x0d82c687b5499d4a8e23cdc976894d84
+                    End
+
+                    LayoutCachedLeft =2338
+                    LayoutCachedTop =1612
+                    LayoutCachedWidth =6755
+                    LayoutCachedHeight =1852
+                    Begin
+                        Begin Label
+                            OverlapFlags =85
+                            Left =60
+                            Top =1612
+                            Width =2100
+                            Height =240
+                            FontWeight =700
+                            Name ="lbl2"
+                            Caption ="2"
+                            GUID = Begin
+                                0x6d58fce2906db24d92cf5639541545cf
+                            End
+                            LayoutCachedLeft =60
+                            LayoutCachedTop =1612
+                            LayoutCachedWidth =2160
+                            LayoutCachedHeight =1852
+                        End
+                    End
+                End
+                Begin TextBox
+                    OverlapFlags =85
+                    IMESentenceMode =3
+                    Left =2338
+                    Top =1908
+                    Width =4417
+                    TabIndex =10
+                    Name ="txt3"
+                    GUID = Begin
+                        0x8d6d49a7c93ea04ca0bf7b3d983f87f7
+                    End
+
+                    LayoutCachedLeft =2338
+                    LayoutCachedTop =1908
+                    LayoutCachedWidth =6755
+                    LayoutCachedHeight =2148
+                    Begin
+                        Begin Label
+                            OverlapFlags =85
+                            Left =60
+                            Top =1908
+                            Width =2100
+                            Height =240
+                            FontWeight =700
+                            Name ="lbl3"
+                            Caption ="3"
+                            GUID = Begin
+                                0xe4c3badcc1480647a34823eaa095befa
+                            End
+                            LayoutCachedLeft =60
+                            LayoutCachedTop =1908
+                            LayoutCachedWidth =2160
+                            LayoutCachedHeight =2148
+                        End
+                    End
+                End
+                Begin TextBox
+                    OverlapFlags =85
+                    IMESentenceMode =3
+                    Left =2338
+                    Top =2204
+                    Width =4417
+                    TabIndex =11
+                    Name ="txt4"
+                    GUID = Begin
+                        0x7899f4aea0de324bb483573ee0ee9e90
+                    End
+
+                    LayoutCachedLeft =2338
+                    LayoutCachedTop =2204
+                    LayoutCachedWidth =6755
+                    LayoutCachedHeight =2444
+                    Begin
+                        Begin Label
+                            OverlapFlags =85
+                            Left =60
+                            Top =2204
+                            Width =2100
+                            Height =240
+                            FontWeight =700
+                            Name ="lbl4"
+                            Caption ="4"
+                            GUID = Begin
+                                0x49bfb713127ce745a92bca09bb817da8
+                            End
+                            LayoutCachedLeft =60
+                            LayoutCachedTop =2204
+                            LayoutCachedWidth =2160
+                            LayoutCachedHeight =2444
+                        End
+                    End
+                End
+                Begin TextBox
+                    OverlapFlags =85
+                    IMESentenceMode =3
+                    Left =2338
+                    Top =2500
+                    Width =4417
+                    TabIndex =12
+                    Name ="txt5"
+                    GUID = Begin
+                        0xf4f334526eb290488e37280768669eba
+                    End
+
+                    LayoutCachedLeft =2338
+                    LayoutCachedTop =2500
+                    LayoutCachedWidth =6755
+                    LayoutCachedHeight =2740
+                    Begin
+                        Begin Label
+                            OverlapFlags =85
+                            Left =60
+                            Top =2500
+                            Width =2100
+                            Height =240
+                            FontWeight =700
+                            Name ="lbl5"
+                            Caption ="5"
+                            GUID = Begin
+                                0x31ea303ad8f0db4793ab35a2ab4e9a4a
+                            End
+                            LayoutCachedLeft =60
+                            LayoutCachedTop =2500
+                            LayoutCachedWidth =2160
+                            LayoutCachedHeight =2740
+                        End
+                    End
+                End
+            End
+        End
+        Begin FormFooter
+            Height =1665
+            BackColor =-2147483633
+            Name ="ПримечаниеФормы"
+            GUID = Begin
+                0xd85e9bc0ec7d4743b9d7fdf587f05a38
+            End
+            Begin
+                Begin Label
+                    OverlapFlags =85
+                    Left =105
+                    Top =60
+                    Width =6645
+                    Height =1605
+                    Name ="lblComment"
+                    Caption ="Комментарий"
+                    GUID = Begin
+                        0x3d89a34f6cee2347af8bd6d88ff4088b
+                    End
+                    LayoutCachedLeft =105
+                    LayoutCachedTop =60
+                    LayoutCachedWidth =6750
+                    LayoutCachedHeight =1665
+                End
+                Begin Line
+                    OverlapFlags =85
+                    SpecialEffect =5
+                    Left =60
+                    Top =30
+                    Width =6701
+                    Name ="Line03"
+                    GUID = Begin
+                        0xd4a458c073ae7b43967b64872807fdfb
+                    End
+                    LayoutCachedLeft =60
+                    LayoutCachedTop =30
+                    LayoutCachedWidth =6761
+                    LayoutCachedHeight =30
+                End
+            End
+        End
+    End
+End
+CodeBehindForm
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = False
+Option Compare Database
+Option Explicit
+Private Const c_strTitle = "Склонение слов"
+Private Const c_strComment = "Основное назначение - склонение пар ""подлежащее - определение"" и ФИО." & vbCrLf & _
+                             "Пример не делает разбор предложения, не анализирует семантику и не занимается согласованием слов в фразе, также - никак не различает одушевленные/неодушевленные. Просто бьет строку на куски по набору разделителей и склоняет каждое слово, кроме указанных в списке пропуска, по набору правил/исключений заданных в функции DeclineWord." & vbCrLf & _
+                             "На самом деле этого вполне достаточно в 90% случаев. Если что-то склоняется неправильно, единственный выход - скорректировать правила под себя."
+Private Const c_strLink = ""
+Private Const Indent = 70 '0.125 * cm   ' отступ от края формы и расстояние между контроламиPrivate Const Indent = 0.15 * cm
+Private iMin As Byte, iMax As Byte, iStep As Byte
+Private m_bytState As Byte
+Private Sub Form_Open(Cancel As Integer):
+Const cShadow = 0.075 * cm
+    lblTitle.Caption = c_strTitle: lblTitle2.Caption = lblTitle.Caption: lblTitle2.Left = lblTitle.Left + cShadow: lblTitle2.Top = lblTitle.Top + cShadow
+    lblComment.Caption = c_strComment
+    'lblLink.Caption = c_strLink: lblLink.HyperlinkAddress = c_strLink
+    InsideHeight = Section(acDetail).Height + Section(acHeader).Height + Section(acFooter).Height
+' начальные значения
+    iMin = LBound(Samples): iMax = UBound(Samples): iStep = 4
+    m_bytState = p_SwitchSamples(iMin)
+Dim i As Byte
+    ' =DeclineWords(Words,NewCase,NewNumb,NewGend,Animate,IsFio,SkipWords)
+Dim aDec: aDec = Array(DeclineCaseImen, DeclineCaseRod, DeclineCaseDat, DeclineCaseVin, DeclineCaseTvor, DeclineCasePred)
+Dim aTxt: aTxt = Array(DeclineCaseImen & ": им. (кто, что?)", _
+                       DeclineCaseRod & ": род. (кого, чего?)", _
+                       DeclineCaseDat & ": дат. (кому, чему?)", _
+                       DeclineCaseVin & ": вин. (кого, что?)", _
+                       DeclineCaseTvor & ": твор. (кем, чем?)", _
+                       DeclineCasePred & ": пред. (о ком, о чём?)")
+    For i = 0 To 5
+        With Me.Controls("txt" & i)
+            .ControlSource = "=DeclineWords(Nz([txtInput],'')," & aDec(i) & ",txtNewNumb,txtWordGender,chkAnimate,chkIsFIO,Nz(txtSkipWords,''))":
+            .Controls(0).Caption = aTxt(i)
+        End With
+    Next i
+    Form_Resize
+End Sub
+Private Sub Form_Resize()
+' обрабатываем изменение границ
+    On Error Resume Next 'GoTo HandleError
+Dim tmpWidth As Long:   tmpWidth = Me.InsideWidth '- ConvPixelsToTwips(rct.Right - rct.Left)
+Dim i As Long
+    For i = 1 To 9
+        With Controls("Line" & Format$(i, "00"))
+            If Err Then Err.Clear Else .Left = Indent: .Width = tmpWidth - 2 * Indent
+        End With
+    Next i
+' ресайзим дополнительные контролы по форме
+    With lblTitle:      .Width = tmpWidth - 4 * Indent: End With
+    With lblTitle2:     .Width = tmpWidth - 4 * Indent: End With
+    With lblComment:    .Width = tmpWidth - 4 * Indent: End With
+    'With lblLink:       .Width = tmpWidth - 4 * Indent: End With
+    
+    On Error GoTo HandleError
+    On Error GoTo HandleError
+    With cmdNew
+        .Left = InsideWidth - .Width - Indent
+    End With
+    With txtInput
+        .Width = InsideWidth - 4 * cm - cmdNew.Width - 3 * Indent
+        .Left = Indent + 4 * cm ': .Top = Indent
+    End With
+    For i = 0 To 5
+    With Controls("txt" & i)
+        .Width = InsideWidth - 4 * cm - 2 * Indent
+        .Left = Indent + 4 * cm ': .Top = Indent
+    End With
+    Next i
+
+HandleExit:  Exit Sub
+HandleError: Err.Clear: Resume HandleExit
+    Select Case Err.Number
+    Case 2100 ' Элемент не может быть размещен в указанном месте
+'        Section(acDetail).Height = Section(acDetail).Height + 2 * Indent
+    Case Else: Stop
+    End Select
+    Err.Clear: Resume HandleExit
+End Sub
+
+Private Sub cmdNew_Click(): m_bytState = p_SwitchSamples(m_bytState + iStep): End Sub
+Private Function Samples()
+' массив данных для примера
+' Элемент массива: [i+0]=Words, [i+1]=Animate, [i+2]=IsFio, [i+3]=SkipWords
+    Samples = Array( _
+        "Чёрная кошка, - белый кот", -1, 0, "", _
+        "Tонкая красная линия! Глубокое синее море...", 0, 0, "", _
+        "Самый маленький Гном", -1, 0, "", _
+        "Ложь?: нож (приз) ночь ноль", 0, 0, "", _
+        "Чёрный дрозд.. Грач-дрыщ,- кныш+сыч", -1, 0, "", _
+        "Конь-ОГОНЬ", -1, 0, "", _
+        "ПроЧая ШеЛуПоНь..", 0, 0, "", _
+        "Лицо, виновное в совершении нарушения", -1, 0, "3-", _
+        "Голохвастов Симон Боливарович", -1, -1, "", _
+        "Прутков Козьма Петрович", -1, -1, "", _
+        "Терешкова Валентина Владимировна", -1, -1, "", _
+        "последний дюйм", 0, 0, "", _
+        "это конец...", 0, 0, "")
+End Function
+Private Function p_SwitchSamples(ByRef i As Byte) As Byte
+    If i < iMin Or i > iMax Then i = iMin
+    txtInput.Value = Samples(i)
+    chkAnimate = Samples(i + 1)
+    chkIsFIO = Samples(i + 2)
+    txtSkipWords = Samples(i + 3)
+    p_SwitchSamples = i
+End Function

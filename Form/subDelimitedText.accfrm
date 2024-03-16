@@ -1,0 +1,130 @@
+Version =20
+VersionRequired =20
+Checksum =-1589504801
+Begin Form
+    AllowDesignChanges = NotDefault
+    MaxRecButton = NotDefault
+    ScrollBars =2
+    ViewsAllowed =1
+    TabularCharSet =204
+    TabularFamily =0
+    PictureAlignment =2
+    DatasheetGridlinesBehavior =3
+    GridY =10
+    Width =6655
+    DatasheetFontHeight =10
+    Left =3165
+    Top =3210
+    Right =9705
+    Bottom =5160
+    DatasheetGridlinesColor =12632256
+    MaxRecords =0
+    RecSrcDt = Begin
+        0xfb90686093efe540
+    End
+    GUID = Begin
+        0xcf7f1f72ce49224b872b0bf267507289
+    End
+    NameMap = Begin
+        0x0acc0e5500000000000000000000000000000000000000000c00000003000000 ,
+        0x0000000000000000000000000000
+    End
+    OnCurrent ="[Event Procedure]"
+    OnDelete ="[Event Procedure]"
+    AfterUpdate ="[Event Procedure]"
+    DatasheetFontName ="Arial"
+    PrtMip = Begin
+        0x3702000037020000370200003702000000000000201c0000e010000001000000 ,
+        0x010000006801000000000000a10700000100000001000000
+    End
+    PrtDevMode = Begin
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x01041b089c006c01036e07000100090000000000640001000100580202000100 ,
+        0x5802030000004134000000000000000000000000000000000000000000000000 ,
+        0x0000000000005802180000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000046500800 ,
+        0x4d53414343455353000000000000000000000000000000000000000000000000 ,
+        0xff3e03005802a700a700a700a700010000003100436f7572696572204e657700 ,
+        0x0000000000000000000000000000000000000000010001000200000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+        0x0000000000000000000000000000000000000000000000000000000000006000 ,
+        0x4b002c0100800000
+    End
+    PrtDevNames = Begin
+        0x0800140027000100000000000000000000000000000000000000000000000000 ,
+        0x00000000000000465052383a00
+    End
+    AllowDatasheetView =0
+    AllowPivotTableView =0
+    AllowPivotChartView =0
+    AllowPivotChartView =0
+    NoSaveCTIWhenDisabled =1
+    Begin
+        Begin Label
+            BackStyle =0
+            TextFontCharSet =204
+            FontName ="Tahoma"
+        End
+        Begin TextBox
+            FELineBreak = NotDefault
+            SpecialEffect =2
+            OldBorderStyle =0
+            TextFontCharSet =204
+            Width =1701
+            LabelX =-1701
+            FontName ="Tahoma"
+            AsianLineBreak =255
+        End
+        Begin ComboBox
+            SpecialEffect =2
+            TextFontCharSet =204
+            Width =1701
+            LabelX =-1701
+            FontName ="Tahoma"
+        End
+        Begin Section
+            Height =240
+            BackColor =-2147483633
+            Name ="ОбластьДанных"
+            GUID = Begin
+                0x69efec519d868345830471be2e7f9aec
+            End
+            Begin
+                Begin TextBox
+                    OverlapFlags =93
+                    IMESentenceMode =3
+                    Left =1701
+                    Width =4564
+                    TabIndex =1
+                    Name ="txtVal"
+                    ControlSource ="TextVal"
+                    GUID = Begin
+                        0x2acf2eb907b3874a97b10a97560cbc29
+                    End
+                End
+                Begin TextBox
+                    Locked = NotDefault
+                    OldBorderStyle =1
+                    OverlapFlags =87
+                    IMESentenceMode =3
+                    Name ="txtIdx"
+                    ControlSource ="TextIdx"
+                    GUID = Begin
+                        0x76abadcd946bdf48a9317516afa23f58
+                    End
+                End
+            End
+        End
+    End
+End
+CodeBehindForm
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = False

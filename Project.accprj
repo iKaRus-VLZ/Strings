@@ -1,0 +1,42 @@
+[Project]
+Name="Strings"
+Description="Примеры работы со строками функций модуля modStrings"
+Help=""
+[Custom Properties]
+Support="KashRus@gmail.com"
+Version="1.0.0.453665262"
+Author="Кашкин Р.В."
+Application="Strings"
+[Database Properties]
+QueryTimeout=Integer:60
+ANSI Query Mode=Long:0
+Themed Form Controls=Long:1
+Auto Compact=Long:1
+Show Values Limit=Long:1000
+Show Values in Indexed=Long:1
+Show Values in Non-Indexed=Long:1
+Show Values in Remote=Long:0
+Show Values in Snapshot=Long:1
+Show Values in Server=Long:0
+Use Default Page Folder=Long:0
+Use Default Connection File=Long:0
+Row Limit=Long:10000
+NavPane Closed=Long:0
+NavPane Width=Long:215
+NavPane Category=Long:0
+NavPane View By=Long:0
+NavPane Sort By=Long:1
+Show Navigation Pane Search Bar=Long:0
+StartUpForm="Form.~RunMe"
+StartUpShowDBWindow=True
+StartUpShowStatusBar=True
+AllowShortcutMenus=True
+AllowFullMenus=True
+AllowBuiltInToolbars=True
+AllowToolbarChanges=True
+AllowSpecialKeys=True
+UseAppIconForFrmRpt=False
+[References]
+stdole={00020430-0000-0000-C000-000000000046}|2|0|C:\Windows\System32\stdole2.tlb
+MSForms={0D452EE1-E08F-101A-852E-02608C4D0BB4}|2|0|C:\WINDOWS\system32\FM20.DLL
+DAO={4AC9E1DA-5BAD-4AC7-86E3-24F4CDCECA28}|12|0|C:\Program Files\Common Files\Microsoft Shared\OFFICE16\ACEDAO.DLL
