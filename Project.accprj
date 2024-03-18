@@ -4,7 +4,7 @@ Description="Примеры работы со строками функций модуля modStrings"
 Help=""
 [Custom Properties]
 Support="KashRus@gmail.com"
-Version="1.0.0.453665262"
+Version="1.0.0.453694289"
 Author="Кашкин Р.В."
 Application="Strings"
 [Database Properties]
@@ -38,5 +38,7 @@ AllowSpecialKeys=True
 UseAppIconForFrmRpt=False
 [References]
 stdole={00020430-0000-0000-C000-000000000046}|2|0|C:\Windows\System32\stdole2.tlb
+ADODB={00000205-0000-0010-8000-00AA006D2EA4}|2|5|C:\Program Files\Common Files\System\ado\msado25.tlb
 MSForms={0D452EE1-E08F-101A-852E-02608C4D0BB4}|2|0|C:\WINDOWS\system32\FM20.DLL
+VBIDE={0002E157-0000-0000-C000-000000000046}|5|3|C:\Program Files (x86)\Common Files\Microsoft Shared\VBA\VBA6\VBE6EXT.OLB
 DAO={4AC9E1DA-5BAD-4AC7-86E3-24F4CDCECA28}|12|0|C:\Program Files\Common Files\Microsoft Shared\OFFICE16\ACEDAO.DLL

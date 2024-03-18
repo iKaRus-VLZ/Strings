@@ -1,6 +1,6 @@
 Version =20
 VersionRequired =20
-Checksum =1925823431
+Checksum =-1442936227
 Begin Form
     RecordSelectors = NotDefault
     NavigationButtons = NotDefault
@@ -19,9 +19,9 @@ Begin Form
     DatasheetFontHeight =10
     ItemSuffix =18
     Left =750
-    Top =555
+    Top =1335
     Right =7440
-    Bottom =5115
+    Bottom =5895
     DatasheetGridlinesColor =12632256
     Tag ="BackColor=Light"
     RecSrcDt = Begin
@@ -367,7 +367,7 @@ Begin Form
                 Begin Label
                     OverlapFlags =93
                     Left =103
-                    Top =73
+                    Top =103
                     Width =6665
                     Height =454
                     FontSize =14
@@ -385,9 +385,9 @@ Begin Form
                     LayoutCachedHeight =557
                 End
                 Begin Label
-                    OverlapFlags =215
+                    OverlapFlags =223
                     Left =60
-                    Top =30
+                    Top =60
                     Width =6665
                     Height =454
                     FontSize =14
@@ -724,7 +724,6 @@ Begin Form
                     OverlapFlags =85
                     SpecialEffect =5
                     Left =70
-                    Top =15
                     Width =6805
                     Name ="Line03"
                     GUID = Begin
@@ -736,7 +735,7 @@ Begin Form
                 Begin Label
                     OverlapFlags =93
                     Left =60
-                    Top =46
+                    Top =31
                     Width =6665
                     Height =825
                     Name ="lblComment"
@@ -752,7 +751,7 @@ Begin Form
                 Begin Label
                     OverlapFlags =87
                     Left =60
-                    Top =871
+                    Top =856
                     Width =6665
                     Height =240
                     ForeColor =16711680
