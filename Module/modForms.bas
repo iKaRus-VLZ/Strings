@@ -206,18 +206,18 @@ Public Enum eControlSplit   ' тип разделителя
     cdHorz = 2                  ' горизонтальный сплиттер
 '    cdBoth = 3                 ' ??? это как ???
 End Enum
-'Public Enum eAlignText ' выравнивание текста
-'    TA_LEFT = 0                 ' Опорная точка находится на левой кромке рабочего прямоугольника.
-'    TA_RIGHT = 2                ' Опорная точка находится на правой кромке рабочего прямоугольника.
-'    TA_CENTER = 6               ' Опорная точка выравнивается горизонтально по центру рабочего прямоугольника.
-'    TA_TOP = 0                  ' Опорная точка на верхней кромке рабочего прямоугольника.
-'    TA_BOTTOM = 8               ' Опорная точка на нижней кромке рабочего прямоугольника.
-'    TA_BASELINE = 24            ' Опорная точка находится на базовой линии текста.
-'    TA_RTLREADING = 256         ' Редакция Windows на языках Ближнего Востока: Текст размечается для порядка чтения справа налево , в противоположность порядку чтения по умолчанию слева направо. Это применяется только тогда, когда шрифт, выбранный в контекст устройства предназначен или для Еврейского или для Арабского языка.
-''    TA_NOUPDATECP               ' Текущая позиция не модифицируется после каждого вызова вывода текста.
-''    TA_UPDATECP                 ' Текущая позиция модифицируется после каждого вызова вывода текста.
-''    TA_MASK  = (TA_BASELINE + TA_CENTER + TA_UPDATECP)
-'End Enum
+Public Enum eAlignText ' выравнивание текста
+    TA_LEFT = 0                 ' Опорная точка находится на левой кромке рабочего прямоугольника.
+    TA_RIGHT = 2                ' Опорная точка находится на правой кромке рабочего прямоугольника.
+    TA_CENTER = 6               ' Опорная точка выравнивается горизонтально по центру рабочего прямоугольника.
+    TA_TOP = 0                  ' Опорная точка на верхней кромке рабочего прямоугольника.
+    TA_BOTTOM = 8               ' Опорная точка на нижней кромке рабочего прямоугольника.
+    TA_BASELINE = 24            ' Опорная точка находится на базовой линии текста.
+    TA_RTLREADING = 256         ' Редакция Windows на языках Ближнего Востока: Текст размечается для порядка чтения справа налево , в противоположность порядку чтения по умолчанию слева направо. Это применяется только тогда, когда шрифт, выбранный в контекст устройства предназначен или для Еврейского или для Арабского языка.
+'    TA_NOUPDATECP               ' Текущая позиция не модифицируется после каждого вызова вывода текста.
+'    TA_UPDATECP                 ' Текущая позиция модифицируется после каждого вызова вывода текста.
+'    TA_MASK  = (TA_BASELINE + TA_CENTER + TA_UPDATECP)
+End Enum
 'Public Enum eObjSizeMode    ' режим изменения размеров изображения
 '    apObjSizeClip = acOLESizeClip           ' 0 - не меняем размер. если размер больше области вывода - обрезка
 '    apObjSizeStretch = acOLESizeStretch     ' 1 - сжатие/растяжение (нарушает пропорции)
@@ -1034,54 +1034,54 @@ Public Function FormOpenContext( _
     Optional Arrange As eAlign = eAlignLeftTop, _
     Optional Visible As Boolean = True)
 ' создает и открывает контекстное меню
-'Const c_strProcedure = "FormOpenContext"
-'' ContextData - перечень элементов меню или имя запроса источника элементов
-'' ContextMenu - ссылка на открываемое (созданое) меню
-'' ContextVal - значение контекстного меню (отображаемое по-умолчанию или возвращаемое)
-'' ContextName - имя создаваемого меню (по-умолчанию - "~tmpContextMenu")
-'' Parent  - ссылка на родительский объект
-'' X, Y - координаты вывода меню
-'' Visible - определяет создавать контекстное меню видимым или не видимым
-'' Arrange - тип выравнивания меню отн-но координат (по-умолчанию координаты задают верхний левый угол меню)
-'Const cstrContextName = "~tmpContextMenu"
-'Dim mnu As clsContextMenu
-'Dim strWhere As String
-'Dim Ret As Long
-'    ContextName = Trim$(ContextName)
-'    'If Len(ContextName) = 0 Then ContextName = cstrContextName
-'' создаем контекстное меню
-'    Set mnu = New clsContextMenu 'Set ContextMenu = Application.CommandBars.Add(Name:=ContextName, Position:=msoBarPopup)
-'    With mnu ' ContextMenu
-'        .CreateContextMenu ContextName
-'    ' проверяем ContextData
-''Stop
-'On Error Resume Next
-'    ' код контекстного меню по таблице SysMenu
-'        If IsNumeric(ContextData) Then Ret = .CreateItemsFromSQL(c_strTableMenu, WhereCond:=c_strParent & sqlEqual & ContextData): GoTo HandleShow
-'Dim dbs As DAO.Database: Set dbs = CurrentDb
-'Dim rst As DAO.Recordset
-'Dim strSQL As String
-'    ' кодовое имя контекстного меню по таблице SysMenu
-'        strSQL = sqlSelectAll & c_strTableMenu & sqlWhere & c_strCName & sqlEqual & "'" & ContextData & "'"
-'        Set rst = dbs.OpenRecordset(strSQL): If Err Then Err.Clear Else Ret = .CreateItemsFromSQL(c_strTableMenu, WhereCond:=c_strParent & sqlEqual & rst.Fields(c_strKey)): GoTo HandleShow
-'    ' имя таблицы/запроса/связаной таблицы
-'        Set rst = dbs.OpenRecordset(ContextData): If Err Then Err.Clear Else Ret = .CreateItemsFromSQL(ContextData): GoTo HandleShow
-'    ' список элементов
-'        Ret = .CreateItemsFromString(ContextData)
-'HandleShow:
-'' выводим и ждём выбора
-'        If Ret Then
-'            .ShowMenu x, y ', Arrange ' перемещаем окно
-'            ContextVal = .Value
-'        Else
-'            .RemoveContextMenu ContextName: Set mnu = Nothing
-'        End If
-'    End With
-'    'Result = ContextVal
-'    Set ContextMenu = mnu
-'    'DoCmd.Echo True' Включаем отображение на экране
-'HandleExit:  Exit Function
-'HandleError: Err.Clear: Resume HandleExit
+Const c_strProcedure = "FormOpenContext"
+' ContextData - перечень элементов меню или имя запроса источника элементов
+' ContextMenu - ссылка на открываемое (созданое) меню
+' ContextVal - значение контекстного меню (отображаемое по-умолчанию или возвращаемое)
+' ContextName - имя создаваемого меню (по-умолчанию - "~tmpContextMenu")
+' Parent  - ссылка на родительский объект
+' X, Y - координаты вывода меню
+' Visible - определяет создавать контекстное меню видимым или не видимым
+' Arrange - тип выравнивания меню отн-но координат (по-умолчанию координаты задают верхний левый угол меню)
+Const cstrContextName = "~tmpContextMenu"
+Dim mnu As clsContextMenu
+Dim strWhere As String
+Dim Ret As Long
+    ContextName = Trim$(ContextName)
+    'If Len(ContextName) = 0 Then ContextName = cstrContextName
+' создаем контекстное меню
+    Set mnu = New clsContextMenu 'Set ContextMenu = Application.CommandBars.Add(Name:=ContextName, Position:=msoBarPopup)
+    With mnu ' ContextMenu
+        .CreateContextMenu ContextName
+    ' проверяем ContextData
+'Stop
+On Error Resume Next
+    ' код контекстного меню по таблице SysMenu
+        If IsNumeric(ContextData) Then Ret = .CreateItemsFromSQL(c_strTableMenu, WhereCond:=c_strParent & sqlEqual & ContextData): GoTo HandleShow
+Dim dbs As DAO.Database: Set dbs = CurrentDb
+Dim rst As DAO.Recordset
+Dim strSQL As String
+    ' кодовое имя контекстного меню по таблице SysMenu
+        strSQL = sqlSelectAll & c_strTableMenu & sqlWhere & c_strCName & sqlEqual & "'" & ContextData & "'"
+        Set rst = dbs.OpenRecordset(strSQL): If Err Then Err.Clear Else Ret = .CreateItemsFromSQL(c_strTableMenu, WhereCond:=c_strParent & sqlEqual & rst.Fields(c_strKey)): GoTo HandleShow
+    ' имя таблицы/запроса/связаной таблицы
+        Set rst = dbs.OpenRecordset(ContextData): If Err Then Err.Clear Else Ret = .CreateItemsFromSQL(ContextData): GoTo HandleShow
+    ' список элементов
+        Ret = .CreateItemsFromString(ContextData)
+HandleShow:
+' выводим и ждём выбора
+        If Ret Then
+            .ShowMenu x, y ', Arrange ' перемещаем окно
+            ContextVal = .Value
+        Else
+            .RemoveContextMenu ContextName: Set mnu = Nothing
+        End If
+    End With
+    'Result = ContextVal
+    Set ContextMenu = mnu
+    'DoCmd.Echo True' Включаем отображение на экране
+HandleExit:  Exit Function
+HandleError: Err.Clear: Resume HandleExit
 End Function
 
 Public Function ReportOpen( _
@@ -1278,7 +1278,7 @@ Dim tmp, i As Long
             If IsNumeric(tmp) Then .Section(i).BackColor = tmp
         Next i
         If Not IsMissing(Icon) Then
-'            With AccObject: Call PictureData_SetIcon(.hwnd, Icon): End With
+            With AccObject: Call PictureData_SetIcon(.hwnd, Icon): End With
         End If
 ' ...
 ' ToDo: сделать нормальную инициализациию оформления/позиционирования контролов формы
