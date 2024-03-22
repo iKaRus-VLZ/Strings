@@ -807,7 +807,7 @@ End Function
 Public Function IsSubForm(frm As Form) As Boolean
 ' Проверяет открыта ли форма как субформа
     On Error Resume Next
-Dim strName As String: strName = frm.PARENT.Name
+Dim strName As String: strName = frm.PARENT.NAME
     IsSubForm = (Err.Number = 0): Err.Clear
 End Function
 
@@ -825,7 +825,7 @@ Public Function IsFormExists(FormName As String) As Boolean
 ' проверяет существует ли форма
 Dim Result As Boolean:  Result = False
     On Error GoTo HandleError
-    Result = (CurrentProject.AllForms(FormName).Name = FormName) '
+    Result = (CurrentProject.AllForms(FormName).NAME = FormName) '
 HandleExit:  IsFormExists = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
@@ -867,7 +867,7 @@ Public Function IsReportExists(FormName As String) As Boolean
 ' проверяет существует ли отчёт
 Dim Result As Boolean:  Result = False
     On Error GoTo HandleError
-    Result = (CurrentProject.AllReports(FormName).Name = FormName) '
+    Result = (CurrentProject.AllReports(FormName).NAME = FormName) '
 HandleExit:  IsReportExists = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
@@ -953,7 +953,7 @@ Dim tmpWinMode As AcWindowMode: tmpWinMode = acHidden '  WindowMode
 '----------------------------------
 Dim i As Long
     For i = Application.Forms.Count - 1 To 0 Step -1
-        Result = (Application.Forms(i).Name = FormName):   If Result Then Set NewForm = Application.Forms(i):   Exit For
+        Result = (Application.Forms(i).NAME = FormName):   If Result Then Set NewForm = Application.Forms(i):   Exit For
     Next i
     If Not Result Then: Err.Raise vbObjectError + 512
 '----------------------------------
@@ -1014,7 +1014,7 @@ Dim bolModal As Boolean: bolModal = (.ModalResult = .ModalResult)
 ' гоняем в цикле пока не дождёмся выбора пользователя
     If bolModal Then
         Do While .Visible: DoEvents: Loop: If .ModalResult = vbOK Then Result = .Value
-        DoCmd.Close acForm, NewForm.Name, acSaveNo: Set NewForm = Nothing ' если открывали модальную - после получения ответа закрываем
+        DoCmd.Close acForm, NewForm.NAME, acSaveNo: Set NewForm = Nothing ' если открывали модальную - после получения ответа закрываем
     End If
     End With
 ' возвращаем результат в исходное поле
@@ -1033,53 +1033,53 @@ Public Function FormOpenContext( _
     Optional x, Optional y, _
     Optional Arrange As eAlign = eAlignLeftTop, _
     Optional Visible As Boolean = True)
-' создает и открывает контекстное меню
-Const c_strProcedure = "FormOpenContext"
-' ContextData - перечень элементов меню или имя запроса источника элементов
-' ContextMenu - ссылка на открываемое (созданое) меню
-' ContextVal - значение контекстного меню (отображаемое по-умолчанию или возвращаемое)
-' ContextName - имя создаваемого меню (по-умолчанию - "~tmpContextMenu")
-' Parent  - ссылка на родительский объект
-' X, Y - координаты вывода меню
-' Visible - определяет создавать контекстное меню видимым или не видимым
-' Arrange - тип выравнивания меню отн-но координат (по-умолчанию координаты задают верхний левый угол меню)
-Const cstrContextName = "~tmpContextMenu"
-Dim mnu As clsContextMenu
-Dim strWhere As String
-Dim Ret As Long
-    ContextName = Trim$(ContextName)
-    'If Len(ContextName) = 0 Then ContextName = cstrContextName
-' создаем контекстное меню
-    Set mnu = New clsContextMenu 'Set ContextMenu = Application.CommandBars.Add(Name:=ContextName, Position:=msoBarPopup)
-    With mnu ' ContextMenu
-        .CreateContextMenu ContextName
-    ' проверяем ContextData
-'Stop
-On Error Resume Next
-    ' код контекстного меню по таблице SysMenu
-        If IsNumeric(ContextData) Then Ret = .CreateItemsFromSQL(c_strTableMenu, WhereCond:=c_strParent & sqlEqual & ContextData): GoTo HandleShow
-Dim dbs As DAO.Database: Set dbs = CurrentDb
-Dim rst As DAO.Recordset
-Dim strSQL As String
-    ' кодовое имя контекстного меню по таблице SysMenu
-        strSQL = sqlSelectAll & c_strTableMenu & sqlWhere & c_strCName & sqlEqual & "'" & ContextData & "'"
-        Set rst = dbs.OpenRecordset(strSQL): If Err Then Err.Clear Else Ret = .CreateItemsFromSQL(c_strTableMenu, WhereCond:=c_strParent & sqlEqual & rst.Fields(c_strKey)): GoTo HandleShow
-    ' имя таблицы/запроса/связаной таблицы
-        Set rst = dbs.OpenRecordset(ContextData): If Err Then Err.Clear Else Ret = .CreateItemsFromSQL(ContextData): GoTo HandleShow
-    ' список элементов
-        Ret = .CreateItemsFromString(ContextData)
-HandleShow:
-' выводим и ждём выбора
-        If Ret Then
-            .ShowMenu x, y ', Arrange ' перемещаем окно
-            ContextVal = .Value
-        Else
-            .RemoveContextMenu ContextName: Set mnu = Nothing
-        End If
-    End With
-    'Result = ContextVal
-    Set ContextMenu = mnu
-    'DoCmd.Echo True' Включаем отображение на экране
+'' создает и открывает контекстное меню
+'Const c_strProcedure = "FormOpenContext"
+'' ContextData - перечень элементов меню или имя запроса источника элементов
+'' ContextMenu - ссылка на открываемое (созданое) меню
+'' ContextVal - значение контекстного меню (отображаемое по-умолчанию или возвращаемое)
+'' ContextName - имя создаваемого меню (по-умолчанию - "~tmpContextMenu")
+'' Parent  - ссылка на родительский объект
+'' X, Y - координаты вывода меню
+'' Visible - определяет создавать контекстное меню видимым или не видимым
+'' Arrange - тип выравнивания меню отн-но координат (по-умолчанию координаты задают верхний левый угол меню)
+'Const cstrContextName = "~tmpContextMenu"
+'Dim mnu As clsContextMenu
+'Dim strWhere As String
+'Dim Ret As Long
+'    ContextName = Trim$(ContextName)
+'    'If Len(ContextName) = 0 Then ContextName = cstrContextName
+'' создаем контекстное меню
+'    Set mnu = New clsContextMenu 'Set ContextMenu = Application.CommandBars.Add(Name:=ContextName, Position:=msoBarPopup)
+'    With mnu ' ContextMenu
+'        .CreateContextMenu ContextName
+'    ' проверяем ContextData
+''Stop
+'On Error Resume Next
+'    ' код контекстного меню по таблице SysMenu
+'        If IsNumeric(ContextData) Then Ret = .CreateItemsFromSQL(c_strTableMenu, WhereCond:=c_strParent & sqlEqual & ContextData): GoTo HandleShow
+'Dim dbs As DAO.Database: Set dbs = CurrentDb
+'Dim rst As DAO.Recordset
+'Dim strSQL As String
+'    ' кодовое имя контекстного меню по таблице SysMenu
+'        strSQL = sqlSelectAll & c_strTableMenu & sqlWhere & c_strCName & sqlEqual & "'" & ContextData & "'"
+'        Set rst = dbs.OpenRecordset(strSQL): If Err Then Err.Clear Else Ret = .CreateItemsFromSQL(c_strTableMenu, WhereCond:=c_strParent & sqlEqual & rst.Fields(c_strKey)): GoTo HandleShow
+'    ' имя таблицы/запроса/связаной таблицы
+'        Set rst = dbs.OpenRecordset(ContextData): If Err Then Err.Clear Else Ret = .CreateItemsFromSQL(ContextData): GoTo HandleShow
+'    ' список элементов
+'        Ret = .CreateItemsFromString(ContextData)
+'HandleShow:
+'' выводим и ждём выбора
+'        If Ret Then
+'            .ShowMenu x, y ', Arrange ' перемещаем окно
+'            ContextVal = .Value
+'        Else
+'            .RemoveContextMenu ContextName: Set mnu = Nothing
+'        End If
+'    End With
+'    'Result = ContextVal
+'    Set ContextMenu = mnu
+'    'DoCmd.Echo True' Включаем отображение на экране
 HandleExit:  Exit Function
 HandleError: Err.Clear: Resume HandleExit
 End Function
@@ -1130,7 +1130,7 @@ Dim acState As acFormState: acState = SysCmd(acSysCmdGetObjectState, acReport, R
 '----------------------------------
 Dim i As Long
     For i = Application.Reports.Count - 1 To 0 Step -1
-        Result = (Application.Reports(i).Name = ReportName): If Result Then Set NewReport = Application.Reports(i): Exit For
+        Result = (Application.Reports(i).NAME = ReportName): If Result Then Set NewReport = Application.Reports(i): Exit For
     Next i
 '----------------------------------
 ' задаём свойства объекта
@@ -1277,9 +1277,9 @@ Dim tmp, i As Long
             If IsNull(tmp) Then tmp = GetColorFromText(TaggedStringGet(.Tag, adhcBackColor)): Err.Clear
             If IsNumeric(tmp) Then .Section(i).BackColor = tmp
         Next i
-        If Not IsMissing(Icon) Then
-            With AccObject: Call PictureData_SetIcon(.hwnd, Icon): End With
-        End If
+'        If Not IsMissing(Icon) Then
+'            With AccObject: Call PictureData_SetIcon(.hwnd, Icon): End With
+'        End If
 ' ...
 ' ToDo: сделать нормальную инициализациию оформления/позиционирования контролов формы
 ' !!! надо отдельно обрабатывать встроенные формы и группы контролов
@@ -1820,7 +1820,7 @@ Dim i&, Result&, s$
     With frm
         For i = acDetail To acGroupLevel2Footer
             Err.Clear
-            s = .Section(i).Name
+            s = .Section(i).NAME
             If Err = 0 Then Result = Result + 1
         Next i
     End With
@@ -2000,7 +2000,7 @@ Public Function IsControlExists(frm As Form, ctlName As String) As Boolean
     On Error Resume Next
 Dim strValue As String
     ' If you can retrieve the value, the such control exists.
-    strValue = frm.Controls(ctlName).Name
+    strValue = frm.Controls(ctlName).NAME
     IsControlExists = (Err.Number = 0)
     Err.Clear
 End Function
