@@ -1,6 +1,6 @@
 Version =20
 VersionRequired =20
-Checksum =-1589504801
+Checksum =-1825815485
 Begin Form
     AllowDesignChanges = NotDefault
     MaxRecButton = NotDefault
@@ -64,7 +64,6 @@ Begin Form
     AllowPivotTableView =0
     AllowPivotChartView =0
     AllowPivotChartView =0
-    NoSaveCTIWhenDisabled =1
     Begin
         Begin Label
             BackStyle =0

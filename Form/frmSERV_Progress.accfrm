@@ -1,6 +1,6 @@
 Version =20
 VersionRequired =20
-Checksum =850468840
+Checksum =1360834123
 Begin Form
     PopUp = NotDefault
     Modal = NotDefault
@@ -77,9 +77,13 @@ Begin Form
     AllowPivotTableView =0
     AllowPivotChartView =0
     AllowPivotChartView =0
-    FilterOnLoad =0
-    DatasheetGridlinesColor12 =12632256
-    PrtDevModeW = Begin
+    UnknownProp = {305 ,452 ,1 ,1 ,1 } Begin
+        0x00
+    End
+    UnknownProp = {400 ,582 ,4 ,4 ,4 } Begin
+        0xc0c0c000
+    End
+    UnknownProp = {419 ,678 ,11 ,0 ,584 } Begin
         0x000068020000000002000002000000004005b804000000000000000000000000 ,
         0x8807680200000000280000280000000088076802000000008047db0400000000 ,
         0x01040b0bdc006c01036e07000100090000000000640001000100580202000100 ,
@@ -100,13 +104,12 @@ Begin Form
         0x0000000000000000000000000000000000000000000000000000000000006000 ,
         0x4b002c0100800000
     End
-    PrtDevNamesW = Begin
+    UnknownProp = {420 ,679 ,11 ,0 ,116 } Begin
         0x040011001b000100000000000000000000000000000000000000000000000000 ,
         0x0000000000000000000000000000000000000000000046005000520031003100 ,
         0x3a00000000000000000000000000000000000000000000000000000000000000 ,
         0x0000000000000000000000000000000000000000
     End
-    NoSaveCTIWhenDisabled =1
     Begin
         Begin Label
             BackStyle =0
@@ -121,7 +124,9 @@ Begin Form
             FontWeight =400
             ForeColor =-2147483630
             FontName ="Tahoma"
-            BorderLineStyle =0
+            UnknownProp = {324 ,11 ,2 ,1 ,1 } Begin
+                0x00
+            End
         End
         Begin TextBox
             FELineBreak = NotDefault
@@ -315,11 +320,21 @@ Begin Form
                     GUID = Begin
                         0x7978e98d211b5a4f97a66eea4650918f
                     End
-
-                    WebImagePaddingLeft =2
-                    WebImagePaddingTop =2
-                    WebImagePaddingRight =1
-                    WebImagePaddingBottom =1
+                    UnknownProp = {289 ,0 ,3 ,4 ,4 } Begin
+                        0xffffffff
+                    End
+                    UnknownProp = {356 ,700 ,4 ,0 ,4 } Begin
+                        0x02000000
+                    End
+                    UnknownProp = {357 ,699 ,4 ,0 ,4 } Begin
+                        0x02000000
+                    End
+                    UnknownProp = {358 ,701 ,4 ,0 ,4 } Begin
+                        0x01000000
+                    End
+                    UnknownProp = {359 ,702 ,4 ,0 ,4 } Begin
+                        0x01000000
+                    End
                 End
             End
         End
@@ -418,7 +433,7 @@ Private Sub cmdCancel_Click()
 '    RaiseEvent Cancel(m_lngMajorVal)
     mCancel = True
      ' если форма не инициализирована из класса clsProgress - закрываем ее
-    If Not mbolInitialized Then DoCmd.Close acForm, Me.Name
+    If Not mbolInitialized Then DoCmd.Close acForm, Me.NAME
 '    Me.Visible = False
 End Sub
 
