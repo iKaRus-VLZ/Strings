@@ -7,8 +7,8 @@ Private Const c_strModule As String = "modStrings"
 '=========================
 ' Описание      : Функции для работы со строками
 ' Автор         : Кашкин Р.В. (KashRus@gmail.com)
-' Версия        : 1.1.30.453724598
-' Дата          : 21.03.2024 11:02:07
+' Версия        : 1.1.30.453844714
+' Дата          : 02.04.2024 11:18:49
 ' Примечание    : сделано под Access x86, адаптировано под x64, но толком не тестировалось. _
 '               : для работы с Excel сделать APPTYPE=1
 ' v.1.1.30      : 12.03.2024 - изменения в GroupsGet - первая попытка переделать скобки под шаблоны (чтобы получить возможность разбирать двух- и более -звенные выражения вроде If .. Then .. End If)
@@ -913,7 +913,7 @@ HandleExit:  PlaceHoldersGet = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
 Private Function p_FindNamedPlaceHolder(ByRef Source As String, _
-    Optional ByRef NAME As String, _
+    Optional ByRef Name As String, _
     Optional ByRef sBeg As Long = 1, Optional ByRef sEnd As Long = 0, _
     Optional LBr As String = "[%", Optional RBr As String = "%]") As Boolean
 ' ищет в строке именную переменную, ограниченную разделителями, возвращает её имя и границы
@@ -933,7 +933,7 @@ Dim pBeg As Long, pEnd As Long
     ' ищем в выражении правую скобку
     pEnd = InStr(pBeg, Source, RBr): If pEnd = 0 Then GoTo HandleExit Else sEnd = pEnd + Len(RBr)
     ' получаем строку между скобками
-    NAME = Mid$(Source, pBeg, pEnd - pBeg)
+    Name = Mid$(Source, pBeg, pEnd - pBeg)
     Result = True 'Len(Name) > 0
 HandleExit:  p_FindNamedPlaceHolder = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
@@ -2133,7 +2133,7 @@ HandleExit:  DelimStringSimile = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
 Public Function TokenStringGet(Source As String, _
-    ByVal Pos As Long, ByVal Data As String, _
+    ByVal Pos As Long, _
     Optional Delims As String = c_strSymbSpaces & c_strSymbPunct & c_strSymbParenth & c_strSymbMath, _
     Optional IncEmpty As Boolean = False, _
     Optional DelimsLeft As String, Optional DelimsRight As String, _
@@ -5882,6 +5882,4 @@ Private Function Nz(p1, Optional p2) As Variant
 ' You will get True True
 End Function
 #End If
-
-
 
