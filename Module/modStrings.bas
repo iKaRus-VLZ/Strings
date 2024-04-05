@@ -7,8 +7,8 @@ Private Const c_strModule As String = "modStrings"
 '=========================
 ' Описание      : Функции для работы со строками
 ' Автор         : Кашкин Р.В. (KashRus@gmail.com)
-' Версия        : 1.1.30.453844714
-' Дата          : 02.04.2024 11:18:49
+' Версия        : 1.1.30.453854194
+' Дата          : 03.04.2024 10:03:56
 ' Примечание    : сделано под Access x86, адаптировано под x64, но толком не тестировалось. _
 '               : для работы с Excel сделать APPTYPE=1
 ' v.1.1.30      : 12.03.2024 - изменения в GroupsGet - первая попытка переделать скобки под шаблоны (чтобы получить возможность разбирать двух- и более -звенные выражения вроде If .. Then .. End If)
@@ -2762,13 +2762,13 @@ Public Function TextToArrayByWidth(TextString As String, WidthInPix As Long, Opt
 ' hDC - hDC -области куда будет выводиться текст
 '' OutLineWidth, OutLineHeight - массивы размеров строк разбитого текста
 '-------------------------
+Dim Result As String
 Dim sz As Size, tm As TEXTMETRIC
 Dim strText As String, strRest As String, strTemp As String
 Dim aWords() As String, aText() As String ', aWidth() As Long, aHeight() As Long
 Dim spLen As Long, spPos As Integer, spPosNext As Integer
 Dim tWidth As Long, tHeight As Long
 Dim i As Long, iMax As Long, ii As Long, w As Long
-Dim Result As String
 
     On Error GoTo HandleError
     Result = vbNullString

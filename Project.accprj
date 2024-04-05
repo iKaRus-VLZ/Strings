@@ -4,7 +4,7 @@ Description="Примеры работы со строками функций модуля modStrings"
 Help=""
 [Custom Properties]
 Application="Strings"
-Version="1.0.0.453694289"
+Version="1.0.0.453854194"
 Author="Кашкин Р.В."
 Support="KashRus@gmail.com"
 [Database Properties]

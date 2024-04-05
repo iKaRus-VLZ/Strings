@@ -470,8 +470,8 @@ Dim Result As Boolean
 ' VBE.ActiveVBProject.Name
     strTitle = "Кодовое имя приложения"
     strMessage = "Введите кодовое имя приложения."
-    If Len(strCodeName) = 0 Then strCodeName = VBE.ActiveVBProject.NAME
-    strCodeName = VBA.Trim$(InputBox(strMessage, strTitle, strCodeName)): VBE.ActiveVBProject.NAME = strCodeName
+    If Len(strCodeName) = 0 Then strCodeName = VBE.ActiveVBProject.Name
+    strCodeName = VBA.Trim$(InputBox(strMessage, strTitle, strCodeName)): VBE.ActiveVBProject.Name = strCodeName
 ' VBE.ActiveVBProject.Description
     strTitle = "Описание приложения"
     strMessage = "Введите краткое описание приложения."
@@ -589,7 +589,7 @@ Dim ParentPath As String, FilePath As String, FileName As String
     If Len(BackupPath) = 0 Then BackupPath = oFso.BuildPath(CurrentProject.Path, c_strSrcPath)
     If Not oFso.FolderExists(BackupPath) Then Call oFso.CreateFolder(BackupPath) 'Then Err.Raise 76 ' Path not Found
 ' создаем имя архива
-    FileName = Split(CurrentProject.NAME, ".")(0)
+    FileName = Split(CurrentProject.Name, ".")(0)
     FileName = FileName & "_" & VBA.Format$(Now(), "YYYYMMDD_hhmmss")
     ParentPath = oFso.BuildPath(BackupPath, FileName)
     If Not oFso.FolderExists(ParentPath) Then Call oFso.CreateFolder(ParentPath) 'Then Err.Raise 76 ' Path not Found
@@ -945,8 +945,8 @@ Dim oItems As Object, oItem
     Set oItems = Application.VBE.ActiveVBProject.VBComponents
     For Each oItem In oItems
         Select Case oItem.Type
-        Case vbext_ct_StdModule, vbext_ct_ClassModule: colObjects.Add oItem, oItem.NAME
-        Case vbext_ct_Document: If BackupDocs Then colObjects.Add oItem, oItem.NAME
+        Case vbext_ct_StdModule, vbext_ct_ClassModule: colObjects.Add oItem, oItem.Name
+        Case vbext_ct_Document: If BackupDocs Then colObjects.Add oItem, oItem.Name
         Case Else ' ???
         End Select
     Next oItem
@@ -955,15 +955,15 @@ Dim oItems As Object, oItem
     ' в Access это проще всего сделать запросом по таблице c_strMSysObjects
     '' или можно пройтись по коллекциям объектов
     'Set oItems = CurrentProject.AllModules:         For Each oItem In oItems: colObjects.Add oItem, oItem.NAME: Next oItem
-    Set oItems = CurrentProject.AllForms:           For Each oItem In oItems: colObjects.Add oItem, oItem.NAME: Next oItem '
-    Set oItems = CurrentProject.AllReports:         For Each oItem In oItems: colObjects.Add oItem, oItem.NAME: Next oItem
-    Set oItems = CurrentProject.AllMacros:          For Each oItem In oItems: colObjects.Add oItem, oItem.NAME: Next oItem
-    Set oItems = CurrentProject.AllDataAccessPages: For Each oItem In oItems: colObjects.Add oItem, oItem.NAME: Next oItem
-    Set oItems = CurrentData.AllQueries:            For Each oItem In oItems: colObjects.Add oItem, oItem.NAME: Next oItem
+    Set oItems = CurrentProject.AllForms:           For Each oItem In oItems: colObjects.Add oItem, oItem.Name: Next oItem '
+    Set oItems = CurrentProject.AllReports:         For Each oItem In oItems: colObjects.Add oItem, oItem.Name: Next oItem
+    Set oItems = CurrentProject.AllMacros:          For Each oItem In oItems: colObjects.Add oItem, oItem.Name: Next oItem
+    Set oItems = CurrentProject.AllDataAccessPages: For Each oItem In oItems: colObjects.Add oItem, oItem.Name: Next oItem
+    Set oItems = CurrentData.AllQueries:            For Each oItem In oItems: colObjects.Add oItem, oItem.Name: Next oItem
     If Not WithoutData Then
     Set oItems = CurrentData.AllTables:             For Each oItem In oItems
                                                     ' пропускаем системные таблицы
-                                                        If Left(oItem.NAME, 4) <> "MSys" Then colObjects.Add oItem, oItem.NAME
+                                                        If Left(oItem.Name, 4) <> "MSys" Then colObjects.Add oItem, oItem.Name
                                                     Next oItem
     End If
 #ElseIf APPTYPE = 1 Then    ' APPTYPE=Excel
@@ -1037,7 +1037,7 @@ Dim strCaption As String, strMessage As String
 Dim iCount As Long
 ' выгружаем поочерёдно все объекты
     For Each oItem In colObjects
-        strObjName = oItem.NAME
+        strObjName = oItem.Name
     ' получаем информацию об объекте
         p_ObjectInfo strObjName, ObjectTypeName:=strTypeName, ObjectTypeDesc:=strTypeDesc
     ' обновляем прогрессбар
@@ -1241,7 +1241,7 @@ On Error GoTo HandleError
     With oFso
     If Len(FilePath) = 0 Then
         FilePath = .BuildPath(CurrentProject.Path, c_strSrcPath)
-        FilePath = .BuildPath(FilePath, Split(CurrentProject.NAME, ".")(0) & "_" & VBA.Format$(Now(), "YYYYMMDD_hhmmss") & "." & c_strObjExtPrj)
+        FilePath = .BuildPath(FilePath, Split(CurrentProject.Name, ".")(0) & "_" & VBA.Format$(Now(), "YYYYMMDD_hhmmss") & "." & c_strObjExtPrj)
     End If
     If Not .FolderExists(.GetParentFolderName(FilePath)) Then Call .CreateFolder(.GetParentFolderName(FilePath)) 'Then Err.Raise 76 ' Path not Found
     End With
@@ -1262,11 +1262,11 @@ End Function
 Public Sub ReferencesPrint()
 ' отладочная - выводит в Immediate все библиотечные ссылки текущего проекта
     Dim Itm As Object
-    Debug.Print "Project """ & VBE.ActiveVBProject.NAME & """ References:"
+    Debug.Print "Project """ & VBE.ActiveVBProject.Name & """ References:"
     For Each Itm In References
         With Itm
             If .BuiltIn Then GoTo HandleNext
-            Debug.Print " " & IIf(.IsBroken, "X", " ") & .NAME, .Guid & " " & " " & .FullPath ' & .Major & " " & .Minor
+            Debug.Print " " & IIf(.IsBroken, "X", " ") & .Name, .Guid & " " & " " & .FullPath ' & .Major & " " & .Minor
         End With
 HandleNext:
     Next Itm
@@ -1279,7 +1279,7 @@ Dim Result As Boolean
     With oFso
     If Len(FilePath) = 0 Then
         FilePath = .BuildPath(CurrentProject.Path, c_strSrcPath)
-        FilePath = .BuildPath(FilePath, Split(CurrentProject.NAME, ".")(0) & "_" & VBA.Format$(Now(), "YYYYMMDD_hhmmss") & "." & c_strObjExtPrj)
+        FilePath = .BuildPath(FilePath, Split(CurrentProject.Name, ".")(0) & "_" & VBA.Format$(Now(), "YYYYMMDD_hhmmss") & "." & c_strObjExtPrj)
     End If
     If Not .FolderExists(.GetParentFolderName(FilePath)) Then Call .CreateFolder(.GetParentFolderName(FilePath)) 'Then Err.Raise 76 ' Path not Found
     End With
@@ -1351,14 +1351,14 @@ HandleError:    Result = False
 End Function
 Public Sub PropertiesClear()
 ' удаляет все пользовательские свойства
-    With CurrentProject.Properties: Do While .Count > 0: .Remove .Item(0).NAME: Loop: End With
+    With CurrentProject.Properties: Do While .Count > 0: .Remove .Item(0).Name: Loop: End With
 End Sub
 Public Sub PropertiesPrint()
 ' отладочная - выводит в Immediate все свойства текущего проекта
     Dim Itm As Object
-    Debug.Print "Project """ & VBE.ActiveVBProject.NAME & """ Properties:"
+    Debug.Print "Project """ & VBE.ActiveVBProject.Name & """ Properties:"
     For Each Itm In CurrentProject.Properties
-        Debug.Print Itm.NAME & "=" & Itm.Value
+        Debug.Print Itm.Name & "=" & Itm.Value
     Next Itm
 End Sub
 Public Function PropertyGet(PropName As String, PropValue As Variant, Optional PropObject As Object) As Boolean
@@ -1466,7 +1466,7 @@ Dim oColl, oItem, eObjType As AcObjectType
             With oItem
                 If .IsLoaded Then
                     If OnlyInDesignMode And .CurrentView <> 0 Then GoTo HandleNextItem
-                    DoCmd.Close eObjType, .NAME, acSaveYes
+                    DoCmd.Close eObjType, .Name, acSaveYes
 'Debug.Print IIf(.IsLoaded, "Can't close object", "Object was closed") & ": """ & oItem.Name & """."
                 End If
             End With
@@ -1506,7 +1506,7 @@ Dim prg As clsProgress
                 With prg
                     If .Canceled Then If MsgBox(c_strBreakProcessMessage, vbYesNo Or vbExclamation Or vbDefaultButton2) = vbYes Then GoTo HandleExit
                     .Canceled = False
-                    .Detail = strCaption & "ы: " & tdf.NAME
+                    .Detail = strCaption & "ы: " & tdf.Name
                     .Progress = i
                 End With
                 tdf.Connect = c_ConnString & DatabasePath
@@ -3267,7 +3267,7 @@ HandlePack:
         If oItm.IsFolder Then
         ' если это папка
             ' получаем количество файлов в папке
-            sItm = oItm.NAME: lItm = oItm.GetFolder.Items.Count
+            sItm = oItm.Name: lItm = oItm.GetFolder.Items.Count
             ' если папка пуста - переходим к следущему объекту
             If lItm = 0 Then GoTo HandleNext
         End If
@@ -3339,11 +3339,11 @@ On Error GoTo HandleError
         If Overwrite Then
             For Each oItm In .Items
             ' если файл или папка уже существуют - удаляем перед извлечением
-                If oFso.FileExists(strPath & oItm.NAME) Then
-                    Kill strPath & oItm.NAME
-                ElseIf oFso.FolderExists(strPath & oItm.NAME) Then
-                    Kill strPath & oItm.NAME & "\*.*"
-                    RmDir strPath & oItm.NAME
+                If oFso.FileExists(strPath & oItm.Name) Then
+                    Kill strPath & oItm.Name
+                ElseIf oFso.FolderExists(strPath & oItm.Name) Then
+                    Kill strPath & oItm.Name & "\*.*"
+                    RmDir strPath & oItm.Name
                 End If
             Next
         End If
@@ -3384,7 +3384,7 @@ Public Function ZipItemName( _
 Dim Result As String
     On Error GoTo HandleError
 Dim oFld As Object: Set oFld = oApp.Namespace((ZipName))
-    With oFld.Items().Item((i)):  Result = IIf(fExt, .Path, .NAME): End With
+    With oFld.Items().Item((i)):  Result = IIf(fExt, .Path, .Name): End With
 HandleExit:  ZipItemName = Result: Exit Function
 HandleError: Result = vbNullString: Resume HandleExit
 End Function
@@ -3424,7 +3424,7 @@ Private Function p_LinkedWrite(TableName As String, FilePath As String)
 ' сохранет в файл FilePath параметры присоединенной таблицы TableName
 Const c_strProcedure = "p_LinkedWrite"
     On Error GoTo HandleError
-    p_SettingKeyWrite FilePath, c_strLnkSecParam, c_strLnkKeyLocal, CurrentDb.TableDefs(TableName).NAME
+    p_SettingKeyWrite FilePath, c_strLnkSecParam, c_strLnkKeyLocal, CurrentDb.TableDefs(TableName).Name
     p_SettingKeyWrite FilePath, c_strLnkSecParam, c_strLnkKeyConnect, CurrentDb.TableDefs(TableName).Connect
     p_SettingKeyWrite FilePath, c_strLnkSecParam, c_strLnkKeyTable, CurrentDb.TableDefs(TableName).SourceTableName
     p_SettingKeyWrite FilePath, c_strLnkSecParam, c_strLnkKeyAttribute, CurrentDb.TableDefs(TableName).Attributes
@@ -3573,7 +3573,7 @@ Const c_strProcedure = "p_ReferencesWrite"
         If Itm.BuiltIn Then GoTo HandleNext
         'If Itm.IsBroken Or Err.Number <> 0 Then Else GoTo HandleNext
 ' сохраняем в виде: Name=GUID|Major|Minor|FullPath
-        With Itm: p_SettingKeyWrite FilePath, c_strRefSecName, .NAME, Join(Array(.Guid, .Major, .Minor, .FullPath), "|"): End With
+        With Itm: p_SettingKeyWrite FilePath, c_strRefSecName, .Name, Join(Array(.Guid, .Major, .Minor, .FullPath), "|"): End With
 HandleNext:
     Next Itm
 HandleExit:     Exit Function
@@ -3590,7 +3590,7 @@ Const c_strProcedure = "p_PropertiesRead"
     On Error GoTo HandleError
 ' восстанавливаем свойства проекта
     With VBE.ActiveVBProject
-        .NAME = p_SettingKeyRead(FilePath, c_strPrjSecName, c_strPrjKeyName)
+        .Name = p_SettingKeyRead(FilePath, c_strPrjSecName, c_strPrjKeyName)
         .Description = p_SettingKeyRead(FilePath, c_strPrjSecName, c_strPrjKeyDesc)
         .HelpFile = p_SettingKeyRead(FilePath, c_strPrjSecName, c_strPrjKeyHelp)
     End With
@@ -3601,7 +3601,7 @@ Dim strName As String, strValue As String, intType As eDataType
     strText = p_SettingSecRead(FilePath, c_strPrpSecName): If Len(strText) = 0 Then Err.Raise 76 ' Path not Found
     ' удаляем все старые свойства
     With CurrentProject.Properties
-        Do While .Count > 0: .Remove .Item(0).NAME: Loop
+        Do While .Count > 0: .Remove .Item(0).Name: Loop
     ' заполняем прочитанные свойства
     aPrps = Split(strText, ";")
     For Each Itm In aPrps
@@ -3644,7 +3644,7 @@ Const c_strProcedure = "p_PropertiesWrite"
     On Error GoTo HandleError
 ' сохраняем свойства проекта
     With VBE.ActiveVBProject
-        p_SettingKeyWrite FilePath, c_strPrjSecName, c_strPrjKeyName, p_PropertyStringCreate(.NAME, PropType:=dbText)
+        p_SettingKeyWrite FilePath, c_strPrjSecName, c_strPrjKeyName, p_PropertyStringCreate(.Name, PropType:=dbText)
         p_SettingKeyWrite FilePath, c_strPrjSecName, c_strPrjKeyDesc, p_PropertyStringCreate(.Description, PropType:=dbText)
         p_SettingKeyWrite FilePath, c_strPrjSecName, c_strPrjKeyHelp, p_PropertyStringCreate(.HelpFile, PropType:=dbText)
     End With
@@ -3652,7 +3652,7 @@ Dim Itm As Object, strName As String, varValue, intType As eDataType: intType = 
 ' сохраняем пользовательские свойства
     With CurrentProject
     For Each Itm In .Properties
-        With Itm:  strName = .NAME: varValue = .Value: End With
+        With Itm:  strName = .Name: varValue = .Value: End With
         varValue = p_PropertyStringCreate(varValue, PropType:=intType)
         p_SettingKeyWrite FilePath, c_strPrpSecName, strName, CStr(varValue)
     Next Itm
@@ -3664,7 +3664,7 @@ On Error Resume Next
     For Each Itm In .Properties
         Err.Clear
         With Itm
-            strName = .NAME
+            strName = .Name
             Select Case strName
             ' пропускаем ненужные свойства по имени
             Case "DesignMasterID", "Name", "Transactions", "Updatable", "CollatingOrder", _
