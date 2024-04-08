@@ -7,8 +7,8 @@ Private Const c_strModule As String = "modStrings"
 '=========================
 ' Описание      : Функции для работы со строками
 ' Автор         : Кашкин Р.В. (KashRus@gmail.com)
-' Версия        : 1.1.30.453854194
-' Дата          : 03.04.2024 10:03:56
+' Версия        : 1.1.30.453906017
+' Дата          : 08.04.2024 14:26:27
 ' Примечание    : сделано под Access x86, адаптировано под x64, но толком не тестировалось. _
 '               : для работы с Excel сделать APPTYPE=1
 ' v.1.1.30      : 12.03.2024 - изменения в GroupsGet - первая попытка переделать скобки под шаблоны (чтобы получить возможность разбирать двух- и более -звенные выражения вроде If .. Then .. End If)
@@ -715,12 +715,12 @@ Dim Term As String, Xpr As String, Key As String, Value As String
 Dim i As Long: i = 1
 ' для доп.модификаторов. формат модификаторов см. p_TermModify
 Const c_ModLBr = "{", c_ModRBr = "}"
-Dim Par As String, Pos As Long
+Dim par As String, Pos As Long
     ' ищем именную переменную в выражении
     Do While p_FindNamedPlaceHolder(Result, Xpr, i, , LBr, RBr)
     ' найдена именная переменная
         ' анализируем строку на наличие дополнительных модификаторов
-        Key = p_TermModify(Xpr, Par, Operation:=1)
+        Key = p_TermModify(Xpr, par, Operation:=1)
         ' если не нужно - просто сделать: Key = Xpr
     ' получаем ее значение из коллекции (или запрашиваем при отсутствии)
         If p_IsExist(Key, NamedTerms, Term) Then
@@ -741,7 +741,7 @@ Dim Par As String, Pos As Long
     ' рекурсивно проверяем (и заменяем) полученное значение на наличие в нем именных переменных
         Term = PlaceHoldersSet(Term, NamedTerms, AskMissing, LBr, RBr)
     ' если есть модификаторы - применяем их к Term
-        If Len(Par) > 0 Then Term = p_TermModify(Term, Par, Operation:=0)
+        If Len(par) > 0 Then Term = p_TermModify(Term, par, Operation:=0)
     '' предполагалось, что это могло улучшить скорость вычисления выражений
         '    If EvalExpres Then
     '' если указано вычислять выражения в процесе подстановки
@@ -913,7 +913,7 @@ HandleExit:  PlaceHoldersGet = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
 Private Function p_FindNamedPlaceHolder(ByRef Source As String, _
-    Optional ByRef Name As String, _
+    Optional ByRef NAME As String, _
     Optional ByRef sBeg As Long = 1, Optional ByRef sEnd As Long = 0, _
     Optional LBr As String = "[%", Optional RBr As String = "%]") As Boolean
 ' ищет в строке именную переменную, ограниченную разделителями, возвращает её имя и границы
@@ -933,7 +933,7 @@ Dim pBeg As Long, pEnd As Long
     ' ищем в выражении правую скобку
     pEnd = InStr(pBeg, Source, RBr): If pEnd = 0 Then GoTo HandleExit Else sEnd = pEnd + Len(RBr)
     ' получаем строку между скобками
-    Name = Mid$(Source, pBeg, pEnd - pBeg)
+    NAME = Mid$(Source, pBeg, pEnd - pBeg)
     Result = True 'Len(Name) > 0
 HandleExit:  p_FindNamedPlaceHolder = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
@@ -969,15 +969,15 @@ Dim Result As String: Result = Term
     Case 0
 ' обработка Term и применение параметров модификатора
         If Len(Params) = 0 Then GoTo HandleExit
-        Dim Xpr, Par As String
+        Dim Xpr, par As String
     ' получаем массив модфикаторов с параметрами
         For Each Xpr In Split(Params, cXprDelim)
     ' перебираем наборы модификаторов
         ' получаем тип модификатора и список его параметров
             Pos = InStr(1, Xpr, cNamDelim)
-            If Pos > 0 Then Par = Mid$(Xpr, Pos + Len(cNamDelim)): Xpr = Left$(Xpr, Pos - 1)
+            If Pos > 0 Then par = Mid$(Xpr, Pos + Len(cNamDelim)): Xpr = Left$(Xpr, Pos - 1)
     ' применяем модификатор
-            Result = p_TermModifyXprGet(Result, Xpr, Par, cParDelim, ReplaceExisting)
+            Result = p_TermModifyXprGet(Result, Xpr, par, cParDelim, ReplaceExisting)
         Next Xpr
     Case Else
 ' извлечение из Term имени параметра, определение наличия в ней модификаторов
@@ -1090,9 +1090,9 @@ Private Function p_TermModifyParGet(Params As String, _
 ' ParDelim - разделитель параметров в списке
 ' ReplaceExisting - флаг определяющий способ реакции на однотипные параметры
 Dim sKey As String, sVal 'As String
-Dim cPar As New Collection, Par
-    For Each Par In Split(Params, ParDelim)
-        Select Case LCase(Par)
+Dim cPar As New Collection, par
+    For Each par In Split(Params, ParDelim)
+        Select Case LCase(par)
 ' <<< здесь нужно описать допустимые имена параметров функций, вызываемых модификаторами и их значения
         Case "колич":   sKey = "NewType": sVal = NumeralOrdinal
         Case "поряд":   sKey = "NewType": sVal = NumeralCardinal
@@ -1109,13 +1109,13 @@ Dim cPar As New Collection, Par
         Case "cр":      sKey = "NewGend": sVal = DeclineGendNeut
         Case "одуш":    sKey = "Animate": sVal = True
         Case "фио":     sKey = "IsFio":   sVal = True
-        Case Else:      sKey = c_idxPref & Par: sVal = Par ' прочие просто добавляем как есть может они зачем-то нужны
+        Case Else:      sKey = c_idxPref & par: sVal = par ' прочие просто добавляем как есть может они зачем-то нужны
         'Case Else:      GoTo HandleNext                    ' неизвестные пропускаем
         End Select
     ' добавляем параметр в коллекцию
         If p_IsExist(sKey, cPar) Then If Not ReplaceExisting Then GoTo HandleNext Else cPar.Remove sKey
         cPar.Add sVal, sKey
-HandleNext: Next Par: Set p_TermModifyParGet = cPar
+HandleNext: Next par: Set p_TermModifyParGet = cPar
 End Function
 
 Public Function GroupsGet(Source As String, _
@@ -3256,7 +3256,7 @@ Const alf$ = "ОЕАИУЭЮЯПСТРКЛМНБВГДЖЗЙФХЦЧШЩЫЁ", _
       cns1$ = "БЗДВГ", _
       cns2$ = "ПСТФК", _
       cns3$ = "ПСТКБВГДЖЗФХЦЧШЩ", _
-      ch$ = "ОЮЕЭЯЁЫ", _
+      cH$ = "ОЮЕЭЯЁЫ", _
       ct$ = "АУИИАИА"
 'alf - алфавит кроме исключаемых букв, cns1 и cns2 - звонкие и глухие
 'согласные, cns3 - согласные, перед которыми звонкие оглушаются,
@@ -3302,7 +3302,7 @@ Dim s$, v$, i&, b&, c$
     'Основной цикл:
     For i = 2 To Len(s)
         c = Mid$(s, i, 1)
-        b = InStr(ch, c)
+        b = InStr(cH, c)
         If b Then Mid$(s, i, 1) = Mid$(ct, b, 1) 'Замена гласных
         If InStr(cns3, c) Then 'Оглушение согласных
             b = InStr(cns1, Mid$(s, i - 1, 1))
@@ -3325,7 +3325,7 @@ Const alf$ = "ОЕАИУЭЮЯПСТРКЛМНБВГДЖЗЙФХЦЧШЩЁЫ", _
       cns1$ = "БЗДВГ", _
       cns2$ = "ПСТФК", _
       cns3$ = "ПСТКБВГДЖЗФХЦЧШЩ", _
-      ch$ = "ОЮЕЭЯЁЫ", _
+      cH$ = "ОЮЕЭЯЁЫ", _
       ct$ = "АУИИАИА"
 'alf - алфавит кроме исключаемых букв, cns1 и cns2 - звонкие и глухие
 'согласные, cns3 - согласные, перед которыми звонкие оглушаются,
@@ -3378,7 +3378,7 @@ Dim s$, v$, i&, b&, c$, old_c$
     'Основной цикл:
     For i = 1 To Len(s)
         c = Mid$(s, i, 1)
-        b = InStr(ch, c)
+        b = InStr(cH, c)
         If b Then   'Если гласная
             If old_c = "Й" Or old_c = "И" Then
                 If c = "О" Or c = "Е" Then 'Буквосочетания с гласной
@@ -3442,7 +3442,7 @@ Const alf$ = "АИУПСТРКЛМНБВГДЖЗЙФХЦЧШЩЕОЁЫЭЮЯ", _
       cns1$ = "БЗДВГ", _
       cns2$ = "ПСТФК", _
       cns3$ = "ПСТКБВГДЖЗФХЦЧШЩ", _
-      ch$ = "ОЮЕЭЯЁЫ", _
+      cH$ = "ОЮЕЭЯЁЫ", _
       ct$ = "АУИИАИА"
 'alf - алфавит кроме исключаемых букв, cns1 и cns2 - звонкие и глухие
 'согласные, cns3 - согласные, перед которыми звонкие оглушаются,
@@ -3497,7 +3497,7 @@ Dim s$, v&, i&, b&, c$, old_c$, new_c$
     'Основной цикл:
     For i = 1 To Len(s)
         c = Mid$(s, i, 1)
-        b = InStr(ch, c)
+        b = InStr(cH, c)
         If b Then 'Если гласная
             If old_c = "Й" Or old_c = "И" Then
                 If c = "О" Or c = "Е" Then 'Буквосочетания с гласной
@@ -5059,7 +5059,7 @@ Public Function DeclineWords( _
     Optional NewNumb As DeclineNumb = DeclineNumbSingle, _
     Optional ByVal NewGend As DeclineGend = DeclineGendUndef, _
     Optional ByRef Animate As Boolean = False, _
-    Optional ByRef IsFio As Boolean = False, _
+    Optional ByRef IsFio, _
     Optional SkipWords As String _
     ) As String
 ' склонение слов. работает весьма условно
@@ -5094,6 +5094,7 @@ Dim Result As String
 '
     On Error GoTo HandleError
     Result = vbNullString
+    If IsMissing(IsFio) Then IsFio = p_GetFIOAttr(Words) ' False
     strTail = Trim$(Words): iMax = Len(strTail)
     Call Tokenize(Words, aWords): jMin = LBound(aWords): j = UBound(aWords)
     ' получаем список слов которые необходимо пропустить
@@ -5105,7 +5106,7 @@ Dim Result As String
     ' перебираем слова от конца к началу
     ' проверяем принадлежность слова текущему диапазону
         If n < nMin Then GoTo HandleText
-        If S1 <= j - jMin + 1 And S1 <> 0 And S2 <> 0 Then GoTo HandleText
+        If (S1 <= (j - jMin + 1)) And (S1 <> 0) And (S2 <> 0) Then GoTo HandleText
 HandleDiap:
         n = n - 1: If n < nMin Then S1 = 0: S2 = 0: GoTo HandleText
     ' получаем элемент списка диапазона пропуска
@@ -5518,6 +5519,22 @@ Dim Result As Boolean
     Result = True
 HandleExit:  p_GetWordParts2 = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
+End Function
+Private Function p_GetFIOAttr(ByVal Words As String, Optional ByVal Gend As DeclineGend = DeclineGendUndef) As Boolean
+' определяет признак ФИО
+'-------------------------
+' весьма условно: признак ФИО - 3 слова, 3 оканчивается на -вич или -вна
+Dim Result As Boolean
+    On Error GoTo HandleError
+Dim aWord() As String
+    If Tokenize(LCase$(Words), aWord()) = 3 Then
+    Select Case Right(aWord(2), 3)
+    Case "вич": Result = True: Gend = DeclineGendMale
+    Case "вна": Result = True: Gend = DeclineGendFem
+    End Select
+    End If
+HandleExit:  p_GetFIOAttr = Result: Exit Function
+HandleError: Err.Clear: Resume HandleExit
 End Function
 
 Private Function p_GetWordGender(ByVal Word As String, Optional ByRef WordEnd As String) As DeclineGend
