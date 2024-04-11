@@ -7,8 +7,8 @@ Private Const c_strModule As String = "modStrings"
 '=========================
 ' Описание      : Функции для работы со строками
 ' Автор         : Кашкин Р.В. (KashRus@gmail.com)
-' Версия        : 1.1.30.453906017
-' Дата          : 08.04.2024 14:26:27
+' Версия        : 1.1.30.453937033
+' Дата          : 11.04.2024 16:52:45
 ' Примечание    : сделано под Access x86, адаптировано под x64, но толком не тестировалось. _
 '               : для работы с Excel сделать APPTYPE=1
 ' v.1.1.30      : 12.03.2024 - изменения в GroupsGet - первая попытка переделать скобки под шаблоны (чтобы получить возможность разбирать двух- и более -звенные выражения вроде If .. Then .. End If)
@@ -4552,7 +4552,7 @@ Dim Result As String
         i = Len(Result): GoTo HandleExit
     End Select
 ' прочие исключения
-    If IsFio Then
+    If IsFio = 1 Then
     ' не склоняются фамилии на:
     Select Case Right(Result, 1)
     Case "о": i = Len(Result): GoTo HandleExit
@@ -4728,6 +4728,26 @@ Dim Result As String
             Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ой", "ыми")
             Case DeclineCasePred: WordEnd = Choose(NewNumb, "ой", "ых")
             End Select
+            ElseIf IsFio = 2 And NewGend = 2 Then
+    ' женские имена на -ва, -на
+            Select Case NewCase
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "ы"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ы", "")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "е", "ам")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "у", "")
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ой", "ами")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+            End Select
+            ElseIf IsFio = 3 And NewGend = 2 Then
+    ' женские отчества на -вна
+            Select Case NewCase
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "ы"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ы", "ых")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "е", "ам")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "ну", "ен"): i = i - 1 ': Stop
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ой", "ами")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+            End Select
     ' прочие на -ва, -на
             Else
             Select Case NewCase
@@ -4833,6 +4853,16 @@ Dim Result As String
             Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "ию", IIf(Animate, "ий", "ии"))
             Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ией", "иями")
             Case DeclineCasePred: WordEnd = Choose(NewNumb, "ии", "иях")
+            End Select
+    Case "ья"
+    ' на -ия
+            Select Case NewCase
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "ьи"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ьи", "ий")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ье", "ьям")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "ью", IIf(Animate, "ий", "ьи"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ьей", "ьями")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "ье", "ьях")
             End Select
     Case "ая"
     ' на -ая
@@ -5094,7 +5124,7 @@ Dim Result As String
 '
     On Error GoTo HandleError
     Result = vbNullString
-    If IsMissing(IsFio) Then IsFio = p_GetFIOAttr(Words) ' False
+    If IsMissing(IsFio) Then IsFio = p_GetFIOAttr(Words, tmpGender): If NewGend = DeclineGendUndef And IsFio Then NewGend = tmpGender ' False
     strTail = Trim$(Words): iMax = Len(strTail)
     Call Tokenize(Words, aWords): jMin = LBound(aWords): j = UBound(aWords)
     ' получаем список слов которые необходимо пропустить
@@ -5520,7 +5550,7 @@ Dim Result As Boolean
 HandleExit:  p_GetWordParts2 = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
-Private Function p_GetFIOAttr(ByVal Words As String, Optional ByVal Gend As DeclineGend = DeclineGendUndef) As Boolean
+Private Function p_GetFIOAttr(ByVal Words As String, Optional ByRef Gend As DeclineGend = DeclineGendUndef) As Boolean
 ' определяет признак ФИО
 '-------------------------
 ' весьма условно: признак ФИО - 3 слова, 3 оканчивается на -вич или -вна
