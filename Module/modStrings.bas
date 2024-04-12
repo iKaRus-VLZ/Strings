@@ -7,8 +7,8 @@ Private Const c_strModule As String = "modStrings"
 '=========================
 ' Описание      : Функции для работы со строками
 ' Автор         : Кашкин Р.В. (KashRus@gmail.com)
-' Версия        : 1.1.30.453937033
-' Дата          : 11.04.2024 16:52:45
+' Версия        : 1.1.30.453945178
+' Дата          : 12.04.2024 12:25:38
 ' Примечание    : сделано под Access x86, адаптировано под x64, но толком не тестировалось. _
 '               : для работы с Excel сделать APPTYPE=1
 ' v.1.1.30      : 12.03.2024 - изменения в GroupsGet - первая попытка переделать скобки под шаблоны (чтобы получить возможность разбирать двух- и более -звенные выражения вроде If .. Then .. End If)
@@ -4941,6 +4941,15 @@ Dim Result As String
             Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ием", "ией"), "иями")
             Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ие", "ии"), "иях")
             End Select
+        Case "л"    ' -лий
+            Select Case NewCase
+            Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "ий", "ия", "ие"), "ии")
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ия", "ию"), "иев")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ию", "ии"), "иям")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ий", "ию"), "иев")
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ием", "ией"), "иями")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ии", "ии"), "иях")
+            End Select
         Case "т"    ' -тий
             Select Case NewCase
             Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "ий", "ья", "ье"), "ьи")
@@ -4950,7 +4959,7 @@ Dim Result As String
             Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ьим", "ьей"), "ьими")
             Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ьем", "ьей"), "ьих")
             End Select
-        Case "ж", "ш", "н"   ' -жий и -ший
+        Case "ж", "ш", "щ", "н"   ' -жий и -ший
             Select Case NewCase
             Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "ий", IIf(sChar = "н", "я", "а") & "я", "ее"), "ие")
             Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "его", "ей"), "их")
@@ -4966,10 +4975,10 @@ Dim Result As String
             i = i + 1
             Select Case NewCase
             Case DeclineCaseImen: WordEnd = Choose(NewNumb, "й", "и")
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "я", "и")
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "я", "ев")
             Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ю", "ям")
             Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "я", "й"), IIf(Animate, "ев", "и"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ем", "и")
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ем", "ями")
             Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ях")
             End Select
         End If
@@ -5043,11 +5052,11 @@ Dim Result As String
       ' на остальные согласные
                 Select Case NewCase
                 Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = IIf(InStr(1, "кгхжчшщ", sChar), "и", "ы")
-                Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "а", "ов")
-                Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "у", "ам")
-                Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "а", ""), IIf(Animate, "ов", "ы")) ' "ы"",""ов"
+                Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "а", IIf(IsFio = 1, "ых", "ов"))
+                Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "у", IIf(IsFio = 1, "ым", "ам"))
+                Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "а", ""), IIf(Animate, IIf(IsFio = 1, "ых", "ов"), "ы"))  ' "ы"",""ов"
                 Case DeclineCaseTvor: WordEnd = Choose(IsFio + 1, Choose(NewNumb, "ом", "ами"), Choose(NewNumb, "ым", "ыми"), Choose(NewNumb, "ом", "ами"), Choose(NewNumb, "ем", "ами"))
-                Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+                Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", IIf(IsFio = 1, "ых", "ах"))
                 End Select
             End Select
         Case "x"
@@ -5124,7 +5133,7 @@ Dim Result As String
 '
     On Error GoTo HandleError
     Result = vbNullString
-    If IsMissing(IsFio) Then IsFio = p_GetFIOAttr(Words, tmpGender): If NewGend = DeclineGendUndef And IsFio Then NewGend = tmpGender ' False
+    If IsMissing(IsFio) Then IsFio = p_GetFIOAttr(Words, tmpGender): If IsFio Then If (NewGend = DeclineGendUndef) Then NewGend = tmpGender ' False
     strTail = Trim$(Words): iMax = Len(strTail)
     Call Tokenize(Words, aWords): jMin = LBound(aWords): j = UBound(aWords)
     ' получаем список слов которые необходимо пропустить
