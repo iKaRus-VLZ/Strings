@@ -202,7 +202,7 @@ Private Sub Class_Initialize()
         m_varAppAuthor = !Author
         m_lngAppUser = !UserCode
         m_strSupportEmail = !Support
-        m_strLogPath = CodeProject.Path & "\" '& "\" & !LogPath & "\"
+        m_strLogPath = CodeProject.path & "\" '& "\" & !LogPath & "\"
     End With
 ' определяем тип обработки событий отладки по-умолчанию
     Me.HandleType = dbgDefault
@@ -422,7 +422,7 @@ Const cstrSec = "SS"    ' SS - секунды
 Const cstrMSec = "FFF"  ' FFF - милисекунды
 Dim Result As String
     On Error GoTo HandleError
-    If InStr(FormatString, cstrMSec) <= 0 Then ad = DateTime: GoTo HandleResult
+    If InStr(FormatString, cstrMSec) <= 0 Then ad = DateTime: GoTo Handleresult
 Dim dt As SYSTEMTIME
 Dim tmp As Double
     tmp = DateTime
@@ -439,7 +439,7 @@ Dim tmp As Double
 ' собираем
         ad = ad + TimeSerial(.wHour, .wMinute, .wSecond)
     End With
-HandleResult:
+Handleresult:
     Result = VBA.Format$(ad, FormatString)
 HandleExit:
     FormatDateTime = Result
@@ -502,7 +502,7 @@ Dim Result As String
         If (OutputType And dbgWriteToLogFile) = dbgWriteToLogFile Then
 '            If LogFile = 0 Then p_InitLogFile
 ' проверяем существование пути m_strLogPath если нет - создаем
-            If Len(Dir(m_strLogPath, vbDirectory)) = 0 Then MkDir m_strLogPath
+            If Len(dir(m_strLogPath, vbDirectory)) = 0 Then MkDir m_strLogPath
             LogFile = FreeFile
             Open m_strLogPath & c_strLogFileName For Append Lock Write As #LogFile
             Print #LogFile, strDateTime & c_strLogValueDelim & strMessage
@@ -635,7 +635,7 @@ End Function
 Private Function p_InitLogFile()
     Close '#LogFile
 ' проверяем существование пути m_strLogPath если нет - создаем
-    If Len(Dir(m_strLogPath, vbDirectory)) = 0 Then MkDir m_strLogPath
+    If Len(dir(m_strLogPath, vbDirectory)) = 0 Then MkDir m_strLogPath
     LogFile = FreeFile
     Open m_strLogPath & c_strLogFileName For Append Lock Write As #LogFile
 End Function

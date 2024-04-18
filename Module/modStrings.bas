@@ -7,10 +7,11 @@ Private Const c_strModule As String = "modStrings"
 '=========================
 ' Описание      : Функции для работы со строками
 ' Автор         : Кашкин Р.В. (KashRus@gmail.com)
-' Версия        : 1.1.30.453945178
-' Дата          : 12.04.2024 12:25:38
+' Версия        : 1.1.31.454004568
+' Дата          : 18.04.2024 10:57:48
 ' Примечание    : сделано под Access x86, адаптировано под x64, но толком не тестировалось. _
 '               : для работы с Excel сделать APPTYPE=1
+' v.1.1.31      : 16.04.2024 - изменения в TaggedStringGet/Set/Del - добавлена возможность работать с тэгами имеющими одинаковые имена
 ' v.1.1.30      : 12.03.2024 - изменения в GroupsGet - первая попытка переделать скобки под шаблоны (чтобы получить возможность разбирать двух- и более -звенные выражения вроде If .. Then .. End If)
 ' v.1.1.29      : 21.12.2022 - изменения в GroupsGet - исправлены многочисленные ошибки. (всё еще сильно экспериментальная)
 ' v.1.1.27      : 09.08.2022 - изменения в DelimStringSet - добавлен параметр SetUnique для контроля уникальности вставляемых значений
@@ -42,6 +43,8 @@ Private Const c_strModule As String = "modStrings"
 ' + PlaceHoldersGet - проверять соответствие извлекаемого значения, заданным параметрам переменной, например принадлежность списку допустимых значений
 ' - NumToWords      - неправильно склоняет знаменатели натуральных дробей >10^6
 '=========================
+Private Const c_strMultiSfx = "~&#" ' признак суффикса для имени при множественных повторениях
+
 'Private Const c_strEsc = "\" ' эскейп символ - для указания что следующий знак следует рассматривать как обычный символ (не специальный, не разделитель)
 ' русский алфавит
     ' проверить например глухой звук: If iInStr (c_strSymbRusConsonDeaf,sChar) Then
@@ -765,7 +768,7 @@ Public Function PlaceHoldersGet(ByRef Source As String, ByRef Template As String
     Optional LBr As String = "[%", Optional RBr As String = "%]", _
     Optional ReplaceExisting As Integer = False, _
     Optional Method As Integer = 0, _
-    Optional MultiSfx As String) As Boolean
+    Optional MultiSfx As String = c_strMultiSfx) As Boolean
 ' проверяет строку на соответствие шаблону и извлекает из строки коллекцию значений именованых параметров
 '-------------------------
 ' Source    - исходная строка
@@ -791,7 +794,6 @@ Public Function PlaceHoldersGet(ByRef Source As String, ByRef Template As String
 ' ToDo: шаблон должен обязательно содержать: условный оператор, список допустимых значений, якоря для определения позиции
 ' - при ReplaceExisting = -1 - ошибка при добавлении в NamedTerms
 '-------------------------
-Const cSfx = "~&#" ' признак суффикса для имени переменной при множественных значениях (по-умолчанию)
 Dim Result As Boolean: Result = False
     On Error GoTo HandleError
     If Len(Source) = 0 Then GoTo HandleExit Else If Len(Template) = 0 Then GoTo HandleExit
@@ -807,7 +809,7 @@ Dim bOK As Long
     i = 0
     rBeg = 1: tBeg = 1: tEnd = tBeg
     Set NamedTerms = New Collection
-    If ReplaceExisting = 1 And Len(MultiSfx) = 0 Then MultiSfx = cSfx
+    'If ReplaceExisting = 1 And Len(MultiSfx) = 0 Then MultiSfx = c_strMultiSfx
     Do Until tBeg > Len(Template)
 ' ищем именную переменную
         Found = vbNullString
@@ -1434,7 +1436,7 @@ HandleRightBound:
 HandleLeftBound:
     S1 = Left$(S1, lPos)                            ' обрезаем справа по найденой границе
     lLen = Len(S1)
-    If bBeg Then lPos = 0: GoTo HandleResult        ' если привязка к левому краю - левая граница известна - получаем результат
+    If bBeg Then lPos = 0: GoTo Handleresult        ' если привязка к левому краю - левая граница известна - получаем результат
     lPos = lLen                     '
     Do
         If Not iSgn Then iSgn = 1 Else If Not (Right$(S1, lPos - 1) Like S2) Then Exit Do
@@ -1444,7 +1446,7 @@ HandleLeftBound:
     Loop
     lLen = lPos: lPos = Len(S1) - lPos
 ' возвращаем результат
-HandleResult:
+Handleresult:
     Result = Start + lPos: If Result Then Found = Mid$(String1, Result, lLen)
 HandleExit:  InStrLike = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
@@ -2261,33 +2263,96 @@ Dim sTemp As String ':  sTemp = vbNullString
 HandleExit:  sEnd = sBeg: TokenStringDel = Result: Exit Function
 HandleError: Result = Source: Err.Clear: Resume HandleExit
 End Function
+Private Function p_GetSubstrBoundsByTag(Source As String, _
+    Optional ByRef Tag As String, Optional Data As String, Optional ByRef Pos As Long = 0, _
+    Optional sBeg As Long, Optional sEnd As Long, _
+    Optional Delim As String = ";", Optional TagDelim As String = "=", _
+    Optional Compare As VbCompareMethod = vbTextCompare _
+    ) As Boolean
+' возвращает номер и позицию начала и конца подстроки тэга (Tag=Val или Tag) в строке
+'-------------------------
+' Source    - исходная строка
+' Tag       - имя (Tag) элемента. если Tag не задан - элемент будет получен по Pos
+' Data      - значение тэга (Val)
+' Pos       - позиция возвращаемого элемента.
+'        >0 - позиция относительно начала строки
+'        <0 - позиция относительно конца строки
+' sBeg,sEnd - возвращает позицию начала и окончания извлеченной подстроки (имя (Tag), разделитель (TagDelim) и значение (Val)) в исходной
+' Delim     - разделитель пар имя/значение (Tag/Val)
+' TagDelim  - разделитель имени (Tag) и значения (Val) в паре
+' Compare   - тип сравнения (vbBinaryCompare/vbTextCompare)
+' возвращает True если заданная позиция в границах строки, иначе False
+'-------------------------
+Dim Result As Boolean
+    On Error GoTo HandleError
+    If Len(Source) = 0 Then GoTo HandleExit
+Dim i As Long
+Dim sPos As Long
+Dim bFound As Boolean
+Dim sSubst As String, sTag As String, sVal As String
+    If Pos >= 0 Then
+' позиция от начала - пробегаем всю строку с начала по разделителям, проверяя номер подстроки
+        If Pos = 0 Then Pos = 1
+        sPos = 1
+        Do
+            sBeg = sPos
+            sPos = InStr(sPos, Source, Delim, Compare)
+            If sPos > 0 Then sEnd = sPos Else sEnd = Len(Source) + 1
+            sSubst = Mid(Source, sBeg, sEnd - sBeg): sTag = Split(sSubst, TagDelim)(0)
+            If Len(Tag) = 0 Then bFound = True Else bFound = (StrComp(sTag, Tag, Compare) = 0)
+            If bFound Then i = i + 1
+            If (sEnd > Len(Source)) Then Exit Do
+            If (i >= Pos) Then Exit Do
+            sPos = sPos + Len(Delim)
+        Loop
+    Else
+' позиция от конца - пробегаем всю строку с конца по разделителям, проверяя номер подстроки
+        sPos = Len(Source): sEnd = sPos + 1
+        Do
+            sPos = InStrRev(Source, Delim, sPos, Compare)
+            If sPos > 0 Then sBeg = sPos + Len(Delim) Else sBeg = 1
+            sSubst = Mid(Source, sBeg, sEnd - sBeg): sTag = Split(sSubst, TagDelim)(0)
+            If Len(Tag) = 0 Then bFound = True Else bFound = (StrComp(sTag, Tag, Compare) = 0)
+            If bFound Then i = i + 1
+            If (sBeg <= 1) Then Exit Do
+            If (i >= Abs(Pos)) Then Exit Do
+            sEnd = sPos: sPos = sPos - 1
+        Loop
+    End If
+' проверяем соответствие позиции границам
+    Result = (i >= Abs(Pos)) ' позиция ниже нижней границы
+' получаем значение тэга
+    If Result Then
+        If Len(Tag) = 0 Then Tag = sTag
+        If Len(sSubst) > Len(Tag) Then Data = Split(sSubst, TagDelim)(1)
+    End If
+HandleExit:  p_GetSubstrBoundsByTag = Result: Exit Function
+HandleError: Result = False: Err.Clear: Resume HandleExit
+End Function
 Public Function TaggedStringGet(Source As String, _
-    ByRef Tag As String, _
+    Optional ByRef Tag As String, Optional ByRef Pos As Long = 0, _
     Optional Delim As String = ";", Optional TagDelim As String = "=", _
     Optional Compare As VbCompareMethod = vbTextCompare, _
     Optional sBeg As Long, Optional sEnd As Long _
     ) As String
-' возвращает значение элемента строки с разделителями с указанным именем
+' возвращает значение элемента строки с разделителями с указанным именем и(или) позицией
 '-------------------------
 ' лучше для этих целей использовать класс вроде TaggedValues от Гетца: https://www.sql.ru/forum/661816/vdrug-u-kogo-est-dlya-obrabotki-v-vba-strok-svoystv
 ' но иногда и такой вариант бывает полезен
 ' функция никак не проверяет уникальность тэга, - будет возвращено первое вхождение
 ' Source    - строка элементов вида "Tag1=Val1;...TagN=ValN"
 ' Tag       - имя (Tag) элемента. если Tag не задан - элемент будет получен по Pos
-' Delim     - разделитель пар имя (Tag) / значение (Val)
-' TagDelim  - разделитель имени (Tag) и значение (Val) в паре
+' Pos -     позиция возвращаемого элемента.
+'           >0 - позиция относительно начала строки
+'           <0 - позиция относительно конца строки
+' Delim     - разделитель пар имя/значение (Tag/Val)
+' TagDelim  - разделитель имени (Tag) и значения (Val) в паре
 ' sBeg,sEnd - возвращает позицию начала и окончания извлеченной подстроки (значения тэга) в исходной
 ' Compare   - тип сравнения (vbBinaryCompare/vbTextCompare)
-' возвращает значение (Val) элемента с указанным именем (Tag)
+' возвращает значение (Val) элемента с указанным именем (Tag) в указанной позиции (Pos) и его границы в исходной строке (Source)
 '-------------------------
-'' ! если нужен доступ по позиции фрагмента - надо раскомментировать соотв строки
-'    и добавить Optional ByRef Pos As Long = 0, _
-'' Pos -     на входе позиция возвращаемого элемента. (если указан Tag не используется)
-''           >0 - позиция относительно начала строки
-''           <0 - позиция относительно конца строки
-''           на выходе позиция полученного элемента относительно начала строки
+' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами
 '-------------------------
-
 'RegExp: Mask = Delim & Tag & TagDelim & "(.+?)" & Delim
 '        With Regex.Execute(Delim & Source & Delim)(0)
 '           Val = .SubMatches(0)
@@ -2296,38 +2361,53 @@ Public Function TaggedStringGet(Source As String, _
 Dim Result As String: Result = vbNullString
     On Error GoTo HandleError
     If Len(Source) = 0 Then GoTo HandleExit
-    sBeg = 1
-    If Len(Tag) > 0 Then
-' ищем по Tag
-Dim pLen As Long: pLen = Len(Tag & TagDelim): If Len(Source) < pLen Then GoTo HandleExit 'Pos = 0: GoTo HandleExit
-        sBeg = sBeg + pLen
-'        If StrComp(Mid$(Source, 1, pLen), Tag & TagDelim, Compare) = 0 ' If Mid$(tmpSrc, 1, pLen) = tmpTag & TagDelim Then
-'            Pos = 1
-'        Else
-        If StrComp(Mid$(Source, 1, pLen), Tag & TagDelim, Compare) <> 0 Then ' If Mid$(tmpSrc, 1, pLen) <> tmpTag & TagDelim Then
-'        ' если тэг с заданным именем не в начале строки
-'        ' ищем подстроку с заданным именем начинающуюся с Delim и заканчивающуюся TagDelim
-            sBeg = InStr(1, Source, Delim & Tag & TagDelim, Compare)
-            If sBeg = 0 Then GoTo HandleExit 'Pos = 0: GoTo HandleExit
-            sBeg = sBeg + Len(Delim) + pLen
-'            Pos = InStrCount(Left$(Source, sBeg), Delim) + 1
-        End If
-'        ' сейчас в sBeg позиция начала значения тэга
-'        ' ищем позицию конца значения тэга с позиции начала до следующего Delim
-        sEnd = InStr(sBeg, Source, Delim, Compare): If sEnd = 0 Then sEnd = Len(Source) + 1
-        Result = Mid$(Source, sBeg, sEnd - sBeg)
-'    Else
-'' ищем по Pos
-'        Call p_GetSubstrBounds(Source, Pos, sBeg, sEnd, Delim)
-'        Result = Mid$(Source, sBeg, sEnd - sBeg)
-'        sEnd = InStr(Result, TagDelim): sBeg = sEnd + Len(TagDelim)
-'        Tag = Left$(Result, sEnd - 1): Result = Mid$(Result, sBeg)
+' ищем границы подстроки в выражении
+    If p_GetSubstrBoundsByTag(Source, Tag, Result, Pos, sBeg, sEnd, Delim, TagDelim) Then
+    ' тэг найден и позиция соответствует искомой, - возвращаем
+        sBeg = sBeg + Len(Tag): If Len(Result) > 0 Then sBeg = sBeg + Len(TagDelim)
+    Else
+    ' позиция не соответствует искомой, - не найдено
+        If Pos >= 0 Then sBeg = sEnd Else sEnd = sBeg
+        Err.Raise 9
     End If
-HandleExit:  TaggedStringGet = Result: Exit Function
-HandleError: Result = vbNullString: Err.Clear: Resume HandleExit
+''-------------------------
+'' Old version (get only 1st entry)
+''-------------------------
+'    sBeg = 1
+'    If Len(Tag) > 0 Then
+'' ищем по Tag
+'Dim pLen As Long: pLen = Len(Tag & TagDelim): If Len(Source) < pLen Then GoTo HandleExit 'Pos = 0: GoTo HandleExit
+'        sBeg = sBeg + pLen
+''        If StrComp(Mid$(Source, 1, pLen), Tag & TagDelim, Compare) = 0 ' If Mid$(tmpSrc, 1, pLen) = tmpTag & TagDelim Then
+''            Pos = 1
+''        Else
+'        If StrComp(Mid$(Source, 1, pLen), Tag & TagDelim, Compare) <> 0 Then ' If Mid$(tmpSrc, 1, pLen) <> tmpTag & TagDelim Then
+''        ' если тэг с заданным именем не в начале строки
+''        ' ищем подстроку с заданным именем начинающуюся с Delim и заканчивающуюся TagDelim
+'            sBeg = InStr(1, Source, Delim & Tag & TagDelim, Compare)
+'            If sBeg = 0 Then GoTo HandleExit 'Pos = 0: GoTo HandleExit
+'            sBeg = sBeg + Len(Delim) + pLen
+''            Pos = InStrCount(Left$(Source, sBeg), Delim) + 1
+'        End If
+''        ' сейчас в sBeg позиция начала значения тэга
+''        ' ищем позицию конца значения тэга с позиции начала до следующего Delim
+'        sEnd = InStr(sBeg, Source, Delim, Compare): If sEnd = 0 Then sEnd = Len(Source) + 1
+'        Result = Mid$(Source, sBeg, sEnd - sBeg)
+''    Else
+''' ищем по Pos
+''        Call p_GetSubstrBounds(Source, Pos, sBeg, sEnd, Delim)
+''        Result = Mid$(Source, sBeg, sEnd - sBeg)
+''        sEnd = InStr(Result, TagDelim): sBeg = sEnd + Len(TagDelim)
+''        Tag = Left$(Result, sEnd - 1): Result = Mid$(Result, sBeg)
+'    End If
+''-------------------------
+HandleExit:   TaggedStringGet = Result: Exit Function
+HandleError:  Result = vbNullString: Err.Clear: Resume HandleExit
 End Function
+
 Public Function TaggedStringSet(Source As String, _
-    ByRef Tag As String, Optional ByRef Data As String, _
+    Optional ByRef Tag As String, Optional ByRef Data As String, _
+    Optional ByRef Pos As Long = 0, _
     Optional Delim As String = ";", Optional TagDelim As String = "=", _
     Optional sBeg As Long, Optional sEnd As Long, _
     Optional Compare As VbCompareMethod = vbTextCompare _
@@ -2337,118 +2417,160 @@ Public Function TaggedStringSet(Source As String, _
 ' Source -  строка элементов вида "Tag1=Val1;...TagN=ValN"
 ' Tag -     имя (Tag) устанавливаемого элемента, если элемент отсутствует - будет добавлен
 ' Data -    значение (Val) устанавливаемого элемента
+' Pos -     позиция устанавливаемого элемента
+'           >0 - позиция относительно начала строки
+'           <0 - позиция относительно конца строки
 ' Delim -   разделитель пар имя (Tag) / значение (Val)
 ' TagDelim - разделитель имени (Tag) и значения (Val) в паре
 ' sBeg,sEnd - возвращает позицию начала и окончания вставленной подстроки (значения тэга) в исходной
 ' Compare - тип сравнения (vbBinaryCompare/vbTextCompare)
 ' возвращает строку элементов с учетом добавленного элемента
 '-------------------------
-'' ! если нужен доступ по позиции фрагмента - надо раскомментировать соотв строки
-'    и добавить Optional ByRef Pos As Long = 0, _
-'' Pos -     на входе позиция вставки элемента. (порядковый номер позиции в результирующей строке)
-''           0  - будет добавлен в позицию найденного элемента или конец при его отсутствии
-''           >0 - позиция относительно начала строки, вставка перед указанной позицией
-''           <0 - позиция относительно конца строки, вставка после указанной позиции
-''           на выходе содержит позицию добавленного элемента относительно начала строки
-'-------------------------
-' ! функция никак не проверяет уникальность тэга, - будет заменено первое вхождение
-'-------------------------
+' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами
 ' v.1.0.3       : 11.02.2022 - Исправлены ошибки возникающие если TagDelim текстовое выражение, зависящее от регистра
+'-------------------------
+'' если тэг задан - вставка в найденную позицию
+'   ' если значение задано      - замена значения на Data
+'   ' иначе удаление значения   - удаляем значение и TagDelim перед ним
+'' если тэг не задан -
+'   '??? заменять или сдвигать ??? - сейчас замена
 '-------------------------
 Dim Result As String: Result = Source
     On Error GoTo HandleError
-' пустое имя тэга
-    If Len(Tag) = 0 Then
-        Result = Source
-'' ищем по Pos и получаем его Tag
-'   ' при получении по позиции - не даем выходить за пределы строки, - всегда берем имеющуюся подстроку
-'        Call p_GetSubstrBounds(Result, Pos, sBeg, sEnd, Delim)
-'        Tag = Split(Mid$(Result, sBeg, sEnd - sBeg), TagDelim)(0)
-'        sTemp = Tag & TagDelim & Data   ' "Tag=Val" - тэг только что получен
-        GoTo HandleExit
-    End If
-' пустое значение
-    If Len(Data) = 0 Then Result = TaggedStringDel(Source, Tag): GoTo HandleExit
-' пустая строка
-    If Len(Source) = 0 Then If Len(Tag) > 0 Then Result = Tag & TagDelim & Data: GoTo HandleExit ': Pos = 1
-Dim sTemp As String
-Dim pLen As Long
-'' ищем по Tag
-'    ' поиск наличия тэга с таким именем
-    sBeg = 0: sEnd = 0 'Len(Result)
-    pLen = 1 'Len(Tag) + Len(TagDelim)
-    sTemp = Tag & TagDelim & Data ' "Tag=Val"
-    If StrComp(Left$(Source, Len(Tag) + Len(TagDelim)), Tag & TagDelim, Compare) = 0 Then  ' Left$(Source, Len(Tag) + Len(TagDelim)) = Tag & TagDelim Then
-    ' имя тэга найдено в начале строки ("Tag=...")
-        sBeg = 1
-    Else
-    ' ищем в середине строки имя тэга с разделителем тэг/значение ("...;Tag=...")
-        sBeg = InStr(pLen + 1, Result, Delim & Tag & TagDelim, Compare)
-        If sBeg > 0 Then
-    ' имя тэга с разделителем тэг/значение найдено в середине строки ("...;Tag=...")
-            pLen = pLen + Len(Delim)
-        Else
-    ' если не найдено - проверяем тэг без значения и разделителя тэг/значение
-            pLen = Len(Tag) + Len(Delim)
-            If StrComp(Left$(Source, pLen), Tag & Delim, Compare) = 0 Then 'Left$(Source, pLen) = Tag & Delim Then
-        ' проверяем в начале строки ("Tag;...")
-                sBeg = 1: sEnd = Len(Tag) + 1
-            ElseIf StrComp(Source, Tag, Compare) = 0 Then  'tmpSource = tmpTag Then
-        ' проверяем всю строку ("Tag")
-                sBeg = 1: sEnd = Len(Result) + 1
-            ElseIf StrComp(Right$(Source, pLen), Delim & Tag, Compare) = 0 Then  'Right$(tmpSource, pLen) = tmpDelim & tmpTag Then
-        ' проверяем в конце строки ("...;Tag")
-                sBeg = Len(Result) - Len(Tag): sEnd = Len(Result) + 1
+
+' если исходная строка пустая
+    If Len(Source) = 0 Then
+        If Len(Tag) > 0 Then
+            Result = Tag
+            If Len(Data) > 0 Then
+                Result = Result & TagDelim: sBeg = Len(Result) + 1
+                Result = Result & Data:     sEnd = Len(Result) + 1
             Else
-        ' проверяем в середине строки ("...;Tag;...")
-                sBeg = InStr(1, Result, Delim & Tag & Delim, Compare): sEnd = sBeg + pLen
+                sBeg = Len(Result) + 1:     sEnd = sBeg
             End If
         End If
+        GoTo HandleExit
     End If
-' если начало найдено а конец не определен ищем конечный разделитель
-    If sBeg > 0 And sEnd = 0 Then sEnd = InStr(sBeg + pLen + 1, Result, Delim, Compare): If sEnd = 0 Then sEnd = Len(Result) + 1
-'        bFound = sBeg > 0
-
-'        If Pos = 0 Then
-'    ' вставка в позицию найденного элемента или в конец строки
-'        ' корректируем границы фрагмента
-'            ' найден не в начале вставка после разделителя
-'            ' не найден - вставка в конец, добавляем перед вставкой разделитель
-        If sBeg = 0 Then sBeg = Len(Result) + 1: sEnd = sBeg
-'        ' получаем позицию фрагмента вставки
-        If sBeg > 1 Then
-            sTemp = Delim & sTemp
-'                Pos = InStrCount(Left$(Result, sBeg), Delim) + 2
-'            Else
-'                Pos = 1
+    
+    Result = Source
+' ищем границы подстроки в выражении
+Dim bFound As Boolean
+    bFound = p_GetSubstrBoundsByTag(Source, Tag, , Pos, sBeg, sEnd, Delim, TagDelim)
+    ' если здесь нет тэга он был не задан и не найден по позиции - добавить невозможно
+    If Not bFound Then
+    ' позиция не соответствует искомой, - не найдено
+        If Pos > 0 Then
+        ' добавляем в конец
+            sBeg = sEnd: If Len(Tag) = 0 Then GoTo HandleExit
+            Result = Result & Delim: sEnd = sEnd + Len(Delim): sBeg = sEnd
+        Else
+        ' добавляем в начало
+            sEnd = sBeg: If Len(Tag) = 0 Then GoTo HandleExit
+            Result = Delim & Result
         End If
+    End If
+Dim sTemp As String
+    sTemp = Tag: If Len(Data) > 0 Then sTemp = sTemp & TagDelim & Data
+    Result = Left$(Result, sBeg - 1) & sTemp & Mid$(Result, sEnd)
+    sBeg = sBeg + Len(sTemp) - Len(Data): sEnd = sBeg + Len(Data)
+''-------------------------
+'' Old version (set only 1st entry)
+''-------------------------
+'' пустое имя тэга
+'    If Len(Tag) = 0 Then
+'        Result = Source
+''' ищем по Pos и получаем его Tag
+''   ' при получении по позиции - не даем выходить за пределы строки, - всегда берем имеющуюся подстроку
+''        Call p_GetSubstrBounds(Result, Pos, sBeg, sEnd, Delim)
+''        Tag = Split(Mid$(Result, sBeg, sEnd - sBeg), TagDelim)(0)
+''        sTemp = Tag & TagDelim & Data   ' "Tag=Val" - тэг только что получен
+'        GoTo HandleExit
+'    End If
+'' пустое значение
+'    If Len(Data) = 0 Then Result = TaggedStringDel(Source, Tag): GoTo HandleExit
+'' пустая строка
+'    If Len(Source) = 0 Then If Len(Tag) > 0 Then Result = Tag & TagDelim & Data: GoTo HandleExit ': Pos = 1
+'Dim sTemp As String
+'Dim pLen As Long
+''' ищем по Tag
+''    ' поиск наличия тэга с таким именем
+'    sBeg = 0: sEnd = 0 'Len(Result)
+'    pLen = 1 'Len(Tag) + Len(TagDelim)
+'    sTemp = Tag & TagDelim & Data ' "Tag=Val"
+'    If StrComp(Left$(Source, Len(Tag) + Len(TagDelim)), Tag & TagDelim, Compare) = 0 Then  ' Left$(Source, Len(Tag) + Len(TagDelim)) = Tag & TagDelim Then
+'    ' имя тэга найдено в начале строки ("Tag=...")
+'        sBeg = 1
+'    Else
+'    ' ищем в середине строки имя тэга с разделителем тэг/значение ("...;Tag=...")
+'        sBeg = InStr(pLen + 1, Result, Delim & Tag & TagDelim, Compare)
+'        If sBeg > 0 Then
+'    ' имя тэга с разделителем тэг/значение найдено в середине строки ("...;Tag=...")
+'            pLen = pLen + Len(Delim)
 '        Else
-'    ' удаление фрагмента в текущей позиции и вставка в указанную позицию
-'        ' удаление в найденной позиции
-'            If sBeg > 0 Then
-'                If sBeg = 1 Then sEnd = sEnd + Len(Delim)
-'                Result = Left$(Source, sBeg - 1) & Mid$(Source, sEnd)
-'            End If
-'        ' получаем позицию фрагмента вставки и формируем вставляемую строку
-'            'Result = DelimStringSet(Result, Pos, sTemp, Delim, Overwrite:=False): GoTo HandleExit
-'            Select Case Pos
-'            Case 1:     Result = sTemp & Delim & Result: GoTo HandleExit
-'            Case -1:    Result = Result & Delim & sTemp: Pos = InStrCount(Result, Delim) + 2: GoTo HandleExit
-'            End Select
-'            If (Sgn(Pos) = -1) = p_GetSubstrBounds(Source, Pos, sBeg, sEnd, Delim) Then
-'                sTemp = Mid$(Result, sBeg, sEnd - sBeg) & Delim & sTemp: If Not bFound Then Pos = Pos + 1
+'    ' если не найдено - проверяем тэг без значения и разделителя тэг/значение
+'            pLen = Len(Tag) + Len(Delim)
+'            If StrComp(Left$(Source, pLen), Tag & Delim, Compare) = 0 Then 'Left$(Source, pLen) = Tag & Delim Then
+'        ' проверяем в начале строки ("Tag;...")
+'                sBeg = 1: sEnd = Len(Tag) + 1
+'            ElseIf StrComp(Source, Tag, Compare) = 0 Then  'tmpSource = tmpTag Then
+'        ' проверяем всю строку ("Tag")
+'                sBeg = 1: sEnd = Len(Result) + 1
+'            ElseIf StrComp(Right$(Source, pLen), Delim & Tag, Compare) = 0 Then  'Right$(tmpSource, pLen) = tmpDelim & tmpTag Then
+'        ' проверяем в конце строки ("...;Tag")
+'                sBeg = Len(Result) - Len(Tag): sEnd = Len(Result) + 1
 '            Else
-'                sTemp = sTemp & Delim & Mid$(Result, sBeg, sEnd - sBeg)
+'        ' проверяем в середине строки ("...;Tag;...")
+'                sBeg = InStr(1, Result, Delim & Tag & Delim, Compare): sEnd = sBeg + pLen
 '            End If
 '        End If
-
-' вставка в указанную позицию
-    Result = Left$(Result, sBeg - 1) & sTemp & Mid$(Result, sEnd)
-HandleExit:  sBeg = sEnd - Len(Data): TaggedStringSet = Result: Exit Function
+'    End If
+'' если начало найдено а конец не определен ищем конечный разделитель
+'    If sBeg > 0 And sEnd = 0 Then sEnd = InStr(sBeg + pLen + 1, Result, Delim, Compare): If sEnd = 0 Then sEnd = Len(Result) + 1
+''        bFound = sBeg > 0
+'
+''        If Pos = 0 Then
+''    ' вставка в позицию найденного элемента или в конец строки
+''        ' корректируем границы фрагмента
+''            ' найден не в начале вставка после разделителя
+''            ' не найден - вставка в конец, добавляем перед вставкой разделитель
+'        If sBeg = 0 Then sBeg = Len(Result) + 1: sEnd = sBeg
+''        ' получаем позицию фрагмента вставки
+'        If sBeg > 1 Then
+'            sTemp = Delim & sTemp
+''                Pos = InStrCount(Left$(Result, sBeg), Delim) + 2
+''            Else
+''                Pos = 1
+'        End If
+''        Else
+''    ' удаление фрагмента в текущей позиции и вставка в указанную позицию
+''        ' удаление в найденной позиции
+''            If sBeg > 0 Then
+''                If sBeg = 1 Then sEnd = sEnd + Len(Delim)
+''                Result = Left$(Source, sBeg - 1) & Mid$(Source, sEnd)
+''            End If
+''        ' получаем позицию фрагмента вставки и формируем вставляемую строку
+''            'Result = DelimStringSet(Result, Pos, sTemp, Delim, Overwrite:=False): GoTo HandleExit
+''            Select Case Pos
+''            Case 1:     Result = sTemp & Delim & Result: GoTo HandleExit
+''            Case -1:    Result = Result & Delim & sTemp: Pos = InStrCount(Result, Delim) + 2: GoTo HandleExit
+''            End Select
+''            If (Sgn(Pos) = -1) = p_GetSubstrBounds(Source, Pos, sBeg, sEnd, Delim) Then
+''                sTemp = Mid$(Result, sBeg, sEnd - sBeg) & Delim & sTemp: If Not bFound Then Pos = Pos + 1
+''            Else
+''                sTemp = sTemp & Delim & Mid$(Result, sBeg, sEnd - sBeg)
+''            End If
+''        End If
+'
+'' вставка в указанную позицию
+'    Result = Left$(Result, sBeg - 1) & sTemp & Mid$(Result, sEnd)
+''-------------------------
+HandleExit:  TaggedStringSet = Result: Exit Function
 HandleError: Result = Source: Err.Clear: Resume HandleExit
 End Function
+
 Public Function TaggedStringDel(Source As String, _
     ByRef Tag As String, _
+    Optional ByRef Pos As Long = 0, _
     Optional Delim As String = ";", Optional TagDelim As String = "=", _
     Optional sBeg As Long, Optional sEnd As Long, _
     Optional Compare As VbCompareMethod = vbTextCompare _
@@ -2457,69 +2579,83 @@ Public Function TaggedStringDel(Source As String, _
 '-------------------------
 ' Source - строка элементов вида "Tag1=Val1;...TagN=ValN"
 ' Tag -     имя (Tag) элемента. если Tag не задан - элемент будет получен по Pos
+' Pos -     позиция удаляемого элемента
+'           >0 - позиция относительно начала строки
+'           <0 - позиция относительно конца строки
 ' Delim -   разделитель пар имя (Tag) / значение (Val)
 ' TagDelim - разделитель имени (Tag) и значение (Val) в паре
 ' sBeg,sEnd - возвращает позицию начала и окончания вставленной подстроки в исходной
 ' Compare - тип сравнения (vbBinaryCompare/vbTextCompare)
 ' Возвращает строку элементов без указанного элемента
 '-------------------------
-'' ! если нужен доступ по позиции фрагмента - надо раскомментировать соотв строки
-'    и добавить Optional ByRef Pos As Long = 0, _
-'' Pos -     на входе позиция удаляемого элемента. (если указан Tag не используется)
-''           >0 - позиция относительно начала строки
-''           <0 - позиция относительно конца строки
-''           на выходе позиция элемента предшествующего удалённому относительно начала строки или 1
-'-------------------------
-' ! функция никак не проверяет уникальность тэга, - будет удалено первое вхождение
+' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами
 '-------------------------
 Dim Result As String: Result = Source
     On Error GoTo HandleError
     If Len(Source) = 0 Then GoTo HandleExit
-    If Len(Tag) > 0 Then
-'' ищем по Tag
-'    ' поиск наличия тага с таким именем
-'' ищем по Tag
-'    ' поиск наличия тэга с таким именем
-        sBeg = 0: sEnd = 0 'Len(Result)
-Dim pLen As Long
-        pLen = 1 'Len(Tag) + Len(TagDelim)
-        'sTemp = Tag & TagDelim & Data   ' "Tag=Val"
-        If StrComp(Left$(Source, Len(Tag) + Len(TagDelim)), Tag & TagDelim, Compare) = 0 Then ' Left$(tmpSource, Len(Tag) + Len(TagDelim)) = tmpTag & tmpTagDelim Then
-        ' имя тэга найдено в начале строки ("Tag=...")
-            sBeg = 1
-        Else
-        ' ищем в середине строки имя тэга с разделителем тэг/значение ("...;Tag=...")
-            sBeg = InStr(pLen + 1, Result, Delim & Tag & TagDelim, Compare)
-            If sBeg > 0 Then
-        ' имя тэга с разделителем тэг/значение найдено в середине строки ("...;Tag=...")
-                pLen = pLen + Len(Delim)
-            Else
-        ' если не найдено - проверяем тэг без значения и разделителя тэг/значение
-                pLen = Len(Tag) + Len(Delim)
-                If StrComp(Left$(Source, pLen), Tag & Delim, Compare) = 0 Then  ' Left$(tmpSource, pLen) = tmpTag & tmpDelim Then
-            ' проверяем в начале строки ("Tag;...")
-                    sBeg = 1: sEnd = Len(Tag) + 1
-                ElseIf StrComp(Source, Tag, Compare) = 0 Then   ' tmpSource = tmpTag Then
-            ' проверяем всю строку ("Tag")
-                    sBeg = 1: sEnd = Len(Result) + 1
-                ElseIf StrComp(Right$(Source, pLen) = Delim & Tag, Compare) = 0 Then   'Right$(tmpSource, pLen) = tmpDelim & tmpTag Then
-            ' проверяем в конце строки ("...;Tag")
-                    sBeg = Len(Result) - Len(Tag): sEnd = Len(Result) + 1
-                Else
-            ' проверяем в середине строки ("...;Tag;...")
-                    sBeg = InStr(1, Result, Delim & Tag & Delim, Compare): sEnd = sBeg + pLen
-                End If
-            End If
-        End If
-        If sBeg = 0 Then GoTo HandleExit ' тэг не найден
-'        ' если начало фрагмента найдено ищем его конец
-        If sEnd = 0 Then sEnd = InStr(sBeg + pLen + 1, Result, Delim, Compare): If sEnd = 0 Then sEnd = Len(Result) + 1
-'        ' получаем позицию фрагмента удаления
-        If sBeg <= 1 Then
-            sEnd = sEnd + Len(Delim) ': Pos = 1
+' ищем границы подстроки в выражении
+    ' если здесь нет тэга он был не задан и не найден по позиции - удалить невозможно
+    If Not p_GetSubstrBoundsByTag(Source, Tag, , Pos, sBeg, sEnd, Delim, TagDelim) Then GoTo HandleExit
+    ' позиция соответствует искомой, - найдено
+        ' если удаление в середине или в начале строки - удалить начальный разделитель правого фрагмента,
+        ' если в конце строки - конечный разделитель левого фрагмента
+        ' сдвинуть границы
+' возвращаем результат
+Dim sTemp As String: sTemp = Left$(Result, sBeg - 1)
+    Result = Mid$(Result, sEnd)
+    If Len(Result) > 0 Then
+        Result = Mid(Result, Len(Delim) + 1)
+    ElseIf Len(sTemp) > 0 Then
+        sTemp = Left(sTemp, Len(sTemp) - Len(Delim)): sBeg = Len(sTemp) + 1
+    End If
+    Result = sTemp & Result
+    sEnd = sBeg
+''-------------------------
+'' Old version (del only 1st entry)
+''-------------------------
+'    If Len(Tag) > 0 Then
+''' ищем по Tag
+''    ' поиск наличия тага с таким именем
+'        sBeg = 0: sEnd = 0 'Len(Result)
+'Dim pLen As Long
+'        pLen = 1 'Len(Tag) + Len(TagDelim)
+'        'sTemp = Tag & TagDelim & Data   ' "Tag=Val"
+'        If StrComp(Left$(Source, Len(Tag) + Len(TagDelim)), Tag & TagDelim, Compare) = 0 Then ' Left$(tmpSource, Len(Tag) + Len(TagDelim)) = tmpTag & tmpTagDelim Then
+'        ' имя тэга найдено в начале строки ("Tag=...")
+'            sBeg = 1
+'        Else
+'        ' ищем в середине строки имя тэга с разделителем тэг/значение ("...;Tag=...")
+'            sBeg = InStr(pLen + 1, Result, Delim & Tag & TagDelim, Compare)
+'            If sBeg > 0 Then
+'        ' имя тэга с разделителем тэг/значение найдено в середине строки ("...;Tag=...")
+'                pLen = pLen + Len(Delim)
+'            Else
+'        ' если не найдено - проверяем тэг без значения и разделителя тэг/значение
+'                pLen = Len(Tag) + Len(Delim)
+'                If StrComp(Left$(Source, pLen), Tag & Delim, Compare) = 0 Then  ' Left$(tmpSource, pLen) = tmpTag & tmpDelim Then
+'            ' проверяем в начале строки ("Tag;...")
+'                    sBeg = 1: sEnd = Len(Tag) + 1
+'                ElseIf StrComp(Source, Tag, Compare) = 0 Then   ' tmpSource = tmpTag Then
+'            ' проверяем всю строку ("Tag")
+'                    sBeg = 1: sEnd = Len(Result) + 1
+'                ElseIf StrComp(Right$(Source, pLen) = Delim & Tag, Compare) = 0 Then   'Right$(tmpSource, pLen) = tmpDelim & tmpTag Then
+'            ' проверяем в конце строки ("...;Tag")
+'                    sBeg = Len(Result) - Len(Tag): sEnd = Len(Result) + 1
+'                Else
+'            ' проверяем в середине строки ("...;Tag;...")
+'                    sBeg = InStr(1, Result, Delim & Tag & Delim, Compare): sEnd = sBeg + pLen
+'                End If
+'            End If
+'        End If
+'        If sBeg = 0 Then GoTo HandleExit ' тэг не найден
+''        ' если начало фрагмента найдено ищем его конец
+'        If sEnd = 0 Then sEnd = InStr(sBeg + pLen + 1, Result, Delim, Compare): If sEnd = 0 Then sEnd = Len(Result) + 1
+''        ' получаем позицию фрагмента удаления
+'        If sBeg <= 1 Then
+'            sEnd = sEnd + Len(Delim) ': Pos = 1
 '        Else
 '            Pos = InStrCount(Left$(Result, sBeg), Delim) + 1
-        End If
+'        End If
 '    Else
 '' ищем по Pos
 '    ' при получении по позиции - не даем выходить за пределы строки, - всегда берем имеющуюся подстроку
@@ -2527,17 +2663,19 @@ Dim pLen As Long
 '        'Tag = Split(Mid$(Result, sBeg, sEnd - sBeg), TagDelim)(0)
 '        If sBeg > 1 Then sBeg = sBeg - Len(Delim) Else sEnd = sEnd + Len(Delim)
 '        If Pos > 1 Then Pos = Pos - 1
-    End If
-' удаление указанной позиции
-    Result = Left$(Result, sBeg - 1) & Mid$(Result, sEnd)
+'    End If
+'' удаление указанной позиции
+'    Result = Left$(Result, sBeg - 1) & Mid$(Result, sEnd)
+''-------------------------
 HandleExit:  sEnd = sBeg: TaggedStringDel = Result: Exit Function
 HandleError: Result = Source: Err.Clear: Resume HandleExit
 End Function
 Public Function TaggedString2Collection(Source As String, _
-    Optional Tags As Collection, Optional Keys, _
-    Optional Delim As String = ";", Optional TagDelim As String = "=", _
-    Optional ReplaceExisting As Integer = True _
-    ) As Boolean
+        Optional Tags As Collection, Optional Keys, _
+        Optional Delim As String = ";", Optional TagDelim As String = "=", _
+        Optional ReplaceExisting As Integer = True, _
+        Optional MultiSfx As String = c_strMultiSfx _
+        ) As Boolean
 ' преобразует строку именованных параметров в коллекцию значений с ключами соотв имени тэга
 '-------------------------
 ' Source - строка элементов вида "Tag1=Val1;...TagN=ValN"
@@ -2546,43 +2684,95 @@ Public Function TaggedString2Collection(Source As String, _
 ' Delim -   разделитель пар имя (Tag) / значение (Val)
 ' TagDelim - разделитель имени (Tag) и значение (Val) в паре
 ' ReplaceExisting - определяет поведение при обнаружении переменных с одинаковым именем
-'   0 - в коллекцию будет добавлена первая найденная, последующие будут игнорироваться
-'  -1 - переменные с одинаковым именем будут заменяться - в коллекции останется последняя найденная
+'   0 - будет сохранено первое значение
+'  -1 - будет сохранено последнее значение
+'   1 - будут сохранены все значения в переменных с добавлением суффикса
+' MultiSfx - признак суффикса для повторяющихся имен (при ReplaceExisting=1) д.б. что-то заведомо отсутствующее в именах переменных
+'-------------------------
+' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами (очень тупо и в лоб, но хороших идей нет)
 '-------------------------
 Dim Result As Boolean: Result = False
     On Error GoTo HandleError
+    'If Len(Source) = 0 Then GoTo HandleExit
     Do While Right(Source, Len(Delim)) = Delim: Source = Trim(Left$(Source, Len(Source) - Len(Delim))): Loop
     If Len(Source) = 0 Then GoTo HandleExit
-    If Tags Is Nothing Then Set Tags = New Collection
+Dim sKey As String, sTag As String, vVal As String, iKey As Long
 Dim Arr() As String, Term 'As String
-Dim sKey As String, vVal 'As String
+' проверяем переданную коллекцию тэгов
+    Select Case ReplaceExisting
+    Case 0, -1: If Tags Is Nothing Then Set Tags = New Collection
+    Case Else
+    ' если допустимы множественные вхождения
+        ' создаем коллекцию имен тэгов, где будем хранить количество вхождений каждого имени тэга
+Dim cCount As Collection: Set cCount = New Collection
+        If Tags Is Nothing Then
+                If Tags Is Nothing Then Set Tags = New Collection
+        Else
+            If Tags.Count > 0 Then
+    ' если передана готовая коллекция тэгов (добавление новых значений к готовой коллекции) - надо сначала проверить её и посчитать количество вхождений для повторяющихся тэгов
+    ' это очень плохо - при каждом вызове надо пробегать все имена из существующей коллекции - проще её пересоздать
+        ' получаем массив ключей имеющихся элементов
+                Arr() = p_GetCollKeys(Tags)
+                For Each Term In Arr
+        ' проверяем ключ, извлекаем из него тэг и заносим в коллекцию количество имеющихся вхождений + 1
+                    sTag = Split(Term, MultiSfx)(0)
+                    If p_IsExist(sTag, cCount, iKey) Then cCount.Remove sTag 'Else iKey = 0
+                    cCount.Add iKey + 1, sTag
+                Next Term
+            End If
+        End If
+    End Select
+' разбираем строку тэгов
+    If Tags Is Nothing Then Set Tags = New Collection
     Arr() = Split(Source, Delim)
     For Each Term In Arr
-        sKey = Split(Term, TagDelim)(0) ' получаем тэг
-        If p_IsExist(sKey, Tags) Then If ReplaceExisting Then Tags.Remove sKey Else GoTo HandleNext
-        vVal = Split(Term, TagDelim)(1) ' получаем значение
-        Tags.Add vVal, sKey
+        sKey = Split(Term, TagDelim)(0)     ' получаем тэг
+        Select Case ReplaceExisting
+        Case 0:     If p_IsExist(sKey, Tags) Then GoTo HandleNext   ' пропускаем если в коллекции уже есть тэг с таким именем иначе добавляем
+        Case -1:    If p_IsExist(sKey, Tags) Then Tags.Remove sKey  ' заменяем если в коллекции уже есть тэг с таким именем иначе добавляем
+        Case Else:  sTag = sKey: iKey = 0                           ' добавляем, если в коллекции уже есть тэг с таким именем - добавляем к имени суффикс
+                If p_IsExist(sKey, cCount, iKey) Then sKey = sTag & MultiSfx & iKey: cCount.Remove sTag ' получаем имя ключа для нового элемента коллекции тэгов из имени тэга и количества вхождений
+                cCount.Add iKey + 1, sTag                           ' обновляем значение количества вхождений для тэга
+        End Select
+        If Len(Term) > Len(sTag) Then vVal = Split(Term, TagDelim)(1) Else vVal = vbNullString ' получаем значение
+        Tags.Add vVal, sKey                                         ' добавляем тэг в коллекцию
 HandleNext:
     Next
-    Erase Arr
+    ' если надо - возвращаем массив имен ключей
     If Not IsMissing(Keys) Then Keys = p_GetCollKeys(Tags)
+    Erase Arr
+    'Select Case ReplaceExisting
+    'Case 0, -1:
+    'Case Else: Set cCount = Nothing
+    'End Select
     Result = True
 HandleExit:  TaggedString2Collection = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
 Public Function TaggedCollection2String(Tags As Collection, _
-    Optional Delim As String = ";", Optional TagDelim As String = "=" _
+    Optional Delim As String = ";", Optional TagDelim As String = "=", _
+    Optional MultiSfx As String = c_strMultiSfx _
     ) As String
 ' преобразует коллекцию значений с ключами соотв имени тэга в строку именованных параметров
+'-------------------------
+' Tags - коллекция значений тэгов.
+' Keys - (если задано) возвращает массив ключей коллекции (Tag)
+' Delim -   разделитель пар имя (Tag) / значение (Val)
+' TagDelim - разделитель имени (Tag) и значение (Val) в паре
+' MultiSfx - признак суффикса для повторяющихся имен (при ReplaceExisting=1) д.б. что-то заведомо отсутствующее в именах переменных
+'-------------------------
+' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами
 '-------------------------
 Dim Result As String: Result = vbNullString
     On Error GoTo HandleError
     If Tags Is Nothing Then GoTo HandleExit
     If Tags.Count = 0 Then GoTo HandleExit
 Dim Keys() As String: Keys() = p_GetCollKeys(Tags)
+Dim sTag As String ', iKey as Long
 Dim i As Long
     For i = 1 To Tags.Count
-        Result = Result & Delim & Keys(i) & TagDelim & Tags.Item(i)
+        sTag = Split(Keys(i), MultiSfx)(0) ': If Len(sTag)< Len(Keys(i)) then iKey = cLng(Split(Keys(i), MultiSfx)(1))
+        Result = Result & Delim & sTag:     If Len(Tags.Item(i)) > 0 Then Result = Result & TagDelim & Tags.Item(i)
     Next i
     If Left$(Result, Len(Delim)) = Delim Then Result = Mid$(Result, Len(Delim) + 1)
 HandleExit:  TaggedCollection2String = Result: Exit Function
@@ -2616,30 +2806,37 @@ Dim i As Long
             i = i + 1: If i > Pos Then Exit Do
             sBeg = sEnd + Len(Delim)
         Loop
-        Result = (Pos <= i): If Not Result Then Pos = i  ' позиция выше верхней границы
     Else
 ' позиция от конца
-    ' Вариант 1: пробегаем всю строку с конца по разделителям, проверяя номер подстроки
-    ' Вариант 2: пробегаем всю строку с начала подсчитывая количество подстрок и формируя массив позиций разделителей
-    Dim aPos() As Long
-    ' подсчитываем количество фрагментов в строке, формируя массив позиций разделителей
+    ' Пробегаем всю строку с конца по разделителям, проверяя номер подстроки (Вариант 1)
+Dim sPos As Long: sPos = Len(Source): sEnd = sPos + 1
         Do
-            ReDim Preserve aPos(1 To i): aPos(i) = sBeg
-            sBeg = InStr(sBeg, Source, Delim) '
-            i = i + 1
-            If sBeg > 0 Then sBeg = sBeg + Len(Delim) Else Exit Do
+            sPos = InStrRev(Source, Delim, sPos)
+            If sPos > 0 Then sBeg = sPos + Len(Delim) Else sBeg = 1: Exit Do
+            i = i + 1: If i > Abs(Pos) Then Exit Do
+            sEnd = sPos
         Loop
-    ' переводим позицию относительно конца строки в позицию от начала
-        Pos = i + Pos
-        Select Case Pos
-        Case 1 To i: Result = True              ' позиция в пределах строки
-        Case Is < 1: Result = False: Pos = 1    ' позиция ниже нижней границы
-        'Case Is > i: Result = False: Pos = i    ' позиция выше верхней границы
-        End Select
-    ' берем границы фрагмента с указанной позицией из массива
-        sBeg = aPos(Pos): If Pos < (i - 1) Then sEnd = aPos(Pos + 1) - Len(Delim) Else sEnd = Len(Source) + 1
-        Erase aPos()
+'    ' Пробегаем всю строку с начала подсчитывая количество подстрок и формируя массив позиций разделителей (Вариант 2)
+'    Dim aPos() As Long
+'    ' подсчитываем количество фрагментов в строке, формируя массив позиций разделителей
+'        Do
+'            ReDim Preserve aPos(1 To i): aPos(i) = sBeg
+'            sBeg = InStr(sBeg, Source, Delim): i = i + 1
+'            If sBeg > 0 Then sBeg = sBeg + Len(Delim) Else Exit Do
+'        Loop
+'    ' переводим позицию относительно конца строки в позицию от начала
+'        Pos = i + Pos
+'        Select Case Pos
+'        Case 1 To i: Result = True  ' позиция в пределах строки
+'        Case Is < 1: Pos = 1        ' позиция ниже нижней границы
+'        'Case Is > i: Pos = i        ' позиция выше верхней границы
+'        End Select
+'    ' берем границы фрагмента с указанной позицией из массива
+'        sBeg = aPos(Pos): If Pos < (i - 1) Then sEnd = aPos(Pos + 1) - Len(Delim) Else sEnd = Len(Source) + 1
+'        Erase aPos()
     End If
+' проверяем соответствие позиции границам
+    Result = (i >= Abs(Pos)): If Not Result Then Pos = Sgn(Pos) * i ' позиция ниже нижней границы
 HandleExit:  p_GetSubstrBounds = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
@@ -5133,7 +5330,7 @@ Dim Result As String
 '
     On Error GoTo HandleError
     Result = vbNullString
-    If IsMissing(IsFio) Then IsFio = p_GetFIOAttr(Words, tmpGender): If IsFio Then If (NewGend = DeclineGendUndef) Then NewGend = tmpGender ' False
+    If IsMissing(IsFio) Then IsFio = p_GetFIOAttr(Words, tmpGender): If NewGend = DeclineGendUndef And IsFio Then NewGend = tmpGender ' False
     strTail = Trim$(Words): iMax = Len(strTail)
     Call Tokenize(Words, aWords): jMin = LBound(aWords): j = UBound(aWords)
     ' получаем список слов которые необходимо пропустить
@@ -5559,6 +5756,7 @@ Dim Result As Boolean
 HandleExit:  p_GetWordParts2 = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
+
 Private Function p_GetFIOAttr(ByVal Words As String, Optional ByRef Gend As DeclineGend = DeclineGendUndef) As Boolean
 ' определяет признак ФИО
 '-------------------------

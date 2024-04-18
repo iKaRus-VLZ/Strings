@@ -861,7 +861,7 @@ End Function
 Public Function IsSubForm(frm As Form) As Boolean
 ' ѕровер€ет открыта ли форма как субформа
     On Error Resume Next
-Dim strName As String: strName = frm.PARENT.Name
+Dim strName As String: strName = frm.PARENT.NAME
     IsSubForm = (Err.Number = 0): Err.Clear
 End Function
 
@@ -879,7 +879,7 @@ Public Function IsFormExists(FormName As String) As Boolean
 ' провер€ет существует ли форма
 Dim Result As Boolean:  Result = False
     On Error GoTo HandleError
-    Result = (CurrentProject.AllForms(FormName).Name = FormName) '
+    Result = (CurrentProject.AllForms(FormName).NAME = FormName) '
 HandleExit:  IsFormExists = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
@@ -921,7 +921,7 @@ Public Function IsReportExists(FormName As String) As Boolean
 ' провер€ет существует ли отчЄт
 Dim Result As Boolean:  Result = False
     On Error GoTo HandleError
-    Result = (CurrentProject.AllReports(FormName).Name = FormName) '
+    Result = (CurrentProject.AllReports(FormName).NAME = FormName) '
 HandleExit:  IsReportExists = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
@@ -1007,7 +1007,7 @@ Dim tmpWinMode As AcWindowMode: tmpWinMode = acHidden '  WindowMode
 '----------------------------------
 Dim i As Long
     For i = Application.Forms.Count - 1 To 0 Step -1
-        Result = (Application.Forms(i).Name = FormName):   If Result Then Set NewForm = Application.Forms(i):   Exit For
+        Result = (Application.Forms(i).NAME = FormName):   If Result Then Set NewForm = Application.Forms(i):   Exit For
     Next i
     If Not Result Then: Err.Raise vbObjectError + 512
 '----------------------------------
@@ -1068,7 +1068,7 @@ Dim bolModal As Boolean: bolModal = (.ModalResult = .ModalResult)
 ' гон€ем в цикле пока не дождЄмс€ выбора пользовател€
     If bolModal Then
         Do While .Visible: DoEvents: Loop: If .ModalResult = vbOK Then Result = .Value
-        DoCmd.Close acForm, NewForm.Name, acSaveNo: Set NewForm = Nothing ' если открывали модальную - после получени€ ответа закрываем
+        DoCmd.Close acForm, NewForm.NAME, acSaveNo: Set NewForm = Nothing ' если открывали модальную - после получени€ ответа закрываем
     End If
     End With
 ' возвращаем результат в исходное поле
@@ -1184,7 +1184,7 @@ Dim acState As acFormState: acState = SysCmd(acSysCmdGetObjectState, acReport, R
 '----------------------------------
 Dim i As Long
     For i = Application.Reports.Count - 1 To 0 Step -1
-        Result = (Application.Reports(i).Name = ReportName): If Result Then Set NewReport = Application.Reports(i): Exit For
+        Result = (Application.Reports(i).NAME = ReportName): If Result Then Set NewReport = Application.Reports(i): Exit For
     Next i
 '----------------------------------
 ' задаЄм свойства объекта
@@ -1532,12 +1532,12 @@ Dim Result As Boolean: Result = False
     On Error GoTo HandleError
 Dim lpPoint As POINT
 'Dim frm As Access.Form
-Dim cX As Long, cY As Long, cW As Long, ch As Long
+Dim cX As Long, cY As Long, cW As Long, cH As Long
 Dim dX As Long, dY As Long, dW As Long, dH As Long
 ' определ€ем родительскую форму и координаты/размеры переданного контрола
     If TypeOf accObject Is Access.Control Then
         Set ParentObject = GetTopParent(accObject)
-        With accObject: cX = .Left: cY = .Top: cW = .Width: ch = .Height: End With
+        With accObject: cX = .Left: cY = .Top: cW = .Width: cH = .Height: End With
         With ParentObject
         dX = .CurrentSectionLeft
         If accObject.Section <> acHeader Then
@@ -1561,7 +1561,7 @@ Dim dX As Long, dY As Long, dW As Long, dH As Long
             On Error Resume Next
             dH = .Section(acHeader).Height + .Section(acFooter).Height: Err.Clear
             On Error GoTo HandleError
-            cW = .Width: ch = dH + .Section(acDetail).Height
+            cW = .Width: cH = dH + .Section(acDetail).Height
         End With
     Else: Err.Raise vbObjectError + 512
     End If
@@ -1572,7 +1572,7 @@ Dim dX As Long, dY As Long, dW As Long, dH As Long
     If Not IsMissing(y) Then y = lpPoint.y + TwipsToPixels(cY + dY, DIRECTION_VERTICAL)
 ' получаем размеры контрола
     If Not IsMissing(w) Then w = TwipsToPixels(cW, DIRECTION_HORIZONTAL)
-    If Not IsMissing(h) Then h = TwipsToPixels(ch, DIRECTION_VERTICAL)
+    If Not IsMissing(h) Then h = TwipsToPixels(cH, DIRECTION_VERTICAL)
     Result = True
 HandleExit:  AccControlLocation = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
@@ -1835,7 +1835,7 @@ Dim i&, Result&, s$
     With frm
         For i = acDetail To acGroupLevel2Footer
             Err.Clear
-            s = .Section(i).Name
+            s = .Section(i).NAME
             If Err = 0 Then Result = Result + 1
         Next i
     End With
@@ -2015,7 +2015,7 @@ Public Function IsControlExists(frm As Form, ctlName As String) As Boolean
     On Error Resume Next
 Dim strValue As String
     ' If you can retrieve the value, the such control exists.
-    strValue = frm.Controls(ctlName).Name
+    strValue = frm.Controls(ctlName).NAME
     IsControlExists = (Err.Number = 0)
     Err.Clear
 End Function
@@ -2236,13 +2236,13 @@ Dim Style&
 HandleExit:  Exit Function
 HandleError: Resume HandleExit
 End Function
-Private Function StrZ(Par As String) As String
+Private Function StrZ(par As String) As String
 Dim nSize As Long, i As Long ', Rez As String
-   nSize = Len(Par)
-   i = InStr(1, Par, Chr(0)) - 1
+   nSize = Len(par)
+   i = InStr(1, par, Chr(0)) - 1
    If i > nSize Then i = nSize
    If i < 0 Then i = nSize
-   StrZ = Mid$(Par, 1, i)
+   StrZ = Mid$(par, 1, i)
 End Function
 Public Function GetWinClass(hwnd As LongPtr) As String
 ' получаем класс окна
@@ -2416,7 +2416,7 @@ Dim ctl As Control, tmp ': If col Is Nothing Then Set col = New Collection
     '' т.к. прежде чем выстраивать данный контрол надо задать позиции объектов относительно которых он задан
             For Each ctl In accObject.Controls
             ' если контрол ещЄ не обработан - обрабатываем если уже обработан - пропускаем
-                Set tmp = Col(ctl.Name): If Err Then Err.Clear: Call TagsRead(ctl, Init, Col)
+                Set tmp = Col(ctl.NAME): If Err Then Err.Clear: Call TagsRead(ctl, Init, Col)
             Next ctl
         Else
             Err.Clear: If TypeOf accObject Is Access.SubForm Then Call TagsRead(accObject.Form, Init) ' у субформы будет сво€ коллекци€ проверенных контролов
@@ -2550,7 +2550,7 @@ HandleColor:
     End With
 ' ----------------------------------
     ' добавл€ем контрол в коллекцию уже обработанных дл€ контрол€
-    If TypeOf accObject Is Access.Control Then Col.Add accObject, accObject.Name
+    If TypeOf accObject Is Access.Control Then Col.Add accObject, accObject.NAME
     Result = True
 HandleExit:  TagsRead = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit

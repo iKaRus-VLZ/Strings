@@ -8,8 +8,8 @@ Option Base 0
 Private Const c_strModule As String = "~Sources"
 '=========================
 ' Описание      : Модуль для работы с исходным текстом приложения
-' Версия        : 1.9.1.448584700
-' Дата          : 24.10.2022 11:16:48
+' Версия        : 1.9.1.453985865
+' Дата          : 16.04.2024 14:04:34
 ' Автор         : Кашкин Р.В. (KashRus@gmail.com)
 ' Примечание    : при USEZIPCLASS = True, нужен модуль clzZipArchive
 ' v.1.9.1       : 24.10.2022 - изменения в ZipPack - изменён способ контроля завершения архивирования элемента
@@ -47,7 +47,8 @@ Private Const c_strModule As String = "~Sources"
 '       End of life (eol) – работы по развитию и поддержке продукта завершены.
 '-------------------------
 
-Private Const c_strLibPath = "d:\Documents\VBA Code\"                       ' путь к библиотеке объектов приложения
+'Private Const c_strLibPath = "%UserProfile%\Documents\VBA Code\" ' путь к библиотеке объектов приложения
+Private Const c_strLibPath = "D:\Documents\VBA Code\" ' путь к библиотеке объектов приложения
 Private Const c_strPrefModName = "Private Const c_strModule As String = "   ' начало текста строки выше для поиска и замены в модуле
 
 ' для процедур обновляющих код приложения
@@ -264,7 +265,7 @@ Private Type OPENFILENAME
     nMaxFileTitle As Long
     lpstrInitialDir As String
     lpstrTitle As String
-    flags As Long
+    Flags As Long
     nFileOffset As Integer
     nFileExtension As Integer
     lpstrDefExt As String
@@ -404,8 +405,8 @@ Private Declare PtrSafe Function SHBrowseForFolder Lib "shell32.dll" Alias "SHBr
 Private Declare PtrSafe Function SHGetPathFromIDList Lib "shell32.dll" Alias "SHGetPathFromIDListA" (ByVal pidl As LongPtr, ByVal pszPath As String) As Boolean
 
 Private Declare PtrSafe Function GetPrivateProfileSection Lib "kernel32" Alias "GetPrivateProfileSectionA" (ByVal lpAppName As String, ByVal lpReturnedString As String, ByVal nSize As Long, ByVal lpFileName As String) As Long
-Private Declare PtrSafe Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivateProfileStringA" (ByVal strSection As String, ByVal strRegKeyName As String, ByVal strDefault As String, ByVal strReturned As String, ByVal lngSize As Long, ByVal strFileName As String) As Long
-Private Declare PtrSafe Function WritePrivateProfileString Lib "kernel32" Alias "WritePrivateProfileStringA" (ByVal strSection As String, ByVal strRegKeyNam As String, ByVal strValue As String, ByVal strFileName As String) As Long
+Private Declare PtrSafe Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivateProfileStringA" (ByVal strSection As String, ByVal strRegKeyName As String, ByVal strDefault As String, ByVal strReturned As String, ByVal lngSize As Long, ByVal strFilename As String) As Long
+Private Declare PtrSafe Function WritePrivateProfileString Lib "kernel32" Alias "WritePrivateProfileStringA" (ByVal strSection As String, ByVal strRegKeyNam As String, ByVal strValue As String, ByVal strFilename As String) As Long
 Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As LongPtr)
 #Else                   '<OFFICE97-2010>
 Private Declare Function GetUserName Lib "advapi32.dll" Alias "GetUserNameA" (ByVal lpBuffer As String, nSize As Long) As Long
@@ -416,8 +417,8 @@ Private Declare Function SHBrowseForFolder Lib "shell32.dll" Alias "SHBrowseForF
 Private Declare Function SHGetPathFromIDList Lib "shell32.dll" Alias "SHGetPathFromIDListA" (ByVal pidl As Long, ByVal pszPath As String) As Boolean
 
 Private Declare Function GetPrivateProfileSection Lib "kernel32" Alias "GetPrivateProfileSectionA" (ByVal lpAppName As String, ByVal lpReturnedString As String, ByVal nSize As Long, ByVal lpFileName As String) As Long
-Private Declare Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivateProfileStringA" (ByVal strSection As String, ByVal strRegKeyName As String, ByVal strDefault As String, ByVal strReturned As String, ByVal lngSize As Long, ByVal strFileName As String) As Long
-Private Declare Function WritePrivateProfileString Lib "kernel32" Alias "WritePrivateProfileStringA" (ByVal strSection As String, ByVal strRegKeyNam As String, ByVal strValue As String, ByVal strFileName As String) As Long
+Private Declare Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivateProfileStringA" (ByVal strSection As String, ByVal strRegKeyName As String, ByVal strDefault As String, ByVal strReturned As String, ByVal lngSize As Long, ByVal strFilename As String) As Long
+Private Declare Function WritePrivateProfileString Lib "kernel32" Alias "WritePrivateProfileStringA" (ByVal strSection As String, ByVal strRegKeyNam As String, ByVal strValue As String, ByVal strFilename As String) As Long
 Private Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 #End If                 '<WIN32>
 '-------------------------
@@ -470,8 +471,8 @@ Dim Result As Boolean
 ' VBE.ActiveVBProject.Name
     strTitle = "Кодовое имя приложения"
     strMessage = "Введите кодовое имя приложения."
-    If Len(strCodeName) = 0 Then strCodeName = VBE.ActiveVBProject.Name
-    strCodeName = VBA.Trim$(InputBox(strMessage, strTitle, strCodeName)): VBE.ActiveVBProject.Name = strCodeName
+    If Len(strCodeName) = 0 Then strCodeName = VBE.ActiveVBProject.NAME
+    strCodeName = VBA.Trim$(InputBox(strMessage, strTitle, strCodeName)): VBE.ActiveVBProject.NAME = strCodeName
 ' VBE.ActiveVBProject.Description
     strTitle = "Описание приложения"
     strMessage = "Введите краткое описание приложения."
@@ -586,10 +587,10 @@ Dim DelAfterZip As Boolean:     DelAfterZip = True      ' удаляем временную папк
 Dim strCaption As String, strMessage As String
 Dim ParentPath As String, FilePath As String, FileName As String
 ' создаем путь сохранения
-    If Len(BackupPath) = 0 Then BackupPath = oFso.BuildPath(CurrentProject.Path, c_strSrcPath)
+    If Len(BackupPath) = 0 Then BackupPath = oFso.BuildPath(CurrentProject.path, c_strSrcPath)
     If Not oFso.FolderExists(BackupPath) Then Call oFso.CreateFolder(BackupPath) 'Then Err.Raise 76 ' Path not Found
 ' создаем имя архива
-    FileName = Split(CurrentProject.Name, ".")(0)
+    FileName = Split(CurrentProject.NAME, ".")(0)
     FileName = FileName & "_" & VBA.Format$(Now(), "YYYYMMDD_hhmmss")
     ParentPath = oFso.BuildPath(BackupPath, FileName)
     If Not oFso.FolderExists(ParentPath) Then Call oFso.CreateFolder(ParentPath) 'Then Err.Raise 76 ' Path not Found
@@ -607,7 +608,6 @@ Dim prg As clsProgress: Set prg = New clsProgress
     p_PropertiesWrite FilePath
     p_ReferencesWrite FilePath
     prg.Update
-    'strMessage = "Завершено сохранение свойств и библиотечных ссылок проекта": prg.Detail = strMessage
 ' выгружаем поочерёдно все объекты
     Result = p_ObjectsBackup(colObjects, ParentPath, prg, WriteType, AskBefore, UseTypeFolders, strMessage) = 0:   If Not Result Then Err.Raise m_errExportError
     'If colObjects.Count > 0 Then ' не все элементы удалось сохранить
@@ -615,7 +615,8 @@ Dim prg As clsProgress: Set prg = New clsProgress
     
 ' упаковываем выгрузку
     FilePath = ParentPath & "." & c_strObjExtZip
-    prg.Detail = "Упаковка сохранённых объектов в архив: " & FilePath
+    prg.Detail = "Завершено сохранение свойств и библиотечных ссылок проекта." & vbCrLf & _
+                 "Идёт упаковка сохранённых объектов в архив: " & FilePath
 #If USEZIPCLASS Then
     Result = oZip.AddFromFolder(ParentPath & "\*.*", True, , True)
     Result = oZip.CompressArchive(FilePath)
@@ -673,7 +674,7 @@ Dim UseTypeFolders As Boolean:  UseTypeFolders = True   ' файлы в бэкапе отсорти
 Dim strCaption As String, strMessage As String
 Dim TempPath As String, FilePath As String
 
-    If Len(SourcePath) = 0 Then SourcePath = oFso.BuildPath(CurrentProject.Path, c_strSrcPath)
+    If Len(SourcePath) = 0 Then SourcePath = oFso.BuildPath(CurrentProject.path, c_strSrcPath)
 ' проверяем/готовим пути
     Result = oFso.FileExists(SourcePath): If Result Then GoTo HandleCreateTempPath
     ' запрашиваем имя файла backup
@@ -686,6 +687,7 @@ HandleCreateTempPath:
     TempPath = oFso.BuildPath(VBA.Environ$("Temp"), "~" & oFso.GetFileName(SourcePath))
     If Not oFso.FolderExists(TempPath) Then Call oFso.CreateFolder(TempPath) 'Then Err.Raise 76 ' Path not Found
 ' инициалиизация прогрессбара
+
 Dim prg As clsProgress: Set prg = New clsProgress
     strCaption = "Восстановление объектов проекта"
     strMessage = strCaption & " из: """ & SourcePath & """"
@@ -717,7 +719,7 @@ Dim oItem As Object
             Case Else: GoTo HandleNextFolder
             End Select
 '
-            If Not p_ObjectFilesCollectionCreate(oItem.Path, colObjects, WithoutData) Then Err.Raise m_errImportError
+            If Not p_ObjectFilesCollectionCreate(oItem.path, colObjects, WithoutData) Then Err.Raise m_errImportError
 HandleNextFolder:
         Next oItem
         Set oItem = Nothing
@@ -850,7 +852,7 @@ HandleError:    Result = False
     Err.Clear: Resume HandleExit
 End Function
 Public Function SourcesUpdateStorage(Optional BackupPath As String)
-' производит массовое сохранение модулей проекта имеющими более старшие версии в хранилище файлов объектов
+' производит массовое сохранение модулей проекта имеющих более старшие версии в хранилище файлов объектов
 Const c_strProcedure = "SourcesUpdateStorage"
 
 Dim Result As Boolean
@@ -945,8 +947,8 @@ Dim oItems As Object, oItem
     Set oItems = Application.VBE.ActiveVBProject.VBComponents
     For Each oItem In oItems
         Select Case oItem.Type
-        Case vbext_ct_StdModule, vbext_ct_ClassModule: colObjects.Add oItem, oItem.Name
-        Case vbext_ct_Document: If BackupDocs Then colObjects.Add oItem, oItem.Name
+        Case vbext_ct_StdModule, vbext_ct_ClassModule: colObjects.Add oItem, oItem.NAME
+        Case vbext_ct_Document: If BackupDocs Then colObjects.Add oItem, oItem.NAME
         Case Else ' ???
         End Select
     Next oItem
@@ -955,15 +957,15 @@ Dim oItems As Object, oItem
     ' в Access это проще всего сделать запросом по таблице c_strMSysObjects
     '' или можно пройтись по коллекциям объектов
     'Set oItems = CurrentProject.AllModules:         For Each oItem In oItems: colObjects.Add oItem, oItem.NAME: Next oItem
-    Set oItems = CurrentProject.AllForms:           For Each oItem In oItems: colObjects.Add oItem, oItem.Name: Next oItem '
-    Set oItems = CurrentProject.AllReports:         For Each oItem In oItems: colObjects.Add oItem, oItem.Name: Next oItem
-    Set oItems = CurrentProject.AllMacros:          For Each oItem In oItems: colObjects.Add oItem, oItem.Name: Next oItem
-    Set oItems = CurrentProject.AllDataAccessPages: For Each oItem In oItems: colObjects.Add oItem, oItem.Name: Next oItem
-    Set oItems = CurrentData.AllQueries:            For Each oItem In oItems: colObjects.Add oItem, oItem.Name: Next oItem
+    Set oItems = CurrentProject.AllForms:           For Each oItem In oItems: colObjects.Add oItem, oItem.NAME: Next oItem '
+    Set oItems = CurrentProject.AllReports:         For Each oItem In oItems: colObjects.Add oItem, oItem.NAME: Next oItem
+    Set oItems = CurrentProject.AllMacros:          For Each oItem In oItems: colObjects.Add oItem, oItem.NAME: Next oItem
+    Set oItems = CurrentProject.AllDataAccessPages: For Each oItem In oItems: colObjects.Add oItem, oItem.NAME: Next oItem
+    Set oItems = CurrentData.AllQueries:            For Each oItem In oItems: colObjects.Add oItem, oItem.NAME: Next oItem
     If Not WithoutData Then
     Set oItems = CurrentData.AllTables:             For Each oItem In oItems
                                                     ' пропускаем системные таблицы
-                                                        If Left(oItem.Name, 4) <> "MSys" Then colObjects.Add oItem, oItem.Name
+                                                        If Left(oItem.NAME, 4) <> "MSys" Then colObjects.Add oItem, oItem.NAME
                                                     Next oItem
     End If
 #ElseIf APPTYPE = 1 Then    ' APPTYPE=Excel
@@ -986,7 +988,7 @@ Dim oItem As Object
     ' перебираем все файлы в подпапках типов объектов в корневой папке
 '' SubFolders похоже не имеет числового индекса
     For Each oItem In oFso.GetFolder(FilesPath).Files
-        Select Case oFso.GetExtensionName(oItem.Path)
+        Select Case oFso.GetExtensionName(oItem.path)
         Case c_strObjExtBas, c_strObjExtCls
         'Case c_strObjExtDoc ' модуль класса документа
 #If APPTYPE = 0 Then        ' APPTYPE=Access
@@ -1037,11 +1039,12 @@ Dim strCaption As String, strMessage As String
 Dim iCount As Long
 ' выгружаем поочерёдно все объекты
     For Each oItem In colObjects
-        strObjName = oItem.Name
+        strObjName = oItem.NAME
     ' получаем информацию об объекте
         p_ObjectInfo strObjName, ObjectTypeName:=strTypeName, ObjectTypeDesc:=strTypeDesc
     ' обновляем прогрессбар
-        strMessage = "Идёт сохранение объекта: " & strTypeDesc & " """ & strObjName & """": prg.Update: prg.Detail = strMessage
+        strMessage = "Идёт сохранение объекта: " & strTypeDesc & " """ & strObjName & """":
+        prg.Update: prg.Detail = strMessage
     ' формируем путь сохранения объекта
         strFilePath = BackupPath: If UseTypeFolders Then strFilePath = oFso.BuildPath(strFilePath, strTypeName)
     ' сохраняем объект по указанному пути
@@ -1121,7 +1124,7 @@ Dim strSkipByUser As String, strSkipByVers As String, strSkipByList As String
 Dim iCount As Long
 ' загружаем поочерёдно все объекты
     For Each oItem In colObjects
-        strFilePath = oItem.Path: strObjName = strFilePath
+        strFilePath = oItem.path: strObjName = strFilePath
     ' получаем информацию об объекте
         p_ObjectInfo strObjName, ObjectTypeName:=strTypeName, ObjectTypeDesc:=strTypeDesc
     ' обновляем прогрессбар
@@ -1191,7 +1194,7 @@ Dim Result As Boolean: Result = False
     Call SysCmd(504, 16484) ' сохраняем все модули
     ' проверяем наличие указанного пути/файла
     Result = oFso.FileExists(FilePath): If Result Then GoTo HandleUpdate
-    FilePath = oFso.BuildPath(CurrentProject.Path, c_strSrcPath) '& "\" & strText
+    FilePath = oFso.BuildPath(CurrentProject.path, c_strSrcPath) '& "\" & strText
     ' запрашиваем имя файла backup
 Dim strTitle As String: strTitle = "Выберите файл свойств проекта"
 Dim strText As String: strText = "Архивная копия свойств проекта " & VBA.Chr$(0) & strText & "*." & c_strObjExtZip & ";" & "*." & c_strObjExtPrj
@@ -1240,8 +1243,8 @@ Dim Result As Boolean: Result = False
 On Error GoTo HandleError
     With oFso
     If Len(FilePath) = 0 Then
-        FilePath = .BuildPath(CurrentProject.Path, c_strSrcPath)
-        FilePath = .BuildPath(FilePath, Split(CurrentProject.Name, ".")(0) & "_" & VBA.Format$(Now(), "YYYYMMDD_hhmmss") & "." & c_strObjExtPrj)
+        FilePath = .BuildPath(CurrentProject.path, c_strSrcPath)
+        FilePath = .BuildPath(FilePath, Split(CurrentProject.NAME, ".")(0) & "_" & VBA.Format$(Now(), "YYYYMMDD_hhmmss") & "." & c_strObjExtPrj)
     End If
     If Not .FolderExists(.GetParentFolderName(FilePath)) Then Call .CreateFolder(.GetParentFolderName(FilePath)) 'Then Err.Raise 76 ' Path not Found
     End With
@@ -1262,11 +1265,11 @@ End Function
 Public Sub ReferencesPrint()
 ' отладочная - выводит в Immediate все библиотечные ссылки текущего проекта
     Dim Itm As Object
-    Debug.Print "Project """ & VBE.ActiveVBProject.Name & """ References:"
+    Debug.Print "Project """ & VBE.ActiveVBProject.NAME & """ References:"
     For Each Itm In References
         With Itm
             If .BuiltIn Then GoTo HandleNext
-            Debug.Print " " & IIf(.IsBroken, "X", " ") & .Name, .Guid & " " & " " & .FullPath ' & .Major & " " & .Minor
+            Debug.Print " " & IIf(.IsBroken, "X", " ") & .NAME, .GUID & " " & " " & .FullPath ' & .Major & " " & .Minor
         End With
 HandleNext:
     Next Itm
@@ -1278,8 +1281,8 @@ Dim Result As Boolean
 ' создаем имя файла
     With oFso
     If Len(FilePath) = 0 Then
-        FilePath = .BuildPath(CurrentProject.Path, c_strSrcPath)
-        FilePath = .BuildPath(FilePath, Split(CurrentProject.Name, ".")(0) & "_" & VBA.Format$(Now(), "YYYYMMDD_hhmmss") & "." & c_strObjExtPrj)
+        FilePath = .BuildPath(CurrentProject.path, c_strSrcPath)
+        FilePath = .BuildPath(FilePath, Split(CurrentProject.NAME, ".")(0) & "_" & VBA.Format$(Now(), "YYYYMMDD_hhmmss") & "." & c_strObjExtPrj)
     End If
     If Not .FolderExists(.GetParentFolderName(FilePath)) Then Call .CreateFolder(.GetParentFolderName(FilePath)) 'Then Err.Raise 76 ' Path not Found
     End With
@@ -1306,7 +1309,7 @@ Dim Result As Boolean ': Result = False
     Call SysCmd(504, 16484) ' сохраняем все модули
     ' проверяем наличие указанного пути/файла
     Result = oFso.FileExists(FilePath): If Result Then GoTo HandleUpdate
-    FilePath = oFso.BuildPath(CurrentProject.Path, c_strSrcPath) '& "\" & strText
+    FilePath = oFso.BuildPath(CurrentProject.path, c_strSrcPath) '& "\" & strText
     ' запрашиваем имя файла backup
 Dim strTitle As String: strTitle = "Выберите файл свойств проекта"
 Dim strText As String: strText = "Архивная копия свойств проекта " & VBA.Chr$(0) & strText & "*." & c_strObjExtZip & ";" & "*." & c_strObjExtPrj
@@ -1351,14 +1354,14 @@ HandleError:    Result = False
 End Function
 Public Sub PropertiesClear()
 ' удаляет все пользовательские свойства
-    With CurrentProject.Properties: Do While .Count > 0: .Remove .Item(0).Name: Loop: End With
+    With CurrentProject.Properties: Do While .Count > 0: .Remove .Item(0).NAME: Loop: End With
 End Sub
 Public Sub PropertiesPrint()
 ' отладочная - выводит в Immediate все свойства текущего проекта
     Dim Itm As Object
-    Debug.Print "Project """ & VBE.ActiveVBProject.Name & """ Properties:"
+    Debug.Print "Project """ & VBE.ActiveVBProject.NAME & """ Properties:"
     For Each Itm In CurrentProject.Properties
-        Debug.Print Itm.Name & "=" & Itm.Value
+        Debug.Print Itm.NAME & "=" & Itm.Value
     Next Itm
 End Sub
 Public Function PropertyGet(PropName As String, PropValue As Variant, Optional PropObject As Object) As Boolean
@@ -1390,7 +1393,7 @@ Dim Result As Boolean
     ' пытаемся записать свойство
     PropObject.Properties(PropName) = PropValue
     Select Case Err.Number
-    Case 0: GoTo HandleExit
+    Case 0: Result = True: GoTo HandleExit
     Case 3270, 2455: ' Свойство не найдено
     Case Else: On Error GoTo HandleExit: Err.Raise Err.Number
     End Select
@@ -1405,7 +1408,7 @@ Dim Result As Boolean
     ' добавляем AccessObject свойство
         PropObject.Properties.Add PropName, PropValue
     Else
-        Err.Raise vbObjectError + 512
+        Err.Raise 438 ' Object doesn't support this property or method ' vbObjectError + 512
     End If
     Result = True
 HandleExit:     PropertySet = Result: Exit Function
@@ -1466,7 +1469,7 @@ Dim oColl, oItem, eObjType As AcObjectType
             With oItem
                 If .IsLoaded Then
                     If OnlyInDesignMode And .CurrentView <> 0 Then GoTo HandleNextItem
-                    DoCmd.Close eObjType, .Name, acSaveYes
+                    DoCmd.Close eObjType, .NAME, acSaveYes
 'Debug.Print IIf(.IsLoaded, "Can't close object", "Object was closed") & ": """ & oItem.Name & """."
                 End If
             End With
@@ -1506,7 +1509,7 @@ Dim prg As clsProgress
                 With prg
                     If .Canceled Then If MsgBox(c_strBreakProcessMessage, vbYesNo Or vbExclamation Or vbDefaultButton2) = vbYes Then GoTo HandleExit
                     .Canceled = False
-                    .Detail = strCaption & "ы: " & tdf.Name
+                    .Detail = strCaption & "ы: " & tdf.NAME
                     .Progress = i
                 End With
                 tdf.Connect = c_ConnString & DatabasePath
@@ -1531,7 +1534,7 @@ End Function
 ' функции обновления версий модулей/функций
 '-------------------------
 Public Function UpdateModule( _
-    ModuleName As String, _
+    ObjectName As String, _
     Optional COMMENT As String, _
     Optional VerType As appVerType = appVerBuild, _
     Optional SkipDialog As Boolean = False)
@@ -1543,18 +1546,32 @@ Dim VerDate As Date
 Dim strVersion As String, strVerShort As String
 Dim strValue As String, strComment As String
 Dim IsLoaded As Boolean
-Dim Result As Boolean: Result = False
+Dim Result As Boolean
+    Result = False
     On Error GoTo HandleError
-    If ModuleName = vbNullString Then ModuleName = InputBox("Введите имя обновляемого модуля:", , ModuleName)
+DoCmd.Echo False
+    If ObjectName = vbNullString Then ObjectName = InputBox("Введите имя обновляемого объекта:", , ObjectName)
+Dim ModuleName As String: ModuleName = ObjectName
+Dim ObjectType As AcObjectType
 ' проверяем введенное имя
-    On Error GoTo HandleError
-    If ModuleName = vbNullString Then Err.Raise m_errModuleNameWrong
-'    If ModuleName = VBE.ActiveCodePane.CodeModule Then Err.Raise m_errModuleIsActive
-    If Not ModuleExists(ModuleName) Then Err.Raise m_errModuleDontFind
-
-'    ' сохраняем модуль
-'    DoCmd.Save acModule, ModuleName ': DoCmd.Close acModule, ModuleName, acSaveYes
-    
+    If ModuleName = vbNullString Then
+        Err.Raise vbObjectError + 512
+'    ElseIf ModuleName = VBE.ActiveCodePane.CodeModule Then
+'        Err.Raise vbObjectError + 513
+    ElseIf Not IsModuleExists(ModuleName, ObjectName, ObjectType) Then
+        Err.Raise vbObjectError + 514
+    'ElseIf Not IsFuncExists(ModuleName) Then
+    '    Result = Update Func ... : Goto HandleExit
+    End If
+' открываем объект в режиме дизайна
+    Select Case ObjectType
+    Case acModule:  'Do Nothing
+    Case acForm:    DoCmd.OpenForm ObjectName, acDesign
+    Case acReport:  DoCmd.OpenReport ObjectName, acDesign
+    Case Else:      Err.Raise vbObjectError + 514
+    End Select
+    ' если модуль открыт - сохраняем
+    'DoCmd.Save acModule, ModuleName ': DoCmd.Close acModule, ModuleName, acSaveYes
     ' получаем текущую версию модуля
     strVersion = ModuleVersGet(ModuleName)
     ' увеличиваем версию модуля
@@ -1588,6 +1605,8 @@ Dim strAuthor As String, strSupport As String: strAuthor = Author: strSupport = 
         'DoCmd.Save acModule, ModuleName
     End If
     'ModuleDebugSet ModuleName, c_bolDebugMode
+' закрываем объект в режиме дизайна
+    DoCmd.Close ObjectType, ObjectName, acSaveYes
 ' обновляем версию приложения
     ' получаем текущую версию приложения
     Call PropertyGet(c_strPrpKeyVer, strVersion)
@@ -1597,17 +1616,53 @@ Dim strAuthor As String, strSupport As String: strAuthor = Author: strSupport = 
     'Call PropertySet(c_strPrpKeyVer, strVersion)
     CurrentProject.Properties(c_strPrpKeyVer) = strVersion
     Result = True
-HandleExit:     UpdateModule = Result: Exit Function
-HandleError:    Result = False
-    Dim Message As String
-    Select Case Err 'Err.Number
-    Case m_errModuleNameWrong: Message = "Неверно задано имя объекта!"
-    Case m_errModuleIsActive: Debug.Print "Невозможно изменить активный модуль: """ & ModuleName & """!"
-    Case m_errModuleDontFind: Debug.Print "Модуль: """ & ModuleName & """ не найден!"
-    Case Else:  Message = Err.Description ': Resume 0
+HandleExit:  DoCmd.Echo True: UpdateModule = Result: Exit Function
+HandleError:
+    Result = False
+    Select Case Err.Number
+    Case vbObjectError + 512: Debug.Print "Не задано имя модуля!"
+    Case vbObjectError + 513: Debug.Print "Не возможно изменить активный модуль: """ & ModuleName & """!"
+    Case vbObjectError + 514: Debug.Print "Модуль: """ & ModuleName & """ не найден!"
+    Case Else: Debug.Print Err.Description
     End Select
-    Debug.Print c_strModule & "." & c_strProcedure, "Error# " & Err.Number & ": " & Message
     Err.Clear: Resume HandleExit
+End Function
+Private Function IsModuleExists( _
+    ByRef ModuleName As String, _
+    Optional ByRef ObjectName As String, _
+    Optional ByRef ObjectType As AcObjectType _
+    ) As Boolean
+' проверяет наличие указанного модуля
+Dim Result As Boolean
+Dim strObjName As String
+' возвращает True, если есть модуль с таким именем.
+
+    Result = False
+    On Error Resume Next
+' Application.Modules видит только загруженные модули.
+'   cоответственно существующий модуль если он Not IsLoaded будет не найден
+' CurrentProject.AllModules видит только модули и не видит модулей форм и отчетов
+    With CurrentProject
+' проверяем коллекцию модулей проекта
+        If (.AllModules(ModuleName).NAME = ModuleName) Then ObjectName = ModuleName
+        Result = (Err = 0): If Result Then ObjectType = acModule: GoTo HandleExit
+        Err.Clear
+' проверяем коллекцию форм проекта
+        If Left$(ObjectName, Len(c_strFrmModPref)) = c_strFrmModPref Then ObjectName = Mid$(ModuleName, Len(c_strFrmModPref) + 1)
+        DoCmd.OpenForm ObjectName, acDesign '1 = acDesign
+        ModuleName = Forms(ObjectName).Module.NAME
+        Result = (Err = 0): If Result Then ObjectType = acForm: GoTo HandleExit
+        Err.Clear
+' проверяем коллекцию отчетов проекта
+        If Left$(ObjectName, Len(c_strFrmModPref)) = c_strRepModPref Then ObjectName = Mid$(ModuleName, Len(c_strFrmModPref) + 1)
+        DoCmd.OpenReport ObjectName, acDesign '1 = acDesign
+        ModuleName = Forms(ObjectName).Module.NAME
+        Result = (Err = 0): If Result Then ObjectType = acReport: GoTo HandleExit
+        Err.Clear
+    End With
+    DoCmd.Close ObjectType, ObjectName
+HandleExit:     IsModuleExists = Result:    Exit Function
+HandleError:    Result = False: Err.Clear:  Resume HandleExit
 End Function
 Public Sub UpdateFunc( _
     funcName As String, _
@@ -2003,8 +2058,8 @@ Const c_strProcedure = "p_ObjectInfo"
 Dim Result As Long ': Result = False
     On Error Resume Next
 ' по-умолчанию
-    ObjectType = appObjTypUndef: ObjectTypeDesc = "Объект"
-    ObjectFileExt = vbNullString: ObjectModuleName = vbNullString
+    ObjectType = appObjTypUndef:    ObjectTypeDesc = "Объект"
+    ObjectFileExt = vbNullString:   ObjectModuleName = vbNullString
 ' проверяем модули проекта
     Result = p_GetModuleType(ObjectName)
     If Result Then
@@ -2047,11 +2102,11 @@ Dim Result As Long ': Result = False
     ObjectName = p_TextCode2Alpha(oFso.GetBaseName(ObjectName)) ' имя объекта из имени файла
 ' если указан путь к файлу выгрузки - получаем тип по расширению
     Select Case ObjectFileExt
-    Case c_strObjExtBas:    ObjectType = appObjTypBas: ObjectTypeName = c_strObjTypModule: ObjectTypeDesc = "Стандартный модуль": ObjectModuleName = ObjectName
+    Case c_strObjExtBas:    ObjectType = appObjTypBas: ObjectTypeName = c_strObjTypModule: ObjectTypeDesc = "Стандартный модуль":   ObjectModuleName = ObjectName
     Case c_strObjExtCls:    ObjectType = appObjTypCls: ObjectTypeName = c_strObjTypModule: ObjectTypeDesc = "Модуль класса": ObjectModuleName = ObjectName
 #If APPTYPE = 0 Then        ' APPTYPE=Access
-    Case c_strObjExtFrm:    ObjectType = appObjTypAccFrm: ObjectTypeName = c_strObjTypAccFrm: ObjectTypeDesc = "Форма Access":     ObjectModuleName = c_strFrmModPref & ObjectName
-    Case c_strObjExtRep:    ObjectType = appObjTypAccRep: ObjectTypeName = c_strObjTypAccRep: ObjectTypeDesc = "Отчёт Access":   ObjectModuleName = c_strRepModPref & ObjectName
+    Case c_strObjExtFrm:    ObjectType = appObjTypAccFrm: ObjectTypeName = c_strObjTypAccFrm: ObjectTypeDesc = "Форма Access":      ObjectModuleName = c_strFrmModPref & ObjectName
+    Case c_strObjExtRep:    ObjectType = appObjTypAccRep: ObjectTypeName = c_strObjTypAccRep: ObjectTypeDesc = "Отчёт Access":      ObjectModuleName = c_strRepModPref & ObjectName
     Case c_strObjExtMac:    ObjectType = appObjTypAccMac: ObjectTypeName = c_strObjTypAccMac: ObjectTypeDesc = "Макрос Access"
     Case c_strObjExtQry:    ObjectType = appObjTypAccQry: ObjectTypeName = c_strObjTypAccQry: ObjectTypeDesc = "Запрос"
     Case c_strObjExtTxt:    ObjectType = appObjTypAccTbl: ObjectTypeName = c_strObjTypAccTbl: ObjectTypeDesc = "Таблица Access (TXT)"
@@ -2170,7 +2225,7 @@ Dim bolDestExist As Boolean: bolDestExist = p_ObjectInfo(strObjName, lngObjType,
 Dim strSrcVer As String, datSrcDate As Date ', strFilDesc As String
 Dim strDestVer As String, datDestDate As Date ', strModDesc As String
 ' читаем текст существующего модуля и извлекаем из него данные о версии
-' ToDo:  прочитать из текста истинное имя объекта TargetName
+' ToDo: прочитать из текста истинное имя объекта TargetName
         If bolDestExist Then If Len(strModName) > 0 Then Call ModuleInfo(strModName, strDestVer, datDestDate)
 ' читаем файл как текст и извлекаем из него данные о версии, дате и пр.
         If bolSrcExist Then Call ModuleInfoFromFile(SourceFile, strSrcVer, datSrcDate)
@@ -2335,7 +2390,7 @@ Dim bolDestExist As Boolean
     With oFso
         If Len(TargetPath) = 0 Then
     ' не задано - берем путь проекта, надо добавить имя файла
-            TargetPath = .BuildPath(CurrentProject.Path, c_strSrcPath)
+            TargetPath = .BuildPath(CurrentProject.path, c_strSrcPath)
             TargetPath = .BuildPath(TargetPath, strObjFile)
             bolDestExist = .FileExists(TargetPath)
         ElseIf .FolderExists(TargetPath) Then
@@ -2360,7 +2415,7 @@ Dim bolDestExist As Boolean
 Dim strSrcVer As String, datSrcDate As Date ', strFilDesc As String
 Dim strDestVer As String, datDestDate As Date ', strModDesc As String
 ' читаем файл как текст и извлекаем из него данные о версии, дате и пр.
-' ToDo:  прочитать из файла истинное имя объекта TargetPath
+' ToDo: прочитать из файла истинное имя объекта TargetPath
 'Stop
         If bolDestExist Then Call ModuleInfoFromFile(TargetPath, strDestVer, datDestDate)
 ' читаем текст существующего модуля и извлекаем из него данные о версии
@@ -2629,14 +2684,14 @@ Dim Result As Boolean: Result = False
 '    If ModuleName = VBE.ActiveCodePane.CodeModule Then Err.Raise m_errModuleIsActive
 Dim objModule As Object: If Not ModuleExists(ModuleName, objModule) Then Err.Raise m_errModuleDontFind
 Dim CodeLine As Long
-Dim LineType As m_CodeLineType, Col As Boolean
+Dim LineType As m_CodeLineType, LineBreak As Boolean
 ' LineType - флаг управляющий циклом проверки
-' COL - признак продолжения чтения строки (строка заканчивается символом переноса)
+' LineBreak - признак продолжения чтения строки (строка заканчивается символом переноса)
     LineType = m_CodeHead ' модуль сразу начинается с кода
 
 Dim strLine As String, strResult As String
-    For CodeLine = 1 To objModule.CountOfDeclarationLines
-        'If LineType = m_CodeProc Then Exit For
+    For CodeLine = 1 To objModule.CountOfLines '.CountOfDeclarationLines - игнорирует комментарии в конце заголовка модуля потому не подходит нам для определения конца заголовка
+        If LineType = m_CodeProc Then Exit For
     ' читаем построчно пока не достигнем конца или не дойдем до объявления первой процедуры
         strLine = objModule.Lines(CodeLine, 1)
     ' проверяем в каком месте модуля находимся
@@ -2649,7 +2704,7 @@ Dim strLine As String, strResult As String
             GoTo HandleNextLine
         End If
         ' определяем тип строки
-        strLine = p_CodeLineGet(strLine, LineType, Col, vbCrLf)
+        strLine = p_CodeLineGet(strLine, LineType, LineBreak, vbCrLf)
         ' формируем строку результата
         strResult = strResult & strLine
         ' сжимаем строку результата - удаляем мусор
@@ -2657,7 +2712,7 @@ Dim strLine As String, strResult As String
 HandleRead:
         If LineType <> m_CodeHead Then
         ' сохраниить результат
-            If Col Then GoTo HandleNextLine
+            If LineBreak Then GoTo HandleNextLine
             If Not IsMissing(ModVers) And LineType = m_CodeVers And Len(strResult) > 0 Then ModVers = strResult: Result = True ': LineType = m_CodeHead: strResult = vbNullString: GoTo HandleNextLine
             If Not IsMissing(ModDate) And LineType = m_CodeDate And Len(strResult) > 0 Then ModDate = strResult: Result = True ': LineType = m_CodeHead: strResult = vbNullString: GoTo HandleNextLine
             If Not IsMissing(ModDesc) And LineType = m_CodeDesc And Len(strResult) > 0 Then ModDesc = strResult: Result = True ': LineType = m_CodeHead: strResult = vbNullString: GoTo HandleNextLine
@@ -2704,7 +2759,7 @@ Dim Result As Boolean: Result = False
     On Error GoTo HandleError
 Dim CodeLine As Long
 Dim strPath As String:  strPath = VBA.Trim$(FilePath)
-' ToDo: добавить чтение подлинного имени объекта/модуля
+' ToDo: прочитать из файла истинное имя объекта TargetPath
     ' проверяем наличие указанного пути/файла
     If Not oFso.FileExists(strPath) Then Err.Raise 76 ' Path not Found
 ' проверяем тип файла (по расширению)
@@ -2725,9 +2780,9 @@ Dim strExtn As String: strExtn = VBA.LCase$(oFso.GetExtensionName(strPath))
     'Case c_strObjExtMac: oType = msys_ObjectMacro   ' макрос Access
     Case Else: Err.Raise vbObjectError + 512
     End Select
-Dim LineType As m_CodeLineType, Col As Boolean
+Dim LineType As m_CodeLineType, LineBreak As Boolean
 ' LineType - флаг управляющий циклом проверки
-' COL - признак продолжения чтения строки (строка заканчивается символом переноса)
+' LineBreak - признак продолжения чтения строки (строка заканчивается символом переноса)
     Select Case oType
     Case msys_ObjectModule:                     LineType = m_CodeHead ' модуль сразу начинается с кода
     Case msys_ObjectForm, msys_ObjectReport:    LineType = m_CodeNone ' форма/отчет сначала содержат информацию о расположении контролов
@@ -2752,7 +2807,7 @@ Dim strLine As String, strResult As String
             GoTo HandleNextLine
         End If
         ' Определяем тип строки
-        strLine = p_CodeLineGet(strLine, LineType, Col, vbCrLf)
+        strLine = p_CodeLineGet(strLine, LineType, LineBreak, vbCrLf)
         ' формируем строку результата
         strResult = strResult & strLine
         ' сжимаем строку результата - удаляем мусор
@@ -2760,7 +2815,7 @@ Dim strLine As String, strResult As String
 HandleRead:
         If LineType <> m_CodeHead Then
         ' сохраниить результат
-            If Col Then GoTo HandleNextLine
+            If LineBreak Then GoTo HandleNextLine
             If Not IsMissing(ModVers) And LineType = m_CodeVers Then ModVers = strResult: Result = True ': LineType = m_CodeHead: strResult = vbNullString: GoTo HandleNextLine
             If Not IsMissing(ModDate) And LineType = m_CodeDate Then ModDate = strResult: Result = True ': LineType = m_CodeHead: strResult = vbNullString: GoTo HandleNextLine
             If Not IsMissing(ModDesc) And LineType = m_CodeDesc Then ModDesc = strResult: Result = True ': LineType = m_CodeHead: strResult = vbNullString: GoTo HandleNextLine
@@ -3068,13 +3123,13 @@ Dim Result As String
     On Error GoTo HandleError
     NumOfLines = 0
 Dim tmpString As String
-Dim Col As Boolean, LineType As m_CodeLineType
+Dim LineBreak As Boolean, LineType As m_CodeLineType
     With objModule
         Do
             tmpString = VBA.Trim$(.Lines(BegLine + NumOfLines, 1))
-            Result = Result & p_CodeLineGet(tmpString, LineType, Col, ReplaceHyphensWith)
+            Result = Result & p_CodeLineGet(tmpString, LineType, LineBreak, ReplaceHyphensWith)
             NumOfLines = NumOfLines + 1
-        Loop While Col
+        Loop While LineBreak
     End With
 ' перед окончанием сжимаем строку - удаляем мусор
     Result = Replace(Result, c_strBrokenQuotes, vbNullString)   ' объединяем разорванные текстовые строки
@@ -3089,7 +3144,7 @@ HandleError:    Result = False
 End Function
 Private Function p_CodeLineGet(CodeLine As String, _
     Optional LineType As m_CodeLineType, _
-    Optional Col As Boolean, _
+    Optional LineBreak As Boolean, _
     Optional ReplaceHyphensWith As String = c_strSpace, _
     Optional TrimPrefix As Boolean = True, _
     Optional TrimSpaces As Boolean) As String
@@ -3097,7 +3152,7 @@ Private Function p_CodeLineGet(CodeLine As String, _
 Const c_strProcedure = "p_CodeLineGet"
 ' CodeLine - обрабатываемая строка
 ' LineType - тип строки кода (опредееляется по содержимому)
-' COL - признак продолжения чтения строки (строка заканчивается символом переноса)
+' LineBreak - признак продолжения чтения строки (строка заканчивается символом переноса)
 ' ReplaceHyphensWith - символ для замены символов переноса строки
 ' TrimPrefix - признак необходимости удаления префиксов строк
 ' TrimSpaces - признак необходимости сжимать пробелы вначале/конце строки
@@ -3113,7 +3168,7 @@ Static arrPrefs(): arrPrefs = Array(m_CodeVers, c_strPrefModVers, _
 Dim i As Long
 Dim strPref As String, lngLineType As Long
 ' если это продолжение строки - удаляем пустой префикс вначале строки
-    If Col Then
+    If LineBreak Then
         Select Case LineType
         Case m_CodeDesc, m_CodeComm, m_CodeHist: strPref = c_strPrefModNone
         End Select
@@ -3140,13 +3195,13 @@ Dim strPref As String, lngLineType As Long
 'Stop
 HandleProceed:
 ' проверяем признак переноса строки
-    Col = (VBA.Right$(Result, Len(c_strHyphen)) = c_strHyphen)
+    LineBreak = (VBA.Right$(Result, Len(c_strHyphen)) = c_strHyphen)
 ' если удаляем префиксы и строка начинается с указанного префикса - удалить его
     If TrimPrefix And Len(strPref) > 0 Then Result = VBA.Trim$(VBA.Mid$(Result, Len(strPref) + 1))
 ' если удаляем пробелы и строка начинается/заканчивается на пробелы - обрезаем
     If TrimSpaces Then Result = Trim$(Result)
 ' если строка заканчивается на  _ заменить на символ объединения и продолжить чтение
-    If Col Then Result = VBA.Left$(Result, Len(Result) - Len(c_strHyphen)) & ReplaceHyphensWith
+    If LineBreak Then Result = VBA.Left$(Result, Len(Result) - Len(c_strHyphen)) & ReplaceHyphensWith
 HandleExit:     p_CodeLineGet = Result: Exit Function
 HandleError:    Result = vbNullString
     Dim Message As String
@@ -3230,7 +3285,7 @@ Const DelayAfterZip = 333
 Const iTryMax = 3
 Dim iTry As Integer
 Dim i As Long, iMax As Long
-Dim strFilePath As String, strFileName As String
+Dim strFilePath As String, strFilename As String
 Dim strZipPath As String, strZipName As String ', strFileName As String
 Dim Result As Boolean
     On Error GoTo HandleError
@@ -3239,7 +3294,7 @@ Dim Result As Boolean
     
     With oFso
         strFilePath = .GetParentFolderName(FilePath)
-        strFileName = .GetFileName(FilePath)
+        strFilename = .GetFileName(FilePath)
         If Len(ZipName) > 0 Then
             strZipPath = .GetParentFolderName(ZipName)
             strZipName = .GetFileName(ZipName)
@@ -3267,12 +3322,12 @@ HandlePack:
         If oItm.IsFolder Then
         ' если это папка
             ' получаем количество файлов в папке
-            sItm = oItm.Name: lItm = oItm.GetFolder.Items.Count
+            sItm = oItm.NAME: lItm = oItm.GetFolder.Items.Count
             ' если папка пуста - переходим к следущему объекту
             If lItm = 0 Then GoTo HandleNext
         End If
         ' перемещаем файлы и папки
-        oZip.MoveHere (oItm.Path), 4 + 8 + 16 + 1024
+        oZip.MoveHere (oItm.path), 4 + 8 + 16 + 1024
         ' ожидаем окончание сжатия файлов
         Do
             Sleep DelayAfterZip: DoEvents: DoEvents
@@ -3323,10 +3378,10 @@ On Error GoTo HandleError
 ' Определяем путь извлечения
     If Len(FilePath) = 0 Then
     ' если задан пустой путь - извлекаем во временную папку
-        strPath = CurrentProject.Path & "\" & c_strSrcPath & "\"
+        strPath = CurrentProject.path & "\" & c_strSrcPath & "\"
     Else
         If oFso.FolderExists(FilePath) Then
-            strPath = oFso.GetFolder(FilePath).Path 'oFso.BuildPath(FilePath)
+            strPath = oFso.GetFolder(FilePath).path 'oFso.BuildPath(FilePath)
         Else
             Err.Raise 53, , "Folder not found"
         End If
@@ -3339,11 +3394,11 @@ On Error GoTo HandleError
         If Overwrite Then
             For Each oItm In .Items
             ' если файл или папка уже существуют - удаляем перед извлечением
-                If oFso.FileExists(strPath & oItm.Name) Then
-                    Kill strPath & oItm.Name
-                ElseIf oFso.FolderExists(strPath & oItm.Name) Then
-                    Kill strPath & oItm.Name & "\*.*"
-                    RmDir strPath & oItm.Name
+                If oFso.FileExists(strPath & oItm.NAME) Then
+                    Kill strPath & oItm.NAME
+                ElseIf oFso.FolderExists(strPath & oItm.NAME) Then
+                    Kill strPath & oItm.NAME & "\*.*"
+                    RmDir strPath & oItm.NAME
                 End If
             Next
         End If
@@ -3384,7 +3439,7 @@ Public Function ZipItemName( _
 Dim Result As String
     On Error GoTo HandleError
 Dim oFld As Object: Set oFld = oApp.Namespace((ZipName))
-    With oFld.Items().Item((i)):  Result = IIf(fExt, .Path, .Name): End With
+    With oFld.Items().Item((i)):  Result = IIf(fExt, .path, .NAME): End With
 HandleExit:  ZipItemName = Result: Exit Function
 HandleError: Result = vbNullString: Resume HandleExit
 End Function
@@ -3424,7 +3479,7 @@ Private Function p_LinkedWrite(TableName As String, FilePath As String)
 ' сохранет в файл FilePath параметры присоединенной таблицы TableName
 Const c_strProcedure = "p_LinkedWrite"
     On Error GoTo HandleError
-    p_SettingKeyWrite FilePath, c_strLnkSecParam, c_strLnkKeyLocal, CurrentDb.TableDefs(TableName).Name
+    p_SettingKeyWrite FilePath, c_strLnkSecParam, c_strLnkKeyLocal, CurrentDb.TableDefs(TableName).NAME
     p_SettingKeyWrite FilePath, c_strLnkSecParam, c_strLnkKeyConnect, CurrentDb.TableDefs(TableName).Connect
     p_SettingKeyWrite FilePath, c_strLnkSecParam, c_strLnkKeyTable, CurrentDb.TableDefs(TableName).SourceTableName
     p_SettingKeyWrite FilePath, c_strLnkSecParam, c_strLnkKeyAttribute, CurrentDb.TableDefs(TableName).Attributes
@@ -3460,7 +3515,7 @@ Dim wshShell As Object, strGUID As String, strKey As String
         'а затем удалить ветку.
         If wshShell Is Nothing Then Set wshShell = CreateObject("WScript.Shell")
         If Err.Number <> 0 Then fBroken = True: GoTo HandleNext
-        strGUID = ref.Guid
+        strGUID = ref.GUID
         strKey = "HKCR\TypeLib\" & strGUID & "\" & ref.Major & "." & ref.Minor & "\"
         wshShell.RegWrite strKey & "0\win32\", ""
         'Вторая попытка удаления ссылки (она, типа, зарегистрирована)
@@ -3500,7 +3555,7 @@ Const c_strProcedure = "p_ReferencesRead"
         Err.Clear
         If ref.BuiltIn Then GoTo HandleRemoveNext
         If Not ref.IsBroken Then GoTo HandleRemoveNext
-        strText = ref.Guid      ' запоминаем GUID
+        strText = ref.GUID      ' запоминаем GUID
         References.Remove ref
     ' удаляем ссылку
         DoEvents
@@ -3573,7 +3628,7 @@ Const c_strProcedure = "p_ReferencesWrite"
         If Itm.BuiltIn Then GoTo HandleNext
         'If Itm.IsBroken Or Err.Number <> 0 Then Else GoTo HandleNext
 ' сохраняем в виде: Name=GUID|Major|Minor|FullPath
-        With Itm: p_SettingKeyWrite FilePath, c_strRefSecName, .Name, Join(Array(.Guid, .Major, .Minor, .FullPath), "|"): End With
+        With Itm: p_SettingKeyWrite FilePath, c_strRefSecName, .NAME, Join(Array(.GUID, .Major, .Minor, .FullPath), "|"): End With
 HandleNext:
     Next Itm
 HandleExit:     Exit Function
@@ -3590,7 +3645,7 @@ Const c_strProcedure = "p_PropertiesRead"
     On Error GoTo HandleError
 ' восстанавливаем свойства проекта
     With VBE.ActiveVBProject
-        .Name = p_SettingKeyRead(FilePath, c_strPrjSecName, c_strPrjKeyName)
+        .NAME = p_SettingKeyRead(FilePath, c_strPrjSecName, c_strPrjKeyName)
         .Description = p_SettingKeyRead(FilePath, c_strPrjSecName, c_strPrjKeyDesc)
         .HelpFile = p_SettingKeyRead(FilePath, c_strPrjSecName, c_strPrjKeyHelp)
     End With
@@ -3601,7 +3656,7 @@ Dim strName As String, strValue As String, intType As eDataType
     strText = p_SettingSecRead(FilePath, c_strPrpSecName): If Len(strText) = 0 Then Err.Raise 76 ' Path not Found
     ' удаляем все старые свойства
     With CurrentProject.Properties
-        Do While .Count > 0: .Remove .Item(0).Name: Loop
+        Do While .Count > 0: .Remove .Item(0).NAME: Loop
     ' заполняем прочитанные свойства
     aPrps = Split(strText, ";")
     For Each Itm In aPrps
@@ -3644,7 +3699,7 @@ Const c_strProcedure = "p_PropertiesWrite"
     On Error GoTo HandleError
 ' сохраняем свойства проекта
     With VBE.ActiveVBProject
-        p_SettingKeyWrite FilePath, c_strPrjSecName, c_strPrjKeyName, p_PropertyStringCreate(.Name, PropType:=dbText)
+        p_SettingKeyWrite FilePath, c_strPrjSecName, c_strPrjKeyName, p_PropertyStringCreate(.NAME, PropType:=dbText)
         p_SettingKeyWrite FilePath, c_strPrjSecName, c_strPrjKeyDesc, p_PropertyStringCreate(.Description, PropType:=dbText)
         p_SettingKeyWrite FilePath, c_strPrjSecName, c_strPrjKeyHelp, p_PropertyStringCreate(.HelpFile, PropType:=dbText)
     End With
@@ -3652,7 +3707,7 @@ Dim Itm As Object, strName As String, varValue, intType As eDataType: intType = 
 ' сохраняем пользовательские свойства
     With CurrentProject
     For Each Itm In .Properties
-        With Itm:  strName = .Name: varValue = .Value: End With
+        With Itm:  strName = .NAME: varValue = .Value: End With
         varValue = p_PropertyStringCreate(varValue, PropType:=intType)
         p_SettingKeyWrite FilePath, c_strPrpSecName, strName, CStr(varValue)
     Next Itm
@@ -3664,7 +3719,7 @@ On Error Resume Next
     For Each Itm In .Properties
         Err.Clear
         With Itm
-            strName = .Name
+            strName = .NAME
             Select Case strName
             ' пропускаем ненужные свойства по имени
             Case "DesignMasterID", "Name", "Transactions", "Updatable", "CollatingOrder", _
@@ -3882,7 +3937,7 @@ Dim InitFolder As String
         .Title = DialogTitle
         .InitialView = InitView
         If Len(InitPath) > 0 Then
-            If Dir(InitPath, vbDirectory) <> vbNullString Then
+            If dir(InitPath, vbDirectory) <> vbNullString Then
                 InitFolder = InitPath
                 If Right(InitFolder, 1) <> "\" Then
                     InitFolder = InitFolder & "\"
@@ -3983,7 +4038,41 @@ Dim oMatches As Object, oMatch As Object
 HandleExit:  InStrRegEx = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
-
+'-------------------------
+' функции вызова статических объектов
+'-------------------------
+Private Function oFso() As Object
+Static soFSO As Object: If soFSO Is Nothing Then Set soFSO = CreateObject("Scripting.FileSystemObject")
+    Set oFso = soFSO
+End Function
+Private Function oApp() As Object
+Static soApp As Object: If soApp Is Nothing Then Set soApp = CreateObject("Shell.Application")
+    Set oApp = soApp
+End Function
+Private Function oRegEx() As Object
+Static soRegEx As Object: If soRegEx Is Nothing Then Set soRegEx = CreateObject("VBScript.RegExp")
+    Set oRegEx = soRegEx
+End Function
+'-------------------------
+' вспомогательные функции
+'-------------------------
+Private Function StrZ(par As String) As String
+Dim nSize As Long, i As Long ', Rez As String
+   nSize = Len(par)
+   i = InStr(1, par, VBA.Chr(0)) - 1
+   If i > nSize Then i = nSize
+   If i < 0 Then i = nSize
+   StrZ = VBA.Mid$(par, 1, i)
+End Function
+#If USEZIPCLASS Then
+Private Function oZip() As clzZipArchive
+Static soZip As clzZipArchive: If soZip Is Nothing Then Set soZip = New clzZipArchive
+    Set oZip = soZip
+End Function
+#End If
+'-------------------------
+' неиспользуемые функции
+'-------------------------
 Private Function p_WinUserName() As String
 ' имя пользователя Windows
 Const c_strProcedure = "p_WinUserName"
@@ -3999,43 +4088,16 @@ HandleExit:     p_WinUserName = Result: Exit Function
 HandleError:    Result = vbNullString: Err.Clear: Resume HandleExit
 End Function
 Private Function p_GetSysDiskSerial() As String
-' простая проверка смены машины
+' простая проверка серийного номера диска
 Dim Result As String
 Dim VolLabel As String, VolSize As Long, Serial As Long, MaxLen As Long
-Dim strName As String, NameSize As Long, flags As Long
+Dim strName As String, NameSize As Long, Flags As Long
 Const DiskName = "C:\"
 
     Result = VBA.String(8, "0")
     On Error GoTo HandleError
-    If GetVolumeInformation(DiskName, VolLabel, VolSize, Serial, MaxLen, flags, strName, NameSize) _
+    If GetVolumeInformation(DiskName, VolLabel, VolSize, Serial, MaxLen, Flags, strName, NameSize) _
         Then Result = VBA.Format$(VBA.Hex$(Serial), VBA.String$(8, "0"))
 HandleExit:     p_GetSysDiskSerial = Result: Exit Function
 HandleError:    Result = VBA.String$(8, "0"): Err.Clear: Resume HandleExit
 End Function
-Private Function StrZ(Par As String) As String
-Dim nSize As Long, i As Long ', Rez As String
-   nSize = Len(Par)
-   i = InStr(1, Par, VBA.Chr(0)) - 1
-   If i > nSize Then i = nSize
-   If i < 0 Then i = nSize
-   StrZ = VBA.Mid$(Par, 1, i)
-End Function
-#If USEZIPCLASS Then
-Private Function oZip() As clzZipArchive
-Static soZip As clzZipArchive: If soZip Is Nothing Then Set soZip = New clzZipArchive
-    Set oZip = soZip
-End Function
-#End If
-Private Function oFso() As Object
-Static soFSO As Object: If soFSO Is Nothing Then Set soFSO = CreateObject("Scripting.FileSystemObject")
-    Set oFso = soFSO
-End Function
-Private Function oApp() As Object
-Static soAPP As Object: If soAPP Is Nothing Then Set soAPP = CreateObject("Shell.Application")
-    Set oApp = soAPP
-End Function
-Private Function oRegEx() As Object
-Static soRegEx As Object: If soRegEx Is Nothing Then Set soRegEx = CreateObject("VBScript.RegExp")
-    Set oRegEx = soRegEx
-End Function
-
