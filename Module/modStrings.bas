@@ -7,8 +7,8 @@ Private Const c_strModule As String = "modStrings"
 '=========================
 ' Описание      : Функции для работы со строками
 ' Автор         : Кашкин Р.В. (KashRus@gmail.com)
-' Версия        : 1.1.31.454004568
-' Дата          : 18.04.2024 10:57:48
+' Версия        : 1.1.31.454015976
+' Дата          : 19.04.2024 14:20:33
 ' Примечание    : сделано под Access x86, адаптировано под x64, но толком не тестировалось. _
 '               : для работы с Excel сделать APPTYPE=1
 ' v.1.1.31      : 16.04.2024 - изменения в TaggedStringGet/Set/Del - добавлена возможность работать с тэгами имеющими одинаковые имена
@@ -2263,72 +2263,7 @@ Dim sTemp As String ':  sTemp = vbNullString
 HandleExit:  sEnd = sBeg: TokenStringDel = Result: Exit Function
 HandleError: Result = Source: Err.Clear: Resume HandleExit
 End Function
-Private Function p_GetSubstrBoundsByTag(Source As String, _
-    Optional ByRef Tag As String, Optional Data As String, Optional ByRef Pos As Long = 0, _
-    Optional sBeg As Long, Optional sEnd As Long, _
-    Optional Delim As String = ";", Optional TagDelim As String = "=", _
-    Optional Compare As VbCompareMethod = vbTextCompare _
-    ) As Boolean
-' возвращает номер и позицию начала и конца подстроки тэга (Tag=Val или Tag) в строке
-'-------------------------
-' Source    - исходная строка
-' Tag       - имя (Tag) элемента. если Tag не задан - элемент будет получен по Pos
-' Data      - значение тэга (Val)
-' Pos       - позиция возвращаемого элемента.
-'        >0 - позиция относительно начала строки
-'        <0 - позиция относительно конца строки
-' sBeg,sEnd - возвращает позицию начала и окончания извлеченной подстроки (имя (Tag), разделитель (TagDelim) и значение (Val)) в исходной
-' Delim     - разделитель пар имя/значение (Tag/Val)
-' TagDelim  - разделитель имени (Tag) и значения (Val) в паре
-' Compare   - тип сравнения (vbBinaryCompare/vbTextCompare)
-' возвращает True если заданная позиция в границах строки, иначе False
-'-------------------------
-Dim Result As Boolean
-    On Error GoTo HandleError
-    If Len(Source) = 0 Then GoTo HandleExit
-Dim i As Long
-Dim sPos As Long
-Dim bFound As Boolean
-Dim sSubst As String, sTag As String, sVal As String
-    If Pos >= 0 Then
-' позиция от начала - пробегаем всю строку с начала по разделителям, проверяя номер подстроки
-        If Pos = 0 Then Pos = 1
-        sPos = 1
-        Do
-            sBeg = sPos
-            sPos = InStr(sPos, Source, Delim, Compare)
-            If sPos > 0 Then sEnd = sPos Else sEnd = Len(Source) + 1
-            sSubst = Mid(Source, sBeg, sEnd - sBeg): sTag = Split(sSubst, TagDelim)(0)
-            If Len(Tag) = 0 Then bFound = True Else bFound = (StrComp(sTag, Tag, Compare) = 0)
-            If bFound Then i = i + 1
-            If (sEnd > Len(Source)) Then Exit Do
-            If (i >= Pos) Then Exit Do
-            sPos = sPos + Len(Delim)
-        Loop
-    Else
-' позиция от конца - пробегаем всю строку с конца по разделителям, проверяя номер подстроки
-        sPos = Len(Source): sEnd = sPos + 1
-        Do
-            sPos = InStrRev(Source, Delim, sPos, Compare)
-            If sPos > 0 Then sBeg = sPos + Len(Delim) Else sBeg = 1
-            sSubst = Mid(Source, sBeg, sEnd - sBeg): sTag = Split(sSubst, TagDelim)(0)
-            If Len(Tag) = 0 Then bFound = True Else bFound = (StrComp(sTag, Tag, Compare) = 0)
-            If bFound Then i = i + 1
-            If (sBeg <= 1) Then Exit Do
-            If (i >= Abs(Pos)) Then Exit Do
-            sEnd = sPos: sPos = sPos - 1
-        Loop
-    End If
-' проверяем соответствие позиции границам
-    Result = (i >= Abs(Pos)) ' позиция ниже нижней границы
-' получаем значение тэга
-    If Result Then
-        If Len(Tag) = 0 Then Tag = sTag
-        If Len(sSubst) > Len(Tag) Then Data = Split(sSubst, TagDelim)(1)
-    End If
-HandleExit:  p_GetSubstrBoundsByTag = Result: Exit Function
-HandleError: Result = False: Err.Clear: Resume HandleExit
-End Function
+
 Public Function TaggedStringGet(Source As String, _
     Optional ByRef Tag As String, Optional ByRef Pos As Long = 0, _
     Optional Delim As String = ";", Optional TagDelim As String = "=", _
@@ -2351,7 +2286,7 @@ Public Function TaggedStringGet(Source As String, _
 ' Compare   - тип сравнения (vbBinaryCompare/vbTextCompare)
 ' возвращает значение (Val) элемента с указанным именем (Tag) в указанной позиции (Pos) и его границы в исходной строке (Source)
 '-------------------------
-' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами
+' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами (старый вариант закомментил)
 '-------------------------
 'RegExp: Mask = Delim & Tag & TagDelim & "(.+?)" & Delim
 '        With Regex.Execute(Delim & Source & Delim)(0)
@@ -2407,10 +2342,12 @@ End Function
 
 Public Function TaggedStringSet(Source As String, _
     Optional ByRef Tag As String, Optional ByRef Data As String, _
-    Optional ByRef Pos As Long = 0, _
-    Optional Delim As String = ";", Optional TagDelim As String = "=", _
-    Optional sBeg As Long, Optional sEnd As Long, _
-    Optional Compare As VbCompareMethod = vbTextCompare _
+    Optional ByVal Pos As Long = 0, _
+    Optional ByRef Delim As String = ";", Optional ByRef TagDelim As String = "=", _
+    Optional ByVal Overwrite As Boolean = True, _
+    Optional ByRef sBeg As Long, Optional ByRef sEnd As Long, _
+    Optional Compare As VbCompareMethod = vbTextCompare, _
+    Optional UseTagPos As Boolean = True _
     ) As String
 ' устанавливает значение элемента строки с разделителями с указанным именем
 '-------------------------
@@ -2422,18 +2359,22 @@ Public Function TaggedStringSet(Source As String, _
 '           <0 - позиция относительно конца строки
 ' Delim -   разделитель пар имя (Tag) / значение (Val)
 ' TagDelim - разделитель имени (Tag) и значения (Val) в паре
+' Overwrite = True  - замена  элемента строки в указанной позиции
+'           = False - вставка со сдвигом в указанную позиию (Pos > 0 после указанной позиции,  Pos < 0 - перед)
 ' sBeg,sEnd - возвращает позицию начала и окончания вставленной подстроки (значения тэга) в исходной
 ' Compare - тип сравнения (vbBinaryCompare/vbTextCompare)
+' UseTagPos - определяет, что задает параметр Pos позицию подстроки, или порядковый номер тэга с именем (Tag) ???
+'           - True  - Pos определяется по имени тэга (Tag)      - n-й тэг с указанным именем
+'           - False - Pos определяется по разделителям (Delim)  - n-й тэг по порядку
 ' возвращает строку элементов с учетом добавленного элемента
 '-------------------------
-' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами
+' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами (старый вариант закомментил)
 ' v.1.0.3       : 11.02.2022 - Исправлены ошибки возникающие если TagDelim текстовое выражение, зависящее от регистра
 '-------------------------
-'' если тэг задан - вставка в найденную позицию
-'   ' если значение задано      - замена значения на Data
-'   ' иначе удаление значения   - удаляем значение и TagDelim перед ним
-'' если тэг не задан -
-'   '??? заменять или сдвигать ??? - сейчас замена
+' !!! если тэг (Tag) и позиция (Pos) заданы, а Overwrite=False - в таком виде получается неоднозначная интерпретация параметров ->
+' ??? заменять/вставлять новый "Tag=Data" в указанную позицию (Pos), или в позицию (Pos) по-порядку тэга с именем (Tag) ???
+'     пришлось вводить доп параметр UseTagPos
+' ToDo: пересмотреть и упростить весь блок процедур TaggedString
 '-------------------------
 Dim Result As String: Result = Source
     On Error GoTo HandleError
@@ -2454,25 +2395,33 @@ Dim Result As String: Result = Source
     
     Result = Source
 ' ищем границы подстроки в выражении
-Dim bFound As Boolean
-    bFound = p_GetSubstrBoundsByTag(Source, Tag, , Pos, sBeg, sEnd, Delim, TagDelim)
-    ' если здесь нет тэга он был не задан и не найден по позиции - добавить невозможно
+Dim bFound As Boolean: bFound = p_GetSubstrBoundsByTag(Source, Tag, , Pos, sBeg, sEnd, Delim, TagDelim, Compare, UseTagPos)
     If Not bFound Then
-    ' позиция не соответствует искомой, - не найдено
-        If Pos > 0 Then
-        ' добавляем в конец
-            sBeg = sEnd: If Len(Tag) = 0 Then GoTo HandleExit
-            Result = Result & Delim: sEnd = sEnd + Len(Delim): sBeg = sEnd
+        If Len(Tag) > 0 Then
+    ' если не найдено, но тэг задан - добавляем в начало или в конец
+            If Pos > 0 Then Pos = -1 Else Pos = 1
+            Overwrite = False
         Else
-        ' добавляем в начало
-            sEnd = sBeg: If Len(Tag) = 0 Then GoTo HandleExit
-            Result = Delim & Result
+    ' если здесь нет тэга он был не задан и не найден по позиции - добавить невозможно
+            If Pos > 0 Then sBeg = sEnd Else sEnd = sBeg
+            GoTo HandleExit
         End If
     End If
-Dim sTemp As String
-    sTemp = Tag: If Len(Data) > 0 Then sTemp = sTemp & TagDelim & Data
+' формируем строку для вставки
+Dim sTemp As String: sTemp = Tag: If Len(Data) > 0 Then sTemp = sTemp & TagDelim & Data
+    If Not Overwrite Then
+    ' вставка со сдвигом
+        ' Pos > 0 - вставка перед указанной позицией,
+        ' Pos < 0 - после указанной позиции
+        If Pos > 0 Then sEnd = sBeg Else sBeg = sEnd
+        ' добавляем разделитель после/перед вставляемым элементом
+        Result = Left$(Result, sBeg - 1) & Delim & Mid$(Result, sEnd)
+        If Pos < 0 Then sEnd = sEnd + Len(Delim): sBeg = sEnd
+    End If
+' формируем результирующую строку
     Result = Left$(Result, sBeg - 1) & sTemp & Mid$(Result, sEnd)
-    sBeg = sBeg + Len(sTemp) - Len(Data): sEnd = sBeg + Len(Data)
+    sBeg = sBeg + Len(Tag): If Len(Data) > 0 Then sBeg = sBeg + Len(TagDelim)
+    sEnd = sBeg + Len(Data)
 ''-------------------------
 '' Old version (set only 1st entry)
 ''-------------------------
@@ -2588,7 +2537,7 @@ Public Function TaggedStringDel(Source As String, _
 ' Compare - тип сравнения (vbBinaryCompare/vbTextCompare)
 ' Возвращает строку элементов без указанного элемента
 '-------------------------
-' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами
+' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами (старый вариант закомментил)
 '-------------------------
 Dim Result As String: Result = Source
     On Error GoTo HandleError
@@ -2691,6 +2640,7 @@ Public Function TaggedString2Collection(Source As String, _
 '-------------------------
 ' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами (очень тупо и в лоб, но хороших идей нет)
 '-------------------------
+' ToDo: !!! необходимо оптимизировать код, а лучше - полностью переписать.
 Dim Result As Boolean: Result = False
     On Error GoTo HandleError
     'If Len(Source) = 0 Then GoTo HandleExit
@@ -2778,6 +2728,91 @@ Dim i As Long
 HandleExit:  TaggedCollection2String = Result: Exit Function
 HandleError: Err.Clear: Resume HandleExit
 End Function
+Private Function p_GetSubstrBoundsByTag(Source As String, _
+    Optional ByRef Tag As String, Optional Data As String, Optional ByRef Pos As Long = 0, _
+    Optional sBeg As Long, Optional sEnd As Long, _
+    Optional Delim As String = ";", Optional TagDelim As String = "=", _
+    Optional Compare As VbCompareMethod = vbTextCompare, _
+    Optional UseTagPos As Boolean = True _
+    ) As Boolean
+' возвращает номер и позицию начала и конца подстроки тэга (Tag=Val или Tag) в строке
+'-------------------------
+' Source    - исходная строка
+' Tag       - имя (Tag) элемента. если Tag не задан - элемент будет получен по Pos
+' Data      - значение тэга (Val)
+' Pos       - позиция возвращаемого элемента.
+'        >0 - позиция относительно начала строки
+'        <0 - позиция относительно конца строки
+' sBeg,sEnd - возвращает позицию начала и окончания извлеченной подстроки (имя (Tag), разделитель (TagDelim) и значение (Val)) в исходной
+' Delim     - разделитель пар имя/значение (Tag/Val)
+' TagDelim  - разделитель имени (Tag) и значения (Val) в паре
+' Compare   - тип сравнения (vbBinaryCompare/vbTextCompare)
+' UseTagPos - определяет что извлекать элемент в указанной позиции (Pos), или n-го (Pos) тэга с именем (Tag) ???
+'           - True  - Pos определяется по имени тэга (Tag)      - n-й тэг с указанным именем
+'           - False - Pos определяется по разделителям (Delim)  - n-й тэг по порядку
+' возвращает True если заданная позиция в границах строки, иначе False
+'-------------------------
+' !!! если тэг (Tag) и позиция (Pos) заданы, получается неоднозначная интерпретация параметров ->
+' ??? извлекать элемент в указанной позиции (Pos), или в позиции (Pos) по-порядку тэга с именем (Tag) ???, поэтому:
+'-------------------------
+Dim Result As Boolean
+    On Error GoTo HandleError
+    If Len(Source) = 0 Then GoTo HandleExit
+Dim i As Long
+Dim sPos As Long
+Dim bFound As Boolean
+Dim sSubst As String, sTag As String, sVal As String
+
+' если тэг не задан - без вариантов считаем позицию по разделителям
+    UseTagPos = UseTagPos And Len(Tag)
+    If Pos >= 0 Then
+' позиция от начала - пробегаем всю строку с начала по разделителям, проверяя номер подстроки
+        If Pos = 0 Then Pos = 1
+        sPos = 1
+        Do
+            sBeg = sPos
+            sPos = InStr(sPos, Source, Delim, Compare)
+            If sPos > 0 Then sEnd = sPos Else sEnd = Len(Source) + 1
+            
+            If UseTagPos Then
+                sSubst = Mid(Source, sBeg, sEnd - sBeg): sTag = Split(sSubst, TagDelim)(0): bFound = (StrComp(sTag, Tag, Compare) = 0)
+                If bFound Then i = i + 1: If (i >= Abs(Pos)) Then Exit Do
+            Else
+                i = i + 1: If (i >= Abs(Pos)) Then sSubst = Mid(Source, sBeg, sEnd - sBeg): sTag = Split(sSubst, TagDelim)(0): Exit Do
+            End If
+            
+            If (sEnd > Len(Source)) Then Exit Do
+            sPos = sPos + Len(Delim)
+        Loop
+    Else
+' позиция от конца - пробегаем всю строку с конца по разделителям, проверяя номер подстроки
+        sPos = Len(Source): sEnd = sPos + 1
+        Do
+            sPos = InStrRev(Source, Delim, sPos, Compare)
+            If sPos > 0 Then sBeg = sPos + Len(Delim) Else sBeg = 1
+            
+            If UseTagPos Then
+                sSubst = Mid(Source, sBeg, sEnd - sBeg): sTag = Split(sSubst, TagDelim)(0): bFound = (StrComp(sTag, Tag, Compare) = 0)
+                If bFound Then i = i + 1: If (i >= Abs(Pos)) Then Exit Do
+            Else
+                i = i + 1: If (i >= Abs(Pos)) Then sSubst = Mid(Source, sBeg, sEnd - sBeg): sTag = Split(sSubst, TagDelim)(0): Exit Do
+            End If
+            
+            If (sBeg <= 1) Then Exit Do
+            sEnd = sPos: sPos = sPos - 1
+        Loop
+    End If
+' проверяем соответствие позиции границам
+    Result = (i >= Abs(Pos)) ' позиция ниже нижней границы
+' получаем значение тэга
+    If Result Then
+        If Len(Tag) = 0 Then Tag = sTag
+        If Len(sSubst) > Len(Tag) Then Data = Split(sSubst, TagDelim)(1)
+    End If
+HandleExit:  p_GetSubstrBoundsByTag = Result: Exit Function
+HandleError: Result = False: Err.Clear: Resume HandleExit
+End Function
+
 Private Function p_GetSubstrBounds(ByRef Source As String, _
     ByRef Pos As Long, ByRef sBeg As Long, ByRef sEnd As Long, _
     Optional Delim As String = " ") As Boolean
@@ -6136,4 +6171,8 @@ Private Function Nz(p1, Optional p2) As Variant
 ' You will get True True
 End Function
 #End If
+
+
+
+
 
