@@ -922,7 +922,7 @@ HandleNext:
 'HandleExitDo:
     If bKeys Then Keys = p_GetCollKeys(NamedTerms)
 HandleExit:  PlaceHoldersGet = Result: Exit Function
-HandleError: Result = False: Resume 0: Err.Clear: Resume HandleExit
+HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
 Private Function p_FindNamedPlaceHolder(ByRef Source As String, _
     Optional ByRef NAME As String, _
