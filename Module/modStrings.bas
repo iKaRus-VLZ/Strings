@@ -1,145 +1,144 @@
-Attribute VB_Name = "modStrings"
 Option Base 0
 Option Explicit
 #Const APPTYPE = 0  ' 0=ACCESS, 1=EXCEL
 '=========================
 Private Const c_strModule As String = "modStrings"
 '=========================
-' Описание      : Функции для работы со строками
-' Автор         : Кашкин Р.В. (KashRus@gmail.com)
-' Версия        : 1.1.31.454015976
-' Дата          : 19.04.2024 14:20:33
-' Примечание    : сделано под Access x86, адаптировано под x64, но толком не тестировалось. _
-'               : для работы с Excel сделать APPTYPE=1
-' v.1.1.31      : 16.04.2024 - изменения в TaggedStringGet/Set/Del - добавлена возможность работать с тэгами имеющими одинаковые имена
-' v.1.1.30      : 12.03.2024 - изменения в GroupsGet - первая попытка переделать скобки под шаблоны (чтобы получить возможность разбирать двух- и более -звенные выражения вроде If .. Then .. End If)
-' v.1.1.29      : 21.12.2022 - изменения в GroupsGet - исправлены многочисленные ошибки. (всё еще сильно экспериментальная)
-' v.1.1.27      : 09.08.2022 - изменения в DelimStringSet - добавлен параметр SetUnique для контроля уникальности вставляемых значений
-' v.1.1.26      : 11.02.2022 - изменения в TaggedStringSet/Del - исправлены ошибки возникающие если TagDelim текстовое выражение, зависящее от регистра
-' v.1.1.25      : 16.07.2020 - переписана PlaceHoldersGet - прошлая версия приводила к неправильному результату если первое совпадение окажется впоследствии забракованным. добавлена поддержка множественных вхождений (ReplaceExisting)
-' v.1.1.24      : 24.03.2020 - добавлена функция GroupGet - для извлечения из текста групп (выражений заключенных в скобки)
-' v.1.1.23      : 04.02.2020 - изменения в PlaceHoldersGet - расширен синтаксис шаблона за счет выражений VBA.Like и VBS.RegExp
-' v.1.1.22      : 03.02.2020 - добавлена PlaceHoldersGet - позволяет извлекать в коллекцию значения переменных из строки по шаблону; _
-                               переименованы функции группы работы с подстановочными значениями для большего единообразия
-' v.1.1.19      : 30.01.2020 - изменения в PlaceHoldersSet - добавлена возможность использования модификаторов (формат см. p_TermModify)
-' v.1.1.17      : 29.11.2019 - добавлены функции для работы с подстановочными переменными PlaceHoldersSetByIndex и PlaceHoldersSet
-' v.1.1.16      : 31.10.2019 - изменения в Tokenize - добавлен необязательный параметр Positions - возвращающий массив позиций найденных токенов в исходной строке _
-                               и добавлены функции TokenString[Get","Set","Del] извлечения/вставки/удаления токенов из строки, аналогичные имеющимся для DelimString и TaggedString _
-                               для всех функций работы с подстроками добавлены параметры sBeg, sEnd возвращающие позицию подстроки в строке
-' v.1.1.12      : 24.09.2019 - обновлены функции работы со строками с разделителями DelimString[Get","Set","Del], _
-                               добавлена возможность работы с отрицательными позициями (от конца строки) _
-                               и добавлены функции работы со строками именных параметров TaggedString[Get","Set","Del]
-' v.1.1.10      : 16.08.2019 - добавлены функции фонетического сравнения: SoundEx, PolyPhone _
-                               и функции определения фонетического расстояния: Наибольшая общая подпоследовательность, Levenshtein, Dice, коэффициент Jaro etc. _
-                               некоторые алгоритмы пытался воспроизвести по текстовым описаниям - возможно реализации не вполне корректны.
-' v.1.1.9       : 18.07.2019 - добавлена NumToWords - преобразование числа в текст и склонение результата по падежам
-' v.1.1.8       : 13.07.2019 - внесены исправления в функции разбиения строки на части по контролам/шрифту
-' v.1.1.5       : 12.12.2018 - добавлена HyphenateWord - для расстановки переносов в словах. Источник: http://www.cyberforum.ru/vba/thread792944.html
-' v.1.1.4       : обновлена DeclineWords - добавлена возможность пропуска слов при склонении словосочетаний
-' v.1.1.2       : переписан DeclineWord - функция склонения по падежам. Добавлена возможность склонять по числам.
+' РћРїРёСЃР°РЅРёРµ      : Р¤СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃРѕ СЃС‚СЂРѕРєР°РјРё
+' РђРІС‚РѕСЂ         : РљР°С€РєРёРЅ Р .Р’. (KashRus@gmail.com)
+' Р’РµСЂСЃРёСЏ        : 1.1.31.456154691
+' Р”Р°С‚Р°          : 19.11.2024 11:15:30
+' РџСЂРёРјРµС‡Р°РЅРёРµ    : СЃРґРµР»Р°РЅРѕ РїРѕРґ Access x86, Р°РґР°РїС‚РёСЂРѕРІР°РЅРѕ РїРѕРґ x64, РЅРѕ С‚РѕР»РєРѕРј РЅРµ С‚РµСЃС‚РёСЂРѕРІР°Р»РѕСЃСЊ. _
+'               : РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ Excel СЃРґРµР»Р°С‚СЊ APPTYPE=1
+' v.1.1.31      : 16.04.2024 - РёР·РјРµРЅРµРЅРёСЏ РІ TaggedStringGet/Set/Del - РґРѕР±Р°РІР»РµРЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ СЂР°Р±РѕС‚Р°С‚СЊ СЃ С‚СЌРіР°РјРё РёРјРµСЋС‰РёРјРё РѕРґРёРЅР°РєРѕРІС‹Рµ РёРјРµРЅР°
+' v.1.1.30      : 12.03.2024 - РёР·РјРµРЅРµРЅРёСЏ РІ GroupsGet - РїРµСЂРІР°СЏ РїРѕРїС‹С‚РєР° РїРµСЂРµРґРµР»Р°С‚СЊ СЃРєРѕР±РєРё РїРѕРґ С€Р°Р±Р»РѕРЅС‹ (С‡С‚РѕР±С‹ РїРѕР»СѓС‡РёС‚СЊ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ СЂР°Р·Р±РёСЂР°С‚СЊ РґРІСѓС…- Рё Р±РѕР»РµРµ -Р·РІРµРЅРЅС‹Рµ РІС‹СЂР°Р¶РµРЅРёСЏ РІСЂРѕРґРµ If .. Then .. End If)
+' v.1.1.29      : 21.12.2022 - РёР·РјРµРЅРµРЅРёСЏ РІ GroupsGet - РёСЃРїСЂР°РІР»РµРЅС‹ РјРЅРѕРіРѕС‡РёСЃР»РµРЅРЅС‹Рµ РѕС€РёР±РєРё. (РІСЃС‘ РµС‰Рµ СЃРёР»СЊРЅРѕ СЌРєСЃРїРµСЂРёРјРµРЅС‚Р°Р»СЊРЅР°СЏ)
+' v.1.1.27      : 09.08.2022 - РёР·РјРµРЅРµРЅРёСЏ РІ DelimStringSet - РґРѕР±Р°РІР»РµРЅ РїР°СЂР°РјРµС‚СЂ SetUnique РґР»СЏ РєРѕРЅС‚СЂРѕР»СЏ СѓРЅРёРєР°Р»СЊРЅРѕСЃС‚Рё РІСЃС‚Р°РІР»СЏРµРјС‹С… Р·РЅР°С‡РµРЅРёР№
+' v.1.1.26      : 11.02.2022 - РёР·РјРµРЅРµРЅРёСЏ РІ TaggedStringSet/Del - РёСЃРїСЂР°РІР»РµРЅС‹ РѕС€РёР±РєРё РІРѕР·РЅРёРєР°СЋС‰РёРµ РµСЃР»Рё TagDelim С‚РµРєСЃС‚РѕРІРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ, Р·Р°РІРёСЃСЏС‰РµРµ РѕС‚ СЂРµРіРёСЃС‚СЂР°
+' v.1.1.25      : 16.07.2020 - РїРµСЂРµРїРёСЃР°РЅР° PlaceHoldersGet - РїСЂРѕС€Р»Р°СЏ РІРµСЂСЃРёСЏ РїСЂРёРІРѕРґРёР»Р° Рє РЅРµРїСЂР°РІРёР»СЊРЅРѕРјСѓ СЂРµР·СѓР»СЊС‚Р°С‚Сѓ РµСЃР»Рё РїРµСЂРІРѕРµ СЃРѕРІРїР°РґРµРЅРёРµ РѕРєР°Р¶РµС‚СЃСЏ РІРїРѕСЃР»РµРґСЃС‚РІРёРё Р·Р°Р±СЂР°РєРѕРІР°РЅРЅС‹Рј. РґРѕР±Р°РІР»РµРЅР° РїРѕРґРґРµСЂР¶РєР° РјРЅРѕР¶РµСЃС‚РІРµРЅРЅС‹С… РІС…РѕР¶РґРµРЅРёР№ (ReplaceExisting)
+' v.1.1.24      : 24.03.2020 - РґРѕР±Р°РІР»РµРЅР° С„СѓРЅРєС†РёСЏ GroupGet - РґР»СЏ РёР·РІР»РµС‡РµРЅРёСЏ РёР· С‚РµРєСЃС‚Р° РіСЂСѓРїРї (РІС‹СЂР°Р¶РµРЅРёР№ Р·Р°РєР»СЋС‡РµРЅРЅС‹С… РІ СЃРєРѕР±РєРё)
+' v.1.1.23      : 04.02.2020 - РёР·РјРµРЅРµРЅРёСЏ РІ PlaceHoldersGet - СЂР°СЃС€РёСЂРµРЅ СЃРёРЅС‚Р°РєСЃРёСЃ С€Р°Р±Р»РѕРЅР° Р·Р° СЃС‡РµС‚ РІС‹СЂР°Р¶РµРЅРёР№ VBA.Like Рё VBS.RegExp
+' v.1.1.22      : 03.02.2020 - РґРѕР±Р°РІР»РµРЅР° PlaceHoldersGet - РїРѕР·РІРѕР»СЏРµС‚ РёР·РІР»РµРєР°С‚СЊ РІ РєРѕР»Р»РµРєС†РёСЋ Р·РЅР°С‡РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅС‹С… РёР· СЃС‚СЂРѕРєРё РїРѕ С€Р°Р±Р»РѕРЅСѓ; _
+                               РїРµСЂРµРёРјРµРЅРѕРІР°РЅС‹ С„СѓРЅРєС†РёРё РіСЂСѓРїРїС‹ СЂР°Р±РѕС‚С‹ СЃ РїРѕРґСЃС‚Р°РЅРѕРІРѕС‡РЅС‹РјРё Р·РЅР°С‡РµРЅРёСЏРјРё РґР»СЏ Р±РѕР»СЊС€РµРіРѕ РµРґРёРЅРѕРѕР±СЂР°Р·РёСЏ
+' v.1.1.19      : 30.01.2020 - РёР·РјРµРЅРµРЅРёСЏ РІ PlaceHoldersSet - РґРѕР±Р°РІР»РµРЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ (С„РѕСЂРјР°С‚ СЃРј. p_TermModify)
+' v.1.1.17      : 29.11.2019 - РґРѕР±Р°РІР»РµРЅС‹ С„СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РїРѕРґСЃС‚Р°РЅРѕРІРѕС‡РЅС‹РјРё РїРµСЂРµРјРµРЅРЅС‹РјРё PlaceHoldersSetByIndex Рё PlaceHoldersSet
+' v.1.1.16      : 31.10.2019 - РёР·РјРµРЅРµРЅРёСЏ РІ Tokenize - РґРѕР±Р°РІР»РµРЅ РЅРµРѕР±СЏР·Р°С‚РµР»СЊРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ Positions - РІРѕР·РІСЂР°С‰Р°СЋС‰РёР№ РјР°СЃСЃРёРІ РїРѕР·РёС†РёР№ РЅР°Р№РґРµРЅРЅС‹С… С‚РѕРєРµРЅРѕРІ РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ _
+                               Рё РґРѕР±Р°РІР»РµРЅС‹ С„СѓРЅРєС†РёРё TokenString[Get","Set","Del] РёР·РІР»РµС‡РµРЅРёСЏ/РІСЃС‚Р°РІРєРё/СѓРґР°Р»РµРЅРёСЏ С‚РѕРєРµРЅРѕРІ РёР· СЃС‚СЂРѕРєРё, Р°РЅР°Р»РѕРіРёС‡РЅС‹Рµ РёРјРµСЋС‰РёРјСЃСЏ РґР»СЏ DelimString Рё TaggedString _
+                               РґР»СЏ РІСЃРµС… С„СѓРЅРєС†РёР№ СЂР°Р±РѕС‚С‹ СЃ РїРѕРґСЃС‚СЂРѕРєР°РјРё РґРѕР±Р°РІР»РµРЅС‹ РїР°СЂР°РјРµС‚СЂС‹ sBeg, sEnd РІРѕР·РІСЂР°С‰Р°СЋС‰РёРµ РїРѕР·РёС†РёСЋ РїРѕРґСЃС‚СЂРѕРєРё РІ СЃС‚СЂРѕРєРµ
+' v.1.1.12      : 24.09.2019 - РѕР±РЅРѕРІР»РµРЅС‹ С„СѓРЅРєС†РёРё СЂР°Р±РѕС‚С‹ СЃРѕ СЃС‚СЂРѕРєР°РјРё СЃ СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё DelimString[Get","Set","Del], _
+                               РґРѕР±Р°РІР»РµРЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ СЂР°Р±РѕС‚С‹ СЃ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹РјРё РїРѕР·РёС†РёСЏРјРё (РѕС‚ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё) _
+                               Рё РґРѕР±Р°РІР»РµРЅС‹ С„СѓРЅРєС†РёРё СЂР°Р±РѕС‚С‹ СЃРѕ СЃС‚СЂРѕРєР°РјРё РёРјРµРЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ TaggedString[Get","Set","Del]
+' v.1.1.10      : 16.08.2019 - РґРѕР±Р°РІР»РµРЅС‹ С„СѓРЅРєС†РёРё С„РѕРЅРµС‚РёС‡РµСЃРєРѕРіРѕ СЃСЂР°РІРЅРµРЅРёСЏ: SoundEx, PolyPhone _
+                               Рё С„СѓРЅРєС†РёРё РѕРїСЂРµРґРµР»РµРЅРёСЏ С„РѕРЅРµС‚РёС‡РµСЃРєРѕРіРѕ СЂР°СЃСЃС‚РѕСЏРЅРёСЏ: РќР°РёР±РѕР»СЊС€Р°СЏ РѕР±С‰Р°СЏ РїРѕРґРїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ, Levenshtein, Dice, РєРѕСЌС„С„РёС†РёРµРЅС‚ Jaro etc. _
+                               РЅРµРєРѕС‚РѕСЂС‹Рµ Р°Р»РіРѕСЂРёС‚РјС‹ РїС‹С‚Р°Р»СЃСЏ РІРѕСЃРїСЂРѕРёР·РІРµСЃС‚Рё РїРѕ С‚РµРєСЃС‚РѕРІС‹Рј РѕРїРёСЃР°РЅРёСЏРј - РІРѕР·РјРѕР¶РЅРѕ СЂРµР°Р»РёР·Р°С†РёРё РЅРµ РІРїРѕР»РЅРµ РєРѕСЂСЂРµРєС‚РЅС‹.
+' v.1.1.9       : 18.07.2019 - РґРѕР±Р°РІР»РµРЅР° NumToWords - РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С‡РёСЃР»Р° РІ С‚РµРєСЃС‚ Рё СЃРєР»РѕРЅРµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р° РїРѕ РїР°РґРµР¶Р°Рј
+' v.1.1.8       : 13.07.2019 - РІРЅРµСЃРµРЅС‹ РёСЃРїСЂР°РІР»РµРЅРёСЏ РІ С„СѓРЅРєС†РёРё СЂР°Р·Р±РёРµРЅРёСЏ СЃС‚СЂРѕРєРё РЅР° С‡Р°СЃС‚Рё РїРѕ РєРѕРЅС‚СЂРѕР»Р°Рј/С€СЂРёС„С‚Сѓ
+' v.1.1.5       : 12.12.2018 - РґРѕР±Р°РІР»РµРЅР° HyphenateWord - РґР»СЏ СЂР°СЃСЃС‚Р°РЅРѕРІРєРё РїРµСЂРµРЅРѕСЃРѕРІ РІ СЃР»РѕРІР°С…. РСЃС‚РѕС‡РЅРёРє: http://www.cyberforum.ru/vba/thread792944.html
+' v.1.1.4       : РѕР±РЅРѕРІР»РµРЅР° DeclineWords - РґРѕР±Р°РІР»РµРЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РїСЂРѕРїСѓСЃРєР° СЃР»РѕРІ РїСЂРё СЃРєР»РѕРЅРµРЅРёРё СЃР»РѕРІРѕСЃРѕС‡РµС‚Р°РЅРёР№
+' v.1.1.2       : РїРµСЂРµРїРёСЃР°РЅ DeclineWord - С„СѓРЅРєС†РёСЏ СЃРєР»РѕРЅРµРЅРёСЏ РїРѕ РїР°РґРµР¶Р°Рј. Р”РѕР±Р°РІР»РµРЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ СЃРєР»РѕРЅСЏС‚СЊ РїРѕ С‡РёСЃР»Р°Рј.
 '=========================
-' ToDo: DeclineWord - переписать для работы с правилами описанными как шаблоны (продумать вид шаблонов), для лучшей читаимости и удобства настройки
-' + добавить возможность эскапирования символов в функциях с разделителями и пропуск разделителей внутри кавычек
-' + PlaceHoldersGet - проверять соответствие извлекаемого значения, заданным параметрам переменной, например принадлежность списку допустимых значений
-' - NumToWords      - неправильно склоняет знаменатели натуральных дробей >10^6
+' ToDo: DeclineWord - РїРµСЂРµРїРёСЃР°С‚СЊ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РїСЂР°РІРёР»Р°РјРё РѕРїРёСЃР°РЅРЅС‹РјРё РєР°Рє С€Р°Р±Р»РѕРЅС‹ (РїСЂРѕРґСѓРјР°С‚СЊ РІРёРґ С€Р°Р±Р»РѕРЅРѕРІ), РґР»СЏ Р»СѓС‡С€РµР№ С‡РёС‚Р°РёРјРѕСЃС‚Рё Рё СѓРґРѕР±СЃС‚РІР° РЅР°СЃС‚СЂРѕР№РєРё
+' + РґРѕР±Р°РІРёС‚СЊ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ СЌСЃРєР°РїРёСЂРѕРІР°РЅРёСЏ СЃРёРјРІРѕР»РѕРІ РІ С„СѓРЅРєС†РёСЏС… СЃ СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё Рё РїСЂРѕРїСѓСЃРє СЂР°Р·РґРµР»РёС‚РµР»РµР№ РІРЅСѓС‚СЂРё РєР°РІС‹С‡РµРє
+' + PlaceHoldersGet - РїСЂРѕРІРµСЂСЏС‚СЊ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РёР·РІР»РµРєР°РµРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ, Р·Р°РґР°РЅРЅС‹Рј РїР°СЂР°РјРµС‚СЂР°Рј РїРµСЂРµРјРµРЅРЅРѕР№, РЅР°РїСЂРёРјРµСЂ РїСЂРёРЅР°РґР»РµР¶РЅРѕСЃС‚СЊ СЃРїРёСЃРєСѓ РґРѕРїСѓСЃС‚РёРјС‹С… Р·РЅР°С‡РµРЅРёР№
+' - NumToWords      - РЅРµРїСЂР°РІРёР»СЊРЅРѕ СЃРєР»РѕРЅСЏРµС‚ Р·РЅР°РјРµРЅР°С‚РµР»Рё РЅР°С‚СѓСЂР°Р»СЊРЅС‹С… РґСЂРѕР±РµР№ >10^6
 '=========================
-Private Const c_strMultiSfx = "~&#" ' признак суффикса для имени при множественных повторениях
+Private Const c_strMultiSfx = "~&#" ' РїСЂРёР·РЅР°Рє СЃСѓС„С„РёРєСЃР° РґР»СЏ РёРјРµРЅРё РїСЂРё РјРЅРѕР¶РµСЃС‚РІРµРЅРЅС‹С… РїРѕРІС‚РѕСЂРµРЅРёСЏС…
 
-'Private Const c_strEsc = "\" ' эскейп символ - для указания что следующий знак следует рассматривать как обычный символ (не специальный, не разделитель)
-' русский алфавит
-    ' проверить например глухой звук: If iInStr (c_strSymbRusConsonDeaf,sChar) Then
-Private Const c_strSymbRusConson = "йбвгджзклмнпрстфхцчшщ"  ' согласные звуки
-'Private Const c_strSymbRusConsonVoicPaired = "бвгджз", c_strSymbRusConsonVoicOnly = "лмнр" ' звонкие парные/непарные
-'Private Const c_strSymbRusConsonDeafPaired = "пфктшс", c_strSymbRusConsonDeafOnly = "хцчщ" ' глухие парные/непарные
-'Private Const c_strSymbRusConsonVoic = c_strSymbRusConsonVoicPaired & c_strSymbRusConsonVoicOnly ' звонкие все
-'Private Const c_strSymbRusConsonDeaf = c_strSymbRusConsonDeafPaired & c_strSymbRusConsonDeafOnly ' глухие все
-'Private Const c_strSymbRusConsonHardSoft = "бвгдзклмнпрстфх" ' парные твёрдые/мягкие в зависимости от гласной
-'Private Const c_strSymbRusConsonHardOnly = "жшц", c_strSymbRusConsonSoftOnly = "йчщ" ' только твёрдые/мягкие
-'Private Const c_strSymbRusConsonHissing = "жшчщ", c_strSymbRusConsonWhistling = "сзц"  ' шипящие/свистящие
-'Private Const c_strSymbRusConsonSonar = "йлмнр", c_strSymbRusConsonNoisy = "кпстфхцчшщбвгджз"  ' сонорные/шумные
-Private Const c_strSymbRusVowel = "аеёиоуыэюя"   ' гласные звуки
-'Private Const c_strSymbRusVowelYotated = "еёюя" ' йотированные (двойные) гласные звуки
-'Private Const c_strSymbRusVowelSoft = "еёюяи"   ' смягчающие гласные звуки
-'Private Const c_strSymbRusVowelHard = "эоуаы"   ' парные им не являющиеся смягчающими
-Private Const c_strSymbRusSign = "ьъ"            ' знаки
-'Private Const c_strSymbRusSignSoft = "ь"        ' мягкий знак
-'Private Const c_strSymbRusSignHard = "ъ"        ' твёрдый знак
-' английский алфавит
+'Private Const c_strEsc = "\" ' СЌСЃРєРµР№Рї СЃРёРјРІРѕР» - РґР»СЏ СѓРєР°Р·Р°РЅРёСЏ С‡С‚Рѕ СЃР»РµРґСѓСЋС‰РёР№ Р·РЅР°Рє СЃР»РµРґСѓРµС‚ СЂР°СЃСЃРјР°С‚СЂРёРІР°С‚СЊ РєР°Рє РѕР±С‹С‡РЅС‹Р№ СЃРёРјРІРѕР» (РЅРµ СЃРїРµС†РёР°Р»СЊРЅС‹Р№, РЅРµ СЂР°Р·РґРµР»РёС‚РµР»СЊ)
+' СЂСѓСЃСЃРєРёР№ Р°Р»С„Р°РІРёС‚
+    ' РїСЂРѕРІРµСЂРёС‚СЊ РЅР°РїСЂРёРјРµСЂ РіР»СѓС…РѕР№ Р·РІСѓРє: If iInStr (c_strSymbRusConsonDeaf,sChar) Then
+Private Const c_strSymbRusConson = "Р№Р±РІРіРґР¶Р·РєР»РјРЅРїСЂСЃС‚С„С…С†С‡С€С‰"  ' СЃРѕРіР»Р°СЃРЅС‹Рµ Р·РІСѓРєРё
+'Private Const c_strSymbRusConsonVoicPaired = "Р±РІРіРґР¶Р·", c_strSymbRusConsonVoicOnly = "Р»РјРЅСЂ" ' Р·РІРѕРЅРєРёРµ РїР°СЂРЅС‹Рµ/РЅРµРїР°СЂРЅС‹Рµ
+'Private Const c_strSymbRusConsonDeafPaired = "РїС„РєС‚С€СЃ", c_strSymbRusConsonDeafOnly = "С…С†С‡С‰" ' РіР»СѓС…РёРµ РїР°СЂРЅС‹Рµ/РЅРµРїР°СЂРЅС‹Рµ
+'Private Const c_strSymbRusConsonVoic = c_strSymbRusConsonVoicPaired & c_strSymbRusConsonVoicOnly ' Р·РІРѕРЅРєРёРµ РІСЃРµ
+'Private Const c_strSymbRusConsonDeaf = c_strSymbRusConsonDeafPaired & c_strSymbRusConsonDeafOnly ' РіР»СѓС…РёРµ РІСЃРµ
+'Private Const c_strSymbRusConsonHardSoft = "Р±РІРіРґР·РєР»РјРЅРїСЂСЃС‚С„С…" ' РїР°СЂРЅС‹Рµ С‚РІС‘СЂРґС‹Рµ/РјСЏРіРєРёРµ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РіР»Р°СЃРЅРѕР№
+'Private Const c_strSymbRusConsonHardOnly = "Р¶С€С†", c_strSymbRusConsonSoftOnly = "Р№С‡С‰" ' С‚РѕР»СЊРєРѕ С‚РІС‘СЂРґС‹Рµ/РјСЏРіРєРёРµ
+'Private Const c_strSymbRusConsonHissing = "Р¶С€С‡С‰", c_strSymbRusConsonWhistling = "СЃР·С†"  ' С€РёРїСЏС‰РёРµ/СЃРІРёСЃС‚СЏС‰РёРµ
+'Private Const c_strSymbRusConsonSonar = "Р№Р»РјРЅСЂ", c_strSymbRusConsonNoisy = "РєРїСЃС‚С„С…С†С‡С€С‰Р±РІРіРґР¶Р·"  ' СЃРѕРЅРѕСЂРЅС‹Рµ/С€СѓРјРЅС‹Рµ
+Private Const c_strSymbRusVowel = "Р°РµС‘РёРѕСѓС‹СЌСЋСЏ"   ' РіР»Р°СЃРЅС‹Рµ Р·РІСѓРєРё
+'Private Const c_strSymbRusVowelYotated = "РµС‘СЋСЏ" ' Р№РѕС‚РёСЂРѕРІР°РЅРЅС‹Рµ (РґРІРѕР№РЅС‹Рµ) РіР»Р°СЃРЅС‹Рµ Р·РІСѓРєРё
+'Private Const c_strSymbRusVowelSoft = "РµС‘СЋСЏРё"   ' СЃРјСЏРіС‡Р°СЋС‰РёРµ РіР»Р°СЃРЅС‹Рµ Р·РІСѓРєРё
+'Private Const c_strSymbRusVowelHard = "СЌРѕСѓР°С‹"   ' РїР°СЂРЅС‹Рµ РёРј РЅРµ СЏРІР»СЏСЋС‰РёРµСЃСЏ СЃРјСЏРіС‡Р°СЋС‰РёРјРё
+Private Const c_strSymbRusSign = "СЊСЉ"            ' Р·РЅР°РєРё
+'Private Const c_strSymbRusSignSoft = "СЊ"        ' РјСЏРіРєРёР№ Р·РЅР°Рє
+'Private Const c_strSymbRusSignHard = "СЉ"        ' С‚РІС‘СЂРґС‹Р№ Р·РЅР°Рє
+' Р°РЅРіР»РёР№СЃРєРёР№ Р°Р»С„Р°РІРёС‚
 Private Const c_strSymbRusAll = c_strSymbRusVowel & c_strSymbRusConson & c_strSymbRusSign
 Private Const c_strSymbEngVowel = "aeiouy", c_strSymbEngConson = "bcdfghjklmnpqrstvwxz", c_strSymbEngSign = "" '"'`"
 Private Const c_strSymbEngAll = c_strSymbEngVowel & c_strSymbEngConson & c_strSymbEngSign
-' цифры и символы
-Private Const c_strSymbDigits = "0123456789", c_strSymbMath = "+-*/\^|=", c_strSymbPunct = ".,?!:;-()" ' & "…"
+' С†РёС„СЂС‹ Рё СЃРёРјРІРѕР»С‹
+Private Const c_strSymbDigits = "0123456789", c_strSymbMath = "+-*/\^|=", c_strSymbPunct = ".,?!:;-()" ' & "вЂ¦"
 Private Const c_strSymbCommas = "'""", c_strSymbParenth = "()[]{}<>", c_strSymbOthers = "_&@#$%~`"
 Private Const c_strSymbSpaces = " " & vbCr & vbLf & vbNewLine & vbTab & vbVerticalTab
-' для преобразования имен
+' РґР»СЏ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РёРјРµРЅ
 Private Const c_strHexPref = "&H"
 Private Const c_strOthers = " -~_"
 
-Private Const c_idxPref = "i" ' префикс имен элементов коллекции
+Private Const c_idxPref = "i" ' РїСЂРµС„РёРєСЃ РёРјРµРЅ СЌР»РµРјРµРЅС‚РѕРІ РєРѕР»Р»РµРєС†РёРё
 ' size convertion constants
 Private Const PointsPerInch = 72
 Private Const TwipsPerInch = 1440
-Private Const CentimitersPerInch = 2.54                 '1 дюйм = 127 / 50 см
-Private Const HimetricPerInch = 2540                    '1 дюйм = 1000 * 127/50 himetrix
+Private Const CentimitersPerInch = 2.54                 '1 РґСЋР№Рј = 127 / 50 СЃРј
+Private Const HimetricPerInch = 2540                    '1 РґСЋР№Рј = 1000 * 127/50 himetrix
 '
-Private Const inch = TwipsPerInch                       '1 дюйм = 1440 twips
-Private Const pt = TwipsPerInch / PointsPerInch         '1 пункт = 20 twips
-Private Const cm = TwipsPerInch / CentimitersPerInch    '1 см = 566.929133858 twips
+Private Const inch = TwipsPerInch                       '1 РґСЋР№Рј = 1440 twips
+Private Const pt = TwipsPerInch / PointsPerInch         '1 РїСѓРЅРєС‚ = 20 twips
+Private Const cm = TwipsPerInch / CentimitersPerInch    '1 СЃРј = 566.929133858 twips
 '--------------------------------------------------------------------------------
-Public Enum DeclineCase         ' падеж
+Public Enum DeclineCase         ' РїР°РґРµР¶
     DeclineCaseUndef = 0
-    DeclineCaseImen = 1         ' им.п. (кто/что)       Nominative
-    DeclineCaseRod = 2          ' р.п.  (кого/чего)     Genitive
-    DeclineCaseDat = 3          ' д.п.  (кому/чему)     Dative
-    DeclineCaseVin = 4          ' в.п.  (кого/что)      Accusative
-    DeclineCaseTvor = 5         ' т.п.  (кем/чем)       Ablative
-    DeclineCasePred = 6         ' п.п.  (о ком/о чём)   Prepositional
+    DeclineCaseImen = 1         ' РёРј.Рї. (РєС‚Рѕ/С‡С‚Рѕ)       Nominative
+    DeclineCaseRod = 2          ' СЂ.Рї.  (РєРѕРіРѕ/С‡РµРіРѕ)     Genitive
+    DeclineCaseDat = 3          ' Рґ.Рї.  (РєРѕРјСѓ/С‡РµРјСѓ)     Dative
+    DeclineCaseVin = 4          ' РІ.Рї.  (РєРѕРіРѕ/С‡С‚Рѕ)      Accusative
+    DeclineCaseTvor = 5         ' С‚.Рї.  (РєРµРј/С‡РµРј)       Ablative
+    DeclineCasePred = 6         ' Рї.Рї.  (Рѕ РєРѕРј/Рѕ С‡С‘Рј)   Prepositional
 End Enum
-Public Enum DeclineGend         ' род ("м|ж|ср")
+Public Enum DeclineGend         ' СЂРѕРґ ("Рј|Р¶|СЃСЂ")
     DeclineGendUndef = 0
-    DeclineGendMale = 1         ' м.р.
-    DeclineGendFem = 2          ' ж.р.
-    DeclineGendNeut = 3         ' с.р.
+    DeclineGendMale = 1         ' Рј.СЂ.
+    DeclineGendFem = 2          ' Р¶.СЂ.
+    DeclineGendNeut = 3         ' СЃ.СЂ.
 End Enum
-Public Enum DeclineNumb         ' число ("ед|мн")
+Public Enum DeclineNumb         ' С‡РёСЃР»Рѕ ("РµРґ|РјРЅ")
     DeclineNumbUndef = 0
-    DeclineNumbSingle = 1       ' ед.ч.
-    DeclineNumbPlural = 2       ' мн.ч.
+    DeclineNumbSingle = 1       ' РµРґ.С‡.
+    DeclineNumbPlural = 2       ' РјРЅ.С‡.
 End Enum
-Public Enum SpeechPartType      ' часть речи
+Public Enum SpeechPartType      ' С‡Р°СЃС‚СЊ СЂРµС‡Рё
     SpeechPartTypeUndef = 0
-    SpeechPartTypeNoun = 1      ' существительное
-    SpeechPartTypeAdject = 2    ' прилагательное
-    SpeechPartTypeNumeral = 3   ' числительное
-    SpeechPartTypeVerb = 4      ' глагол
-    SpeechPartTypeAdverb = 5    ' наречие
-    SpeechPartTypePronoun = 6   ' местоимение
-    SpeechPartTypePreposition = 7 ' предлог
+    SpeechPartTypeNoun = 1      ' СЃСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅРѕРµ
+    SpeechPartTypeAdject = 2    ' РїСЂРёР»Р°РіР°С‚РµР»СЊРЅРѕРµ
+    SpeechPartTypeNumeral = 3   ' С‡РёСЃР»РёС‚РµР»СЊРЅРѕРµ
+    SpeechPartTypeVerb = 4      ' РіР»Р°РіРѕР»
+    SpeechPartTypeAdverb = 5    ' РЅР°СЂРµС‡РёРµ
+    SpeechPartTypePronoun = 6   ' РјРµСЃС‚РѕРёРјРµРЅРёРµ
+    SpeechPartTypePreposition = 7 ' РїСЂРµРґР»РѕРі
 End Enum
-Public Enum NumeralType         ' тип числительных ("количественное|порядковое")
+Public Enum NumeralType         ' С‚РёРї С‡РёСЃР»РёС‚РµР»СЊРЅС‹С… ("РєРѕР»РёС‡РµСЃС‚РІРµРЅРЅРѕРµ|РїРѕСЂСЏРґРєРѕРІРѕРµ")
     NumeralUndef = 0
-    NumeralOrdinal = 1          ' количественное
-    NumeralCardinal = 2         ' порядковое
+    NumeralOrdinal = 1          ' РєРѕР»РёС‡РµСЃС‚РІРµРЅРЅРѕРµ
+    NumeralCardinal = 2         ' РїРѕСЂСЏРґРєРѕРІРѕРµ
 End Enum
-Public Enum SymbolType          ' тип символа
+Public Enum SymbolType          ' С‚РёРї СЃРёРјРІРѕР»Р°
     SymbolTypeUndef = 0
-    SymbolTypeVowel = 1         ' гласные
-    SymbolTypeCons = 2          ' согласные
-    SymbolTypeSign = 3          ' знаки алфавита
-    SymbolTypeNumb = 4          ' цифры
+    SymbolTypeVowel = 1         ' РіР»Р°СЃРЅС‹Рµ
+    SymbolTypeCons = 2          ' СЃРѕРіР»Р°СЃРЅС‹Рµ
+    SymbolTypeSign = 3          ' Р·РЅР°РєРё Р°Р»С„Р°РІРёС‚Р°
+    SymbolTypeNumb = 4          ' С†РёС„СЂС‹
 End Enum
-Public Enum AlphabetType        ' тип алфавита
+Public Enum AlphabetType        ' С‚РёРї Р°Р»С„Р°РІРёС‚Р°
     AlphabetTypeUndef = 0
-    AlphabetTypeLatin = 1       ' латинский
-    AlphabetTypeCyrilic = 2     ' кириллический
+    AlphabetTypeLatin = 1       ' Р»Р°С‚РёРЅСЃРєРёР№
+    AlphabetTypeCyrilic = 2     ' РєРёСЂРёР»Р»РёС‡РµСЃРєРёР№
 End Enum
-Public Type GroupExpr           ' тип для хранения выражений содержимого групп в текстовых выражениях (см. GroupsGet)
-    Text As String              ' внутренний текст подстроки (без скобок)
-    TextBeg As Long             ' позиция начала подстроки в исходной строке (включая скобки)
-    TextEnd As Long             ' позиция конца подстроки в исходной строке (включая скобки)
-    Bracket As Long             ' вид скобки/маркера группы (достаточно хранить индекс типа скобки в массиве)
-    Level As Long               ' уровень вложенности (0-вне скобок, 1-внешние скобки, ... n-скобки n-уровня)
+Public Type GroupExpr           ' С‚РёРї РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РІС‹СЂР°Р¶РµРЅРёР№ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ РіСЂСѓРїРї РІ С‚РµРєСЃС‚РѕРІС‹С… РІС‹СЂР°Р¶РµРЅРёСЏС… (СЃРј. GroupsGet)
+    Text As String              ' РІРЅСѓС‚СЂРµРЅРЅРёР№ С‚РµРєСЃС‚ РїРѕРґСЃС‚СЂРѕРєРё (Р±РµР· СЃРєРѕР±РѕРє)
+    TextBeg As Long             ' РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РІРєР»СЋС‡Р°СЏ СЃРєРѕР±РєРё)
+    TextEnd As Long             ' РїРѕР·РёС†РёСЏ РєРѕРЅС†Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РІРєР»СЋС‡Р°СЏ СЃРєРѕР±РєРё)
+    Bracket As Long             ' РІРёРґ СЃРєРѕР±РєРё/РјР°СЂРєРµСЂР° РіСЂСѓРїРїС‹ (РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ С…СЂР°РЅРёС‚СЊ РёРЅРґРµРєСЃ С‚РёРїР° СЃРєРѕР±РєРё РІ РјР°СЃСЃРёРІРµ)
+    Level As Long               ' СѓСЂРѕРІРµРЅСЊ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё (0-РІРЅРµ СЃРєРѕР±РѕРє, 1-РІРЅРµС€РЅРёРµ СЃРєРѕР±РєРё, ... n-СЃРєРѕР±РєРё n-СѓСЂРѕРІРЅСЏ)
 End Type
 '--------------------------------------------------------------------------------
 ' POINTER
@@ -163,21 +162,21 @@ Private Const FADF_AUTO As Long = (&H1)
 Private Const FADF_FIXEDSIZE As Long = (&H10)
 Private Const FADF_HAVEVARTYPE As Long = (&H80)
 Private Type SAFEARRAYBOUND         ' 8 bytes
-    cElements As Long               ' +0 Количество элементов в размерности
-    lLbound As Long                 ' +4 Нижняя граница размерности
+    cElements As Long               ' +0 РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РІ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё
+    lLbound As Long                 ' +4 РќРёР¶РЅСЏСЏ РіСЂР°РЅРёС†Р° СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё
 End Type
 'Private Type SAFEARRAY
-'    cDims           As Integer      ' +0 Число размерностей
-'    fFeatures       As Integer      ' +2 Флаг, используется функциями SafeArray
-'    cbElements      As Long         ' +4 Размер одного элемента в байтах
-'    cLocks          As Long         ' +8 Cчетчик ссылок, указывающий количество блокировок, наложенных на массив.
+'    cDims           As Integer      ' +0 Р§РёСЃР»Рѕ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№
+'    fFeatures       As Integer      ' +2 Р¤Р»Р°Рі, РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ С„СѓРЅРєС†РёСЏРјРё SafeArray
+'    cbElements      As Long         ' +4 Р Р°Р·РјРµСЂ РѕРґРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РІ Р±Р°Р№С‚Р°С…
+'    cLocks          As Long         ' +8 CС‡РµС‚С‡РёРє СЃСЃС‹Р»РѕРє, СѓРєР°Р·С‹РІР°СЋС‰РёР№ РєРѕР»РёС‡РµСЃС‚РІРѕ Р±Р»РѕРєРёСЂРѕРІРѕРє, РЅР°Р»РѕР¶РµРЅРЅС‹С… РЅР° РјР°СЃСЃРёРІ.
 '    dummyPadding    As Long         ' +8 (x64 only!)
-'    pvData          As Long         ' +12(x86) Указатель на данные
+'    pvData          As Long         ' +12(x86) РЈРєР°Р·Р°С‚РµР»СЊ РЅР° РґР°РЅРЅС‹Рµ
 '                    As LongLong     ' +16(x64)
-'    rgSAbound As SAFEARRAYBOUND     ' Повторяется для каждой размерности (размер = n*8 bytes, n- кол-во размерностей массива)
-'                                    ' +16(x86) rgSAbound.cElements (Long) - Количество элементов в размерности
+'    rgSAbound As SAFEARRAYBOUND     ' РџРѕРІС‚РѕСЂСЏРµС‚СЃСЏ РґР»СЏ РєР°Р¶РґРѕР№ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё (СЂР°Р·РјРµСЂ = n*8 bytes, n- РєРѕР»-РІРѕ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ РјР°СЃСЃРёРІР°)
+'                                    ' +16(x86) rgSAbound.cElements (Long) - РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РІ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё
 '                                    ' +24(x64)
-'                                    ' +20(x86) rgSAbound.lLbound (Long)   - Нижняя граница размерности
+'                                    ' +20(x86) rgSAbound.lLbound (Long)   - РќРёР¶РЅСЏСЏ РіСЂР°РЅРёС†Р° СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё
 '                                    ' +28(x64)
 'End Type
 Private Type SAFEARRAY1D
@@ -272,9 +271,9 @@ Private Declare Function SysAllocStringByteLen Lib "oleaut32.dll" (ByVal oleStr 
 'Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
 'Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
 
-Private Const LOCALE_SLIST = &HC        ' разделитель элементов списка
-Private Const LOCALE_SDECIMAL = &HE     ' десятичный разделитель
-Private Const LOCALE_STHOUSAND = &HF    ' разделитель разрядов
+Private Const LOCALE_SLIST = &HC        ' СЂР°Р·РґРµР»РёС‚РµР»СЊ СЌР»РµРјРµРЅС‚РѕРІ СЃРїРёСЃРєР°
+Private Const LOCALE_SDECIMAL = &HE     ' РґРµСЃСЏС‚РёС‡РЅС‹Р№ СЂР°Р·РґРµР»РёС‚РµР»СЊ
+Private Const LOCALE_STHOUSAND = &HF    ' СЂР°Р·РґРµР»РёС‚РµР»СЊ СЂР°Р·СЂСЏРґРѕРІ
 
 Const LOCALE_USER_DEFAULT = &H400
 Const LOCALE_SYSTEM_DEFAULT = &H800
@@ -316,14 +315,14 @@ End Enum
 
 ' ==================
 Public Function RegEx() As Object
-' возвращает объект RegExp для работы с регулярными выражениями
-' по RegEx см. https://regex.sorokin.engineer/ru/latest/regular_expressions.htmlStatic oRegEx As Object: If oRegEx Is Nothing Then Set oRegEx = CreateObject("VBScript.RegExp")
+' РІРѕР·РІСЂР°С‰Р°РµС‚ РѕР±СЉРµРєС‚ RegExp РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ СЂРµРіСѓР»СЏСЂРЅС‹РјРё РІС‹СЂР°Р¶РµРЅРёСЏРјРё
+' РїРѕ RegEx СЃРј. https://regex.sorokin.engineer/ru/latest/regular_expressions.htmlStatic oRegEx As Object: If oRegEx Is Nothing Then Set oRegEx = CreateObject("VBScript.RegExp")
 Static soRegEx As Object: If soRegEx Is Nothing Then Set soRegEx = CreateObject("VBScript.RegExp")
     Set RegEx = soRegEx
 End Function
 ' ==================
-' Замены стандартных строковых функций и другие быстрые строковые функции с
-' http://www.xbeat.net/vbspeed/ см. также варианты на http://www.vbforums.com/showthread.php?540323-VB6-Faster-Split-amp-Join-(development)
+' Р—Р°РјРµРЅС‹ СЃС‚Р°РЅРґР°СЂС‚РЅС‹С… СЃС‚СЂРѕРєРѕРІС‹С… С„СѓРЅРєС†РёР№ Рё РґСЂСѓРіРёРµ Р±С‹СЃС‚СЂС‹Рµ СЃС‚СЂРѕРєРѕРІС‹Рµ С„СѓРЅРєС†РёРё СЃ
+' http://www.xbeat.net/vbspeed/ СЃРј. С‚Р°РєР¶Рµ РІР°СЂРёР°РЅС‚С‹ РЅР° http://www.vbforums.com/showthread.php?540323-VB6-Faster-Split-amp-Join-(development)
 ' ==================
 Public Sub xSplit(Expression As String, Result() As String, Optional Delimiter As String = " ") 'As Long
 ' Returns a zero-based, one-dimensional array containing a specified number of substrings.
@@ -332,23 +331,23 @@ Public Sub xSplit(Expression As String, Result() As String, Optional Delimiter A
 ' asToken()   - Required. One-dimensional string array that will hold the returned substrings. Does not have to be bound before calling xSplit, and is guaranteed to hold at least one element (zero-based) on return.
 ' Delimiter   - Optional. String character used to identify substring limits. If omitted, the space character (" ") is assumed to be the delimiter. If delimiter is a zero-length string, a single-element array containing the entire expression string is returned.
 ' returns number of elements
-' стандартный Split работает быстрее на коротких строках, xSplit - на длинных
+' СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ Split СЂР°Р±РѕС‚Р°РµС‚ Р±С‹СЃС‚СЂРµРµ РЅР° РєРѕСЂРѕС‚РєРёС… СЃС‚СЂРѕРєР°С…, xSplit - РЅР° РґР»РёРЅРЅС‹С…
 '-------------------------
 ' v.1.0.0       : 08.12.2001 - original SplitB04 by Chris Lucas, cdl1051@earthlink.net from http://www.xbeat.net/vbspeed/c_Split.htm#SplitB04
 '-------------------------
 Dim c As Long, sLen As Long, DelLen As Long, tmp As Long, Results() As Long
 'Dim lCount As Long
     sLen = LenB(Expression) \ 2: DelLen = LenB(Delimiter) \ 2
-    If sLen = 0 Or DelLen = 0 Then ReDim Preserve Result(0 To 0): Result(0) = Expression: Exit Sub ': xSplit = 1: Exit Function     ' пустая строка
-' считаем разделители и запоминаем их позиции
+    If sLen = 0 Or DelLen = 0 Then ReDim Preserve Result(0 To 0): Result(0) = Expression: Exit Sub ': xSplit = 1: Exit Function     ' РїСѓСЃС‚Р°СЏ СЃС‚СЂРѕРєР°
+' СЃС‡РёС‚Р°РµРј СЂР°Р·РґРµР»РёС‚РµР»Рё Рё Р·Р°РїРѕРјРёРЅР°РµРј РёС… РїРѕР·РёС†РёРё
     ReDim Preserve Results(0 To sLen): tmp = InStr(Expression, Delimiter)
     Do While tmp
         Results(c) = tmp: c = c + 1
         tmp = InStr(Results(c - 1) + 1, Expression, Delimiter)
     Loop
-' наполняем массив
+' РЅР°РїРѕР»РЅСЏРµРј РјР°СЃСЃРёРІ
     ReDim Preserve Result(0 To c)
-    If c = 0 Then Result(0) = Expression: Exit Sub ': xSplit = 1: Exit Function      ' нет разделителей
+    If c = 0 Then Result(0) = Expression: Exit Sub ': xSplit = 1: Exit Function      ' РЅРµС‚ СЂР°Р·РґРµР»РёС‚РµР»РµР№
     Result(0) = Left$(Expression, Results(0) - 1)
     For c = 0 To c - 2
         Result(c + 1) = Mid$(Expression, Results(c) + DelLen, Results(c + 1) - Results(c) - DelLen)
@@ -359,11 +358,11 @@ End Sub
 Public Function xJoin(Arr() As String, _
     Optional Delimiter As String = " ", _
     Optional ByVal Count As Long = -1) As String
-' замена стандартного Join
+' Р·Р°РјРµРЅР° СЃС‚Р°РЅРґР°СЂС‚РЅРѕРіРѕ Join
 '-------------------------
 ' v.1.0.0       : 01.10.2000 - original Join08 by by Matt Curland, mattcur@microsoft.com, www.PowerVB.com from http://www.xbeat.net/vbspeed/c_Join.htm#Join08
 '-------------------------
-' стабильно медленнее оригинальной, быстрые варианты без ASM инъекций никак
+' СЃС‚Р°Р±РёР»СЊРЅРѕ РјРµРґР»РµРЅРЅРµРµ РѕСЂРёРіРёРЅР°Р»СЊРЅРѕР№, Р±С‹СЃС‚СЂС‹Рµ РІР°СЂРёР°РЅС‚С‹ Р±РµР· ASM РёРЅСЉРµРєС†РёР№ РЅРёРєР°Рє
 ' Works with VB- or typelib-declared CopyMemory (pass strings with StrPtr)
 '-------------------------
 Dim Lower As Long
@@ -539,16 +538,16 @@ Dim BufferPosNew As Long, BufferPosNext As Long
 End Sub
 Public Function ReplaceMany(Source As String, _
     ParamArray ReplacePairs()) As String
-' производит множественную замену в строке значением из выражения
+' РїСЂРѕРёР·РІРѕРґРёС‚ РјРЅРѕР¶РµСЃС‚РІРµРЅРЅСѓСЋ Р·Р°РјРµРЅСѓ РІ СЃС‚СЂРѕРєРµ Р·РЅР°С‡РµРЅРёРµРј РёР· РІС‹СЂР°Р¶РµРЅРёСЏ
 '-------------------------
-' Source - исходная строка
-' ReplacePairs  - подстановочные значения в виде "OldText=NewText"
+' Source - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
+' ReplacePairs  - РїРѕРґСЃС‚Р°РЅРѕРІРѕС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РІ РІРёРґРµ "OldText=NewText"
 '-------------------------
 Const cDelim = ";", cTagDelim = "="
 Dim Result As String
     On Error GoTo HandleError
     Result = Source: If Len(Result) = 0 Then GoTo HandleExit
-Dim i As Long: i = 1 'LBound(Terms)             ' начинаем с [%1%]
+Dim i As Long: i = 1 'LBound(Terms)             ' РЅР°С‡РёРЅР°РµРј СЃ [%1%]
 Dim sTerms As String:         sTerms = Join(ReplacePairs, cDelim)
 Dim cTerms As New Collection, aKeys, sKey 'As String
     Call TaggedString2Collection(sTerms, cTerms, aKeys, cDelim, cTagDelim)
@@ -563,16 +562,16 @@ Public Function Tokenize(Source As String, _
     Optional Positions, _
     Optional IncEmpty As Boolean = False _
     ) As Long
-' разбивает строку на подстроки по набору разделителей
+' СЂР°Р·Р±РёРІР°РµС‚ СЃС‚СЂРѕРєСѓ РЅР° РїРѕРґСЃС‚СЂРѕРєРё РїРѕ РЅР°Р±РѕСЂСѓ СЂР°Р·РґРµР»РёС‚РµР»РµР№
 '-------------------------
-' Source    - исходная строка
-' Tokens()  - на выходе содержит массив строк выделенных из исходной строки по набору разделителей
-' Delims    - набор возможных разделителей
-' Positions - (необязательный) массив позиций начала элементов в исходной строке (необходимы для замены/удаления элементов строки)
-' IncEmpty  = False - пропуск пустых элементов - последовательные разделители будут рассматриваться как один
-'           = True  - результирующий массив будет включать пустые элементы между последовательными разделителями
+' Source    - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
+' Tokens()  - РЅР° РІС‹С…РѕРґРµ СЃРѕРґРµСЂР¶РёС‚ РјР°СЃСЃРёРІ СЃС‚СЂРѕРє РІС‹РґРµР»РµРЅРЅС‹С… РёР· РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё РїРѕ РЅР°Р±РѕСЂСѓ СЂР°Р·РґРµР»РёС‚РµР»РµР№
+' Delims    - РЅР°Р±РѕСЂ РІРѕР·РјРѕР¶РЅС‹С… СЂР°Р·РґРµР»РёС‚РµР»РµР№
+' Positions - (РЅРµРѕР±СЏР·Р°С‚РµР»СЊРЅС‹Р№) РјР°СЃСЃРёРІ РїРѕР·РёС†РёР№ РЅР°С‡Р°Р»Р° СЌР»РµРјРµРЅС‚РѕРІ РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РЅРµРѕР±С…РѕРґРёРјС‹ РґР»СЏ Р·Р°РјРµРЅС‹/СѓРґР°Р»РµРЅРёСЏ СЌР»РµРјРµРЅС‚РѕРІ СЃС‚СЂРѕРєРё)
+' IncEmpty  = False - РїСЂРѕРїСѓСЃРє РїСѓСЃС‚С‹С… СЌР»РµРјРµРЅС‚РѕРІ - РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹Рµ СЂР°Р·РґРµР»РёС‚РµР»Рё Р±СѓРґСѓС‚ СЂР°СЃСЃРјР°С‚СЂРёРІР°С‚СЊСЃСЏ РєР°Рє РѕРґРёРЅ
+'           = True  - СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РёР№ РјР°СЃСЃРёРІ Р±СѓРґРµС‚ РІРєР»СЋС‡Р°С‚СЊ РїСѓСЃС‚С‹Рµ СЌР»РµРјРµРЅС‚С‹ РјРµР¶РґСѓ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹РјРё СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё
 '-------------------------
-' v.1.1.0       : 31.10.2019 - добавлен необязательный параметр Positions - возвращающий массив позиций найденных токенов в исходной строке
+' v.1.1.0       : 31.10.2019 - РґРѕР±Р°РІР»РµРЅ РЅРµРѕР±СЏР·Р°С‚РµР»СЊРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ Positions - РІРѕР·РІСЂР°С‰Р°СЋС‰РёР№ РјР°СЃСЃРёРІ РїРѕР·РёС†РёР№ РЅР°Р№РґРµРЅРЅС‹С… С‚РѕРєРµРЅРѕРІ РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ
 ' v.1.0.0       : 24.11.2000 - original Tokenize02 by Donald, donald@xbeat.net modified by G.Beckmann, G.Beckmann@NikoCity.de from http://www.xbeat.net/vbspeed/c_Tokenize.htm#Tokenize04
 '-------------------------
 Const ARR_CHUNK& = 1024
@@ -587,91 +586,91 @@ Dim Result As Long
     Result = -1
     On Error GoTo HandleError
     ubExpr = Len(Source): ubDelim = Len(Delims)
-    ' готовим SAFEARRAY для исходной строки
+    ' РіРѕС‚РѕРІРёРј SAFEARRAY РґР»СЏ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё
     sa1.cbElements = 2:   sa1.cElements = ubExpr
     sa1.cDims = 1:        sa1.pvData = StrPtr(Source)
-    ' заполняем массив символов исходной строки
+    ' Р·Р°РїРѕР»РЅСЏРµРј РјР°СЃСЃРёРІ СЃРёРјРІРѕР»РѕРІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё
     CopyMemory ByVal VarPtrArray(aExpr), VarPtr(sa1), PTR_LENGTH ' 4
-    ' готовим SAFEARRAY для строки разделителей
+    ' РіРѕС‚РѕРІРёРј SAFEARRAY РґР»СЏ СЃС‚СЂРѕРєРё СЂР°Р·РґРµР»РёС‚РµР»РµР№
     sa2.cbElements = 2:   sa2.cElements = ubDelim
     sa2.cDims = 1:        sa2.pvData = StrPtr(Delims)
-    ' заполняем массив символов разделителей
+    ' Р·Р°РїРѕР»РЅСЏРµРј РјР°СЃСЃРёРІ СЃРёРјРІРѕР»РѕРІ СЂР°Р·РґРµР»РёС‚РµР»РµР№
     CopyMemory ByVal VarPtrArray(aDelim), VarPtr(sa2), PTR_LENGTH ' 4
     
-    ' инициализируем результирующие массивы
+    ' РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РёРµ РјР°СЃСЃРёРІС‹
     If IncEmpty Then ReDim Preserve Tokens(ubExpr) Else ReDim Preserve Tokens(ubExpr \ 2)
-    ' проверяем необходимость возвращать позиции найденных элементов
+    ' РїСЂРѕРІРµСЂСЏРµРј РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚СЊ РІРѕР·РІСЂР°С‰Р°С‚СЊ РїРѕР·РёС†РёРё РЅР°Р№РґРµРЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
     bPos = Not IsMissing(Positions): If bPos Then bPos = IsArray(Positions)
     If bPos Then If IncEmpty Then ReDim Preserve Positions(ubExpr) Else ReDim Preserve Positions(ubExpr \ 2)
     
     ubDelim = ubDelim - 1
     For cExp = 0 To ubExpr - 1
-    ' перебираем все символы исходной строки
+    ' РїРµСЂРµР±РёСЂР°РµРј РІСЃРµ СЃРёРјРІРѕР»С‹ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё
         For cDel = 0 To ubDelim
-    ' перебираем все символы строки разделителей
+    ' РїРµСЂРµР±РёСЂР°РµРј РІСЃРµ СЃРёРјРІРѕР»С‹ СЃС‚СЂРѕРєРё СЂР°Р·РґРµР»РёС‚РµР»РµР№
             If aExpr(cExp) = aDelim(cDel) Then
                 If cExp > iPos Then
-        ' если текущий символ исходной строки совпадает с разделителем
-            ' и предыдущией не был разделителем
-            ' (если предыдущий символ также был разделителем было бы cExp=iPos)
-                ' сохраняем фрагмент строки
+        ' РµСЃР»Рё С‚РµРєСѓС‰РёР№ СЃРёРјРІРѕР» РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё СЃРѕРІРїР°РґР°РµС‚ СЃ СЂР°Р·РґРµР»РёС‚РµР»РµРј
+            ' Рё РїСЂРµРґС‹РґСѓС‰РёРµР№ РЅРµ Р±С‹Р» СЂР°Р·РґРµР»РёС‚РµР»РµРј
+            ' (РµСЃР»Рё РїСЂРµРґС‹РґСѓС‰РёР№ СЃРёРјРІРѕР» С‚Р°РєР¶Рµ Р±С‹Р» СЂР°Р·РґРµР»РёС‚РµР»РµРј Р±С‹Р»Рѕ Р±С‹ cExp=iPos)
+                ' СЃРѕС…СЂР°РЅСЏРµРј С„СЂР°РіРјРµРЅС‚ СЃС‚СЂРѕРєРё
                     Tokens(cTokens) = Mid$(Source, iPos + 1, cExp - iPos)
                     If bPos Then Positions(cTokens) = iPos + 1
                     cTokens = cTokens + 1
                 ElseIf IncEmpty Then
-            ' или если выводим пустые строки
-                ' сохраняем пустую строку
+            ' РёР»Рё РµСЃР»Рё РІС‹РІРѕРґРёРј РїСѓСЃС‚С‹Рµ СЃС‚СЂРѕРєРё
+                ' СЃРѕС…СЂР°РЅСЏРµРј РїСѓСЃС‚СѓСЋ СЃС‚СЂРѕРєСѓ
                     Tokens(cTokens) = vbNullString
                     If bPos Then Positions(cTokens) = iPos + 1
                     cTokens = cTokens + 1
                 End If
-        ' сохраняем позицию начала следующего символа строки
+        ' СЃРѕС…СЂР°РЅСЏРµРј РїРѕР·РёС†РёСЋ РЅР°С‡Р°Р»Р° СЃР»РµРґСѓСЋС‰РµРіРѕ СЃРёРјРІРѕР»Р° СЃС‚СЂРѕРєРё
                 iPos = cExp + 1: Exit For
             End If
         Next cDel
     Next cExp
-    ' если после последнего разделителя остались символы или указано выводить пустые строки
-    ' добавляем в остаток
+    ' РµСЃР»Рё РїРѕСЃР»Рµ РїРѕСЃР»РµРґРЅРµРіРѕ СЂР°Р·РґРµР»РёС‚РµР»СЏ РѕСЃС‚Р°Р»РёСЃСЊ СЃРёРјРІРѕР»С‹ РёР»Рё СѓРєР°Р·Р°РЅРѕ РІС‹РІРѕРґРёС‚СЊ РїСѓСЃС‚С‹Рµ СЃС‚СЂРѕРєРё
+    ' РґРѕР±Р°РІР»СЏРµРј РІ РѕСЃС‚Р°С‚РѕРє
     If (cExp > iPos) Or IncEmpty Then
         Tokens(cTokens) = Mid$(Source, iPos + 1)
         If bPos Then Positions(cTokens) = iPos + 1
         cTokens = cTokens + 1
     End If
-    ' обрезаем результирующие массивы по количеству найденных элементов
+    ' РѕР±СЂРµР·Р°РµРј СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РёРµ РјР°СЃСЃРёРІС‹ РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ РЅР°Р№РґРµРЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
     If cTokens = 0 Then Erase Tokens() Else ReDim Preserve Tokens(cTokens - 1)
     If bPos Then If cTokens = 0 Then Erase Positions() Else ReDim Preserve Positions(cTokens - 1)
-    ' возвращаем количество найденных элементов
+    ' РІРѕР·РІСЂР°С‰Р°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ РЅР°Р№РґРµРЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
     Result = cTokens '- 1
-    ' очищаем вспомогательные массивы
+    ' РѕС‡РёС‰Р°РµРј РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјР°СЃСЃРёРІС‹
     ZeroMemory ByVal VarPtrArray(aExpr), PTR_LENGTH '4
     ZeroMemory ByVal VarPtrArray(aDelim), PTR_LENGTH '4
 HandleExit:  Tokenize = Result: Exit Function
 HandleError: Result = -1: Err.Clear: Resume HandleExit
 End Function
 Public Function PlaceHoldersSetByIndex(Source As String, ParamArray Terms()) As String
-' заменяет подстановочные шаблоны вида [%n%] (где n - номер параметра), значениями массива параметров
+' Р·Р°РјРµРЅСЏРµС‚ РїРѕРґСЃС‚Р°РЅРѕРІРѕС‡РЅС‹Рµ С€Р°Р±Р»РѕРЅС‹ РІРёРґР° [%n%] (РіРґРµ n - РЅРѕРјРµСЂ РїР°СЂР°РјРµС‚СЂР°), Р·РЅР°С‡РµРЅРёСЏРјРё РјР°СЃСЃРёРІР° РїР°СЂР°РјРµС‚СЂРѕРІ
 '-------------------------
-' Source - исходная строка
-' Terms - подстановочные значения
-Const LBr = "[%", RBr = "%]"                ' константы левой/правой скобок шаблона
+' Source - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
+' Terms - РїРѕРґСЃС‚Р°РЅРѕРІРѕС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ
+Const LBr = "[%", RBr = "%]"                ' РєРѕРЅСЃС‚Р°РЅС‚С‹ Р»РµРІРѕР№/РїСЂР°РІРѕР№ СЃРєРѕР±РѕРє С€Р°Р±Р»РѕРЅР°
 Dim Result As String
     On Error GoTo HandleError
     Result = Source: If Len(Result) = 0 Then GoTo HandleExit
-Dim i As Long: i = 1 'LBound(Terms)             ' начинаем с [%1%]
+Dim i As Long: i = 1 'LBound(Terms)             ' РЅР°С‡РёРЅР°РµРј СЃ [%1%]
 Dim Term, sTemp As String
     If IsArray(Terms(0)) Then GoTo HandleArray
-' передан массив параметров
+' РїРµСЂРµРґР°РЅ РјР°СЃСЃРёРІ РїР°СЂР°РјРµС‚СЂРѕРІ
     For Each Term In Terms
-        sTemp = LBr & CStr(i) & RBr             ' создаем шаблон
-        Result = Replace(Result, sTemp, Term)   ' замена
+        sTemp = LBr & CStr(i) & RBr             ' СЃРѕР·РґР°РµРј С€Р°Р±Р»РѕРЅ
+        Result = Replace(Result, sTemp, Term)   ' Р·Р°РјРµРЅР°
         i = i + 1
     Next
     GoTo HandleExit
 HandleArray:
-' на тот случай если в параметре передали обычный массив
+' РЅР° С‚РѕС‚ СЃР»СѓС‡Р°Р№ РµСЃР»Рё РІ РїР°СЂР°РјРµС‚СЂРµ РїРµСЂРµРґР°Р»Рё РѕР±С‹С‡РЅС‹Р№ РјР°СЃСЃРёРІ
     For Each Term In Terms(0)
-        sTemp = LBr & CStr(i) & RBr             ' создаем шаблон
-        Result = Replace(Result, sTemp, Term)   ' замена
+        sTemp = LBr & CStr(i) & RBr             ' СЃРѕР·РґР°РµРј С€Р°Р±Р»РѕРЅ
+        Result = Replace(Result, sTemp, Term)   ' Р·Р°РјРµРЅР°
         i = i + 1
     Next
 HandleExit:  PlaceHoldersSetByIndex = Result: Exit Function
@@ -679,16 +678,16 @@ HandleError: Err.Clear: Resume HandleExit
 End Function
 Public Function PlaceHoldersSetByNames(Source As String, _
     ParamArray NamedTerms()) As String
-' заменяет подстановочные шаблоны вида [%Param1%], значениями массива параметров
+' Р·Р°РјРµРЅСЏРµС‚ РїРѕРґСЃС‚Р°РЅРѕРІРѕС‡РЅС‹Рµ С€Р°Р±Р»РѕРЅС‹ РІРёРґР° [%Param1%], Р·РЅР°С‡РµРЅРёСЏРјРё РјР°СЃСЃРёРІР° РїР°СЂР°РјРµС‚СЂРѕРІ
 Const c_strProcedure = "PlaceHoldersSetByNames"
-' Source - исходная строка
-' NamedTerms  - подстановочные значения в виде "Param1=Value1"
-Const LBr = "[%", RBr = "%]"                ' константы левой/правой скобок шаблона
+' Source - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
+' NamedTerms  - РїРѕРґСЃС‚Р°РЅРѕРІРѕС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РІ РІРёРґРµ "Param1=Value1"
+Const LBr = "[%", RBr = "%]"                ' РєРѕРЅСЃС‚Р°РЅС‚С‹ Р»РµРІРѕР№/РїСЂР°РІРѕР№ СЃРєРѕР±РѕРє С€Р°Р±Р»РѕРЅР°
 Const cDelim = ";"
 Dim Result As String
     On Error GoTo HandleError
     Result = Source: If Len(Result) = 0 Then GoTo HandleExit
-Dim i As Long: i = 1 'LBound(Terms)             ' начинаем с [%1%]
+Dim i As Long: i = 1 'LBound(Terms)             ' РЅР°С‡РёРЅР°РµРј СЃ [%1%]
 Dim sTerms As String:         sTerms = Join(NamedTerms, cDelim)
 Dim cTerms As New Collection: Call TaggedString2Collection(sTerms, cTerms, Delim:=cDelim)
     Result = PlaceHoldersSet(Result, cTerms, False, LBr, RBr)
@@ -699,64 +698,64 @@ Public Function PlaceHoldersSet(ByRef Source As String, _
     ByRef NamedTerms As Collection, _
     Optional AskMissing As Boolean = False, _
     Optional LBr As String = "[%", Optional RBr As String = "%]") As String
-' заменяет в строке именные подстановочные шаблоны вида [%Param1%] значениями из коллекции
+' Р·Р°РјРµРЅСЏРµС‚ РІ СЃС‚СЂРѕРєРµ РёРјРµРЅРЅС‹Рµ РїРѕРґСЃС‚Р°РЅРѕРІРѕС‡РЅС‹Рµ С€Р°Р±Р»РѕРЅС‹ РІРёРґР° [%Param1%] Р·РЅР°С‡РµРЅРёСЏРјРё РёР· РєРѕР»Р»РµРєС†РёРё
 '-------------------------
-' Source    - исходная строка
-' NamedTerms - коллекция подставляемых значений. в качестве имени подстановочной переменно берётся ключ элемента коллекции
-' AskMissing - запрашивать значения отсутствующих в коллекции элементов
-' LBr/RBr   - левая/правая скобки отмечающие границы имени переменной (напр [%Param1%])
+' Source    - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
+' NamedTerms - РєРѕР»Р»РµРєС†РёСЏ РїРѕРґСЃС‚Р°РІР»СЏРµРјС‹С… Р·РЅР°С‡РµРЅРёР№. РІ РєР°С‡РµСЃС‚РІРµ РёРјРµРЅРё РїРѕРґСЃС‚Р°РЅРѕРІРѕС‡РЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕ Р±РµСЂС‘С‚СЃСЏ РєР»СЋС‡ СЌР»РµРјРµРЅС‚Р° РєРѕР»Р»РµРєС†РёРё
+' AskMissing - Р·Р°РїСЂР°С€РёРІР°С‚СЊ Р·РЅР°С‡РµРЅРёСЏ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РёС… РІ РєРѕР»Р»РµРєС†РёРё СЌР»РµРјРµРЅС‚РѕРІ
+' LBr/RBr   - Р»РµРІР°СЏ/РїСЂР°РІР°СЏ СЃРєРѕР±РєРё РѕС‚РјРµС‡Р°СЋС‰РёРµ РіСЂР°РЅРёС†С‹ РёРјРµРЅРё РїРµСЂРµРјРµРЅРЅРѕР№ (РЅР°РїСЂ [%Param1%])
 '-------------------------
-' v.1.1.1       : 30.01.2020 - добавлена возможность использования модификаторов (формат см. p_TermModify)
-' v.1.1.0       : 20.01.2020 - изменён алгоритм замены переменных. Теперь можно в качестве значения в коллекции подавать выражения
+' v.1.1.1       : 30.01.2020 - РґРѕР±Р°РІР»РµРЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ (С„РѕСЂРјР°С‚ СЃРј. p_TermModify)
+' v.1.1.0       : 20.01.2020 - РёР·РјРµРЅС‘РЅ Р°Р»РіРѕСЂРёС‚Рј Р·Р°РјРµРЅС‹ РїРµСЂРµРјРµРЅРЅС‹С…. РўРµРїРµСЂСЊ РјРѕР¶РЅРѕ РІ РєР°С‡РµСЃС‚РІРµ Р·РЅР°С‡РµРЅРёСЏ РІ РєРѕР»Р»РµРєС†РёРё РїРѕРґР°РІР°С‚СЊ РІС‹СЂР°Р¶РµРЅРёСЏ
 '-------------------------
-' ToDo: шаблон должен обязательно содержать условный оператор
+' ToDo: С€Р°Р±Р»РѕРЅ РґРѕР»Р¶РµРЅ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ СЃРѕРґРµСЂР¶Р°С‚СЊ СѓСЃР»РѕРІРЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ
 '-------------------------
 Dim Result As String
     On Error GoTo HandleError
     Result = Source: If Len(Result) = 0 Then GoTo HandleExit
 Dim Term As String, Xpr As String, Key As String, Value As String
 Dim i As Long: i = 1
-' для доп.модификаторов. формат модификаторов см. p_TermModify
+' РґР»СЏ РґРѕРї.РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ. С„РѕСЂРјР°С‚ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ СЃРј. p_TermModify
 Const c_ModLBr = "{", c_ModRBr = "}"
 Dim par As String, Pos As Long
-    ' ищем именную переменную в выражении
+    ' РёС‰РµРј РёРјРµРЅРЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ РІ РІС‹СЂР°Р¶РµРЅРёРё
     Do While p_FindNamedPlaceHolder(Result, Xpr, i, , LBr, RBr)
-    ' найдена именная переменная
-        ' анализируем строку на наличие дополнительных модификаторов
+    ' РЅР°Р№РґРµРЅР° РёРјРµРЅРЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ
+        ' Р°РЅР°Р»РёР·РёСЂСѓРµРј СЃС‚СЂРѕРєСѓ РЅР° РЅР°Р»РёС‡РёРµ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹С… РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ
         Key = p_TermModify(Xpr, par, Operation:=1)
-        ' если не нужно - просто сделать: Key = Xpr
-    ' получаем ее значение из коллекции (или запрашиваем при отсутствии)
+        ' РµСЃР»Рё РЅРµ РЅСѓР¶РЅРѕ - РїСЂРѕСЃС‚Рѕ СЃРґРµР»Р°С‚СЊ: Key = Xpr
+    ' РїРѕР»СѓС‡Р°РµРј РµРµ Р·РЅР°С‡РµРЅРёРµ РёР· РєРѕР»Р»РµРєС†РёРё (РёР»Рё Р·Р°РїСЂР°С€РёРІР°РµРј РїСЂРё РѕС‚СЃСѓС‚СЃС‚РІРёРё)
         If p_IsExist(Key, NamedTerms, Term) Then
-        ' нашли в коллекции
+        ' РЅР°С€Р»Рё РІ РєРѕР»Р»РµРєС†РёРё
         ElseIf AskMissing Then
-        ' запрашиваем значение отсутствующей в коллекции переменной
-            Term = InputBox("Укажите значение переменной " & vbCrLf & Key & ":", "Переменная не найдена!")
-        ' ??? и добавляем её в набор для повторного использования
+        ' Р·Р°РїСЂР°С€РёРІР°РµРј Р·РЅР°С‡РµРЅРёРµ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РµР№ РІ РєРѕР»Р»РµРєС†РёРё РїРµСЂРµРјРµРЅРЅРѕР№
+            Term = InputBox("РЈРєР°Р¶РёС‚Рµ Р·РЅР°С‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ " & vbCrLf & Key & ":", "РџРµСЂРµРјРµРЅРЅР°СЏ РЅРµ РЅР°Р№РґРµРЅР°!")
+        ' ??? Рё РґРѕР±Р°РІР»СЏРµРј РµС‘ РІ РЅР°Р±РѕСЂ РґР»СЏ РїРѕРІС‚РѕСЂРЅРѕРіРѕ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ
             NamedTerms.Add Term, Key
         Else
-        ' если не нашли и не запрашиваем - оставляем как есть
-            ' можно создать список отсутствующих переменных
-            ' или другим способом передать управление пользователю
-            ' чтобы он мог приемлемым способом задать значения отсутствующего параметра,
-            ' но чтобы не усложнять больше необходимого оставим так
+        ' РµСЃР»Рё РЅРµ РЅР°С€Р»Рё Рё РЅРµ Р·Р°РїСЂР°С€РёРІР°РµРј - РѕСЃС‚Р°РІР»СЏРµРј РєР°Рє РµСЃС‚СЊ
+            ' РјРѕР¶РЅРѕ СЃРѕР·РґР°С‚СЊ СЃРїРёСЃРѕРє РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РёС… РїРµСЂРµРјРµРЅРЅС‹С…
+            ' РёР»Рё РґСЂСѓРіРёРј СЃРїРѕСЃРѕР±РѕРј РїРµСЂРµРґР°С‚СЊ СѓРїСЂР°РІР»РµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЋ
+            ' С‡С‚РѕР±С‹ РѕРЅ РјРѕРі РїСЂРёРµРјР»РµРјС‹Рј СЃРїРѕСЃРѕР±РѕРј Р·Р°РґР°С‚СЊ Р·РЅР°С‡РµРЅРёСЏ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РµРіРѕ РїР°СЂР°РјРµС‚СЂР°,
+            ' РЅРѕ С‡С‚РѕР±С‹ РЅРµ СѓСЃР»РѕР¶РЅСЏС‚СЊ Р±РѕР»СЊС€Рµ РЅРµРѕР±С…РѕРґРёРјРѕРіРѕ РѕСЃС‚Р°РІРёРј С‚Р°Рє
             Term = LBr & Xpr & RBr: GoTo HandleNext
         End If
-    ' рекурсивно проверяем (и заменяем) полученное значение на наличие в нем именных переменных
+    ' СЂРµРєСѓСЂСЃРёРІРЅРѕ РїСЂРѕРІРµСЂСЏРµРј (Рё Р·Р°РјРµРЅСЏРµРј) РїРѕР»СѓС‡РµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РЅР° РЅР°Р»РёС‡РёРµ РІ РЅРµРј РёРјРµРЅРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…
         Term = PlaceHoldersSet(Term, NamedTerms, AskMissing, LBr, RBr)
-    ' если есть модификаторы - применяем их к Term
+    ' РµСЃР»Рё РµСЃС‚СЊ РјРѕРґРёС„РёРєР°С‚РѕСЂС‹ - РїСЂРёРјРµРЅСЏРµРј РёС… Рє Term
         If Len(par) > 0 Then Term = p_TermModify(Term, par, Operation:=0)
-    '' предполагалось, что это могло улучшить скорость вычисления выражений
+    '' РїСЂРµРґРїРѕР»Р°РіР°Р»РѕСЃСЊ, С‡С‚Рѕ СЌС‚Рѕ РјРѕРіР»Рѕ СѓР»СѓС‡С€РёС‚СЊ СЃРєРѕСЂРѕСЃС‚СЊ РІС‹С‡РёСЃР»РµРЅРёСЏ РІС‹СЂР°Р¶РµРЅРёР№
         '    If EvalExpres Then
-    '' если указано вычислять выражения в процесе подстановки
-        '    ' вычисляем значение выражения и
-        '    ' заменяем вычислимое выражение в коллекции его значением
+    '' РµСЃР»Рё СѓРєР°Р·Р°РЅРѕ РІС‹С‡РёСЃР»СЏС‚СЊ РІС‹СЂР°Р¶РµРЅРёСЏ РІ РїСЂРѕС†РµСЃРµ РїРѕРґСЃС‚Р°РЅРѕРІРєРё
+        '    ' РІС‹С‡РёСЃР»СЏРµРј Р·РЅР°С‡РµРЅРёРµ РІС‹СЂР°Р¶РµРЅРёСЏ Рё
+        '    ' Р·Р°РјРµРЅСЏРµРј РІС‹С‡РёСЃР»РёРјРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ РІ РєРѕР»Р»РµРєС†РёРё РµРіРѕ Р·РЅР°С‡РµРЅРёРµРј
         '        If p_IsEvalutable(Term, Value) Then
         '            Term = Value: With NamedTerms: .Remove (Key): .Add Key, Term: End With
         '        End If
         '    End If
-    ' производим замену именной переменной полученным значением по всему выражению
-        Result = Left$(Result, i - 1) & Replace(Result, LBr & Xpr & RBr, Term, i) ' замена
-HandleNext:  i = i + Len(Term) 'If i > Len(Result) Then Exit Do ' повторяем пока в выражении есть именные переменные
+    ' РїСЂРѕРёР·РІРѕРґРёРј Р·Р°РјРµРЅСѓ РёРјРµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ РїРѕР»СѓС‡РµРЅРЅС‹Рј Р·РЅР°С‡РµРЅРёРµРј РїРѕ РІСЃРµРјСѓ РІС‹СЂР°Р¶РµРЅРёСЋ
+        Result = Left$(Result, i - 1) & Replace(Result, LBr & Xpr & RBr, Term, i) ' Р·Р°РјРµРЅР°
+HandleNext:  i = i + Len(Term) 'If i > Len(Result) Then Exit Do ' РїРѕРІС‚РѕСЂСЏРµРј РїРѕРєР° РІ РІС‹СЂР°Р¶РµРЅРёРё РµСЃС‚СЊ РёРјРµРЅРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ
     Loop
     'Erase Keys()
 HandleExit:  PlaceHoldersSet = Result: Exit Function
@@ -767,32 +766,32 @@ Public Function PlaceHoldersGet(ByRef Source As String, ByRef Template As String
     Optional ByRef NamedTerms As Collection, Optional Keys, _
     Optional LBr As String = "[%", Optional RBr As String = "%]", _
     Optional ReplaceExisting As Integer = False, _
-    Optional Method As Integer = 0, _
+    Optional Method As Integer = 1, _
     Optional MultiSfx As String = c_strMultiSfx) As Boolean
-' проверяет строку на соответствие шаблону и извлекает из строки коллекцию значений именованых параметров
+' РїСЂРѕРІРµСЂСЏРµС‚ СЃС‚СЂРѕРєСѓ РЅР° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ С€Р°Р±Р»РѕРЅСѓ Рё РёР·РІР»РµРєР°РµС‚ РёР· СЃС‚СЂРѕРєРё РєРѕР»Р»РµРєС†РёСЋ Р·РЅР°С‡РµРЅРёР№ РёРјРµРЅРѕРІР°РЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 '-------------------------
-' Source    - исходная строка
-' Template  - шаблон строки, может содержать подстановочные переменные вида [%Param1%]
-' NamedTerms - (возвращаемое значение) коллекция значений подстановочных переменных вида [%Param1%], извлечённых из исходной строки
-' Keys      - (возвращаемое значение) массив имён переменных вида [%Param1%], извлечённых из исходной строки (являются ключами NamedTerms)
-' LBr/RBr   - левая/правая скобки отмечающие границы имени переменной (напр [%Param1%])
-' ReplaceExisting - определяет сохраняемые в коллекцию значения в случае
-' если шаблон содержит несколько ссылок на переменную с одним и тем же именем
-'   0 - будет сохранено первое значение
-'  -1 - будет сохранено последнее значение
-'   1 - будут сохранены все значения в переменных с добавлением суффикса
-' Method    - способ сравнения подстрок шаблона
-'   0 - по простой подстроке (InStr)
-'   1 - по Like подстроке (InStrLike)
-'   2 - по RegEx выражению (InStrRegEx)
-' MultiSfx - признак суффикса для повторяющихся имен (при ReplaceExisting=1) д.б. что-то заведомо отсутствующее в именах переменных
+' Source    - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
+' Template  - С€Р°Р±Р»РѕРЅ СЃС‚СЂРѕРєРё, РјРѕР¶РµС‚ СЃРѕРґРµСЂР¶Р°С‚СЊ РїРѕРґСЃС‚Р°РЅРѕРІРѕС‡РЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ РІРёРґР° [%Param1%]
+' NamedTerms - (РІРѕР·РІСЂР°С‰Р°РµРјРѕРµ Р·РЅР°С‡РµРЅРёРµ) РєРѕР»Р»РµРєС†РёСЏ Р·РЅР°С‡РµРЅРёР№ РїРѕРґСЃС‚Р°РЅРѕРІРѕС‡РЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С… РІРёРґР° [%Param1%], РёР·РІР»РµС‡С‘РЅРЅС‹С… РёР· РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё
+' Keys      - (РІРѕР·РІСЂР°С‰Р°РµРјРѕРµ Р·РЅР°С‡РµРЅРёРµ) РјР°СЃСЃРёРІ РёРјС‘РЅ РїРµСЂРµРјРµРЅРЅС‹С… РІРёРґР° [%Param1%], РёР·РІР»РµС‡С‘РЅРЅС‹С… РёР· РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё (СЏРІР»СЏСЋС‚СЃСЏ РєР»СЋС‡Р°РјРё NamedTerms)
+' LBr/RBr   - Р»РµРІР°СЏ/РїСЂР°РІР°СЏ СЃРєРѕР±РєРё РѕС‚РјРµС‡Р°СЋС‰РёРµ РіСЂР°РЅРёС†С‹ РёРјРµРЅРё РїРµСЂРµРјРµРЅРЅРѕР№ (РЅР°РїСЂ [%Param1%])
+' ReplaceExisting - РѕРїСЂРµРґРµР»СЏРµС‚ СЃРѕС…СЂР°РЅСЏРµРјС‹Рµ РІ РєРѕР»Р»РµРєС†РёСЋ Р·РЅР°С‡РµРЅРёСЏ РІ СЃР»СѓС‡Р°Рµ
+' РµСЃР»Рё С€Р°Р±Р»РѕРЅ СЃРѕРґРµСЂР¶РёС‚ РЅРµСЃРєРѕР»СЊРєРѕ СЃСЃС‹Р»РѕРє РЅР° РїРµСЂРµРјРµРЅРЅСѓСЋ СЃ РѕРґРЅРёРј Рё С‚РµРј Р¶Рµ РёРјРµРЅРµРј
+'   0 - Р±СѓРґРµС‚ СЃРѕС…СЂР°РЅРµРЅРѕ РїРµСЂРІРѕРµ Р·РЅР°С‡РµРЅРёРµ
+'  -1 - Р±СѓРґРµС‚ СЃРѕС…СЂР°РЅРµРЅРѕ РїРѕСЃР»РµРґРЅРµРµ Р·РЅР°С‡РµРЅРёРµ
+'   1 - Р±СѓРґСѓС‚ СЃРѕС…СЂР°РЅРµРЅС‹ РІСЃРµ Р·РЅР°С‡РµРЅРёСЏ РІ РїРµСЂРµРјРµРЅРЅС‹С… СЃ РґРѕР±Р°РІР»РµРЅРёРµРј СЃСѓС„С„РёРєСЃР°
+' Method    - СЃРїРѕСЃРѕР± СЃСЂР°РІРЅРµРЅРёСЏ РїРѕРґСЃС‚СЂРѕРє С€Р°Р±Р»РѕРЅР°
+'   0 - РїРѕ РїСЂРѕСЃС‚РѕР№ РїРѕРґСЃС‚СЂРѕРєРµ (InStr)
+'   1 - РїРѕ Like РїРѕРґСЃС‚СЂРѕРєРµ (InStrLike)
+'   2 - РїРѕ RegEx РІС‹СЂР°Р¶РµРЅРёСЋ (InStrRegEx)
+' MultiSfx - РїСЂРёР·РЅР°Рє СЃСѓС„С„РёРєСЃР° РґР»СЏ РїРѕРІС‚РѕСЂСЏСЋС‰РёС…СЃСЏ РёРјРµРЅ (РїСЂРё ReplaceExisting=1) Рґ.Р±. С‡С‚Рѕ-С‚Рѕ Р·Р°РІРµРґРѕРјРѕ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РµРµ РІ РёРјРµРЅР°С… РїРµСЂРµРјРµРЅРЅС‹С…
 '-------------------------
-' v.1.0.2       : 16.07.2020 - исходный вариант себя не оправдал - функция переписана. добавлена поддержка множественных вхождений (ReplaceExisting)
-' v.1.0.1       : 04.02.2020 - расширен синтаксис шаблона за счет выражений VBA.Like и VBS.RegExp
-' v.1.0.0       : 03.02.2020 - исходная версия
+' v.1.0.2       : 16.07.2020 - РёСЃС…РѕРґРЅС‹Р№ РІР°СЂРёР°РЅС‚ СЃРµР±СЏ РЅРµ РѕРїСЂР°РІРґР°Р» - С„СѓРЅРєС†РёСЏ РїРµСЂРµРїРёСЃР°РЅР°. РґРѕР±Р°РІР»РµРЅР° РїРѕРґРґРµСЂР¶РєР° РјРЅРѕР¶РµСЃС‚РІРµРЅРЅС‹С… РІС…РѕР¶РґРµРЅРёР№ (ReplaceExisting)
+' v.1.0.1       : 04.02.2020 - СЂР°СЃС€РёСЂРµРЅ СЃРёРЅС‚Р°РєСЃРёСЃ С€Р°Р±Р»РѕРЅР° Р·Р° СЃС‡РµС‚ РІС‹СЂР°Р¶РµРЅРёР№ VBA.Like Рё VBS.RegExp
+' v.1.0.0       : 03.02.2020 - РёСЃС…РѕРґРЅР°СЏ РІРµСЂСЃРёСЏ
 '-------------------------
-' ToDo: шаблон должен обязательно содержать: условный оператор, список допустимых значений, якоря для определения позиции
-' - при ReplaceExisting = -1 - ошибка при добавлении в NamedTerms
+' ToDo: С€Р°Р±Р»РѕРЅ РґРѕР»Р¶РµРЅ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ СЃРѕРґРµСЂР¶Р°С‚СЊ: СѓСЃР»РѕРІРЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ, СЃРїРёСЃРѕРє РґРѕРїСѓСЃС‚РёРјС‹С… Р·РЅР°С‡РµРЅРёР№, СЏРєРѕСЂСЏ РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ РїРѕР·РёС†РёРё
+' - РїСЂРё ReplaceExisting = -1 - РѕС€РёР±РєР° РїСЂРё РґРѕР±Р°РІР»РµРЅРёРё РІ NamedTerms
 '-------------------------
 Dim Result As Boolean: Result = False
     On Error GoTo HandleError
@@ -811,16 +810,16 @@ Dim bOK As Long
     Set NamedTerms = New Collection
     'If ReplaceExisting = 1 And Len(MultiSfx) = 0 Then MultiSfx = c_strMultiSfx
     Do Until tBeg > Len(Template)
-' ищем именную переменную
+' РёС‰РµРј РёРјРµРЅРЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ
         Found = vbNullString
-    ' если найдена именная переменная работаем с результатми поиска
-    ' если не найдена, но до конца строки еще остались символы - проверить остаток до конца строки
-        ' (осталась не сохранена предыдущая переменная)
+    ' РµСЃР»Рё РЅР°Р№РґРµРЅР° РёРјРµРЅРЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ СЂР°Р±РѕС‚Р°РµРј СЃ СЂРµР·СѓР»СЊС‚Р°С‚РјРё РїРѕРёСЃРєР°
+    ' РµСЃР»Рё РЅРµ РЅР°Р№РґРµРЅР°, РЅРѕ РґРѕ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё РµС‰Рµ РѕСЃС‚Р°Р»РёСЃСЊ СЃРёРјРІРѕР»С‹ - РїСЂРѕРІРµСЂРёС‚СЊ РѕСЃС‚Р°С‚РѕРє РґРѕ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё
+        ' (РѕСЃС‚Р°Р»Р°СЃСЊ РЅРµ СЃРѕС…СЂР°РЅРµРЅР° РїСЂРµРґС‹РґСѓС‰Р°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ)
         If p_FindNamedPlaceHolder(Template, Xpr, tEnd, , LBr, RBr) Then Else tEnd = Len(Template) + 1
-    ' берём кусок из шаблона от конца прошлой именной переменной до начала найденной
+    ' Р±РµСЂС‘Рј РєСѓСЃРѕРє РёР· С€Р°Р±Р»РѕРЅР° РѕС‚ РєРѕРЅС†Р° РїСЂРѕС€Р»РѕР№ РёРјРµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ РґРѕ РЅР°С‡Р°Р»Р° РЅР°Р№РґРµРЅРЅРѕР№
         Part = Mid$(Template, tBeg, tEnd - tBeg)
         If j = 0 Then ' ???
-    ' если это первый кусок шаблона (не именованная переменная)- получаем все вхождения фрагмента в массив
+    ' РµСЃР»Рё СЌС‚Рѕ РїРµСЂРІС‹Р№ РєСѓСЃРѕРє С€Р°Р±Р»РѕРЅР° (РЅРµ РёРјРµРЅРѕРІР°РЅРЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ)- РїРѕР»СѓС‡Р°РµРј РІСЃРµ РІС…РѕР¶РґРµРЅРёСЏ С„СЂР°РіРјРµРЅС‚Р° РІ РјР°СЃСЃРёРІ
 '            aBeg = InStrAll(rBeg, Source, Part, aFound, Method): jMax = UBound(aBeg)
             Do While rBeg <= Len(Source)
                 j = j + 1
@@ -831,110 +830,121 @@ Dim bOK As Long
                 End Select
                 If rEnd = 0 Then Exit Do
                 rBeg = rEnd + Len(Found)
-                'sKey = c_idxPref & j     ' ??? сохраняем имя ключа - понадобится для индексов переменных при поиске множественных результатов
+                'sKey = c_idxPref & j     ' ??? СЃРѕС…СЂР°РЅСЏРµРј РёРјСЏ РєР»СЋС‡Р° - РїРѕРЅР°РґРѕР±РёС‚СЃСЏ РґР»СЏ РёРЅРґРµРєСЃРѕРІ РїРµСЂРµРјРµРЅРЅС‹С… РїСЂРё РїРѕРёСЃРєРµ РјРЅРѕР¶РµСЃС‚РІРµРЅРЅС‹С… СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ
                 cBeg.Add rBeg ', sKey
             Loop
         End If
-    ' если ищем с конца - берем последнее вхождение, иначе - начинаем с первого
+    ' РµСЃР»Рё РёС‰РµРј СЃ РєРѕРЅС†Р° - Р±РµСЂРµРј РїРѕСЃР»РµРґРЅРµРµ РІС…РѕР¶РґРµРЅРёРµ, РёРЅР°С‡Рµ - РЅР°С‡РёРЅР°РµРј СЃ РїРµСЂРІРѕРіРѕ
         If ReplaceExisting = -1 Then j = cBeg.Count Else j = 1
-    ' если это первый проход найдена только левая ганица (перед переменной) - ищем правую
+    ' РµСЃР»Рё СЌС‚Рѕ РїРµСЂРІС‹Р№ РїСЂРѕС…РѕРґ РЅР°Р№РґРµРЅР° С‚РѕР»СЊРєРѕ Р»РµРІР°СЏ РіР°РЅРёС†Р° (РїРµСЂРµРґ РїРµСЂРµРјРµРЅРЅРѕР№) - РёС‰РµРј РїСЂР°РІСѓСЋ
         If Len(Key) = 0 Then GoTo HandleNext
-        i = i + 1   ' увеличиваем индекс переменной в шаблоне
+        i = i + 1   ' СѓРІРµР»РёС‡РёРІР°РµРј РёРЅРґРµРєСЃ РїРµСЂРµРјРµРЅРЅРѕР№ РІ С€Р°Р±Р»РѕРЅРµ
         Do Until j > cBeg.Count
-' перебираем возможные совпадения
+' РїРµСЂРµР±РёСЂР°РµРј РІРѕР·РјРѕР¶РЅС‹Рµ СЃРѕРІРїР°РґРµРЅРёСЏ
             If Len(Part) > 0 Then
-' сравниваем проверяемую строку с текущим куском шаблона
-    ' если перед именованной переменной есть фрагмент шаблона для распознавания
-' !!! непонятно как разделять две и более идущие подряд именованные переменные
-    ' вероятно надо извлекать текст в первую потом по мере анализа Params отсекать хвост
-    ' постепенно распределяя его по оставшимся.
-' пока иметь ввиду это как ограничение допустимых шаблонов
+' СЃСЂР°РІРЅРёРІР°РµРј РїСЂРѕРІРµСЂСЏРµРјСѓСЋ СЃС‚СЂРѕРєСѓ СЃ С‚РµРєСѓС‰РёРј РєСѓСЃРєРѕРј С€Р°Р±Р»РѕРЅР°
+    ' РµСЃР»Рё РїРµСЂРµРґ РёРјРµРЅРѕРІР°РЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ РµСЃС‚СЊ С„СЂР°РіРјРµРЅС‚ С€Р°Р±Р»РѕРЅР° РґР»СЏ СЂР°СЃРїРѕР·РЅР°РІР°РЅРёСЏ
+' !!! РЅРµРїРѕРЅСЏС‚РЅРѕ РєР°Рє СЂР°Р·РґРµР»СЏС‚СЊ РґРІРµ Рё Р±РѕР»РµРµ РёРґСѓС‰РёРµ РїРѕРґСЂСЏРґ РёРјРµРЅРѕРІР°РЅРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ
+    ' РІРµСЂРѕСЏС‚РЅРѕ РЅР°РґРѕ РёР·РІР»РµРєР°С‚СЊ С‚РµРєСЃС‚ РІ РїРµСЂРІСѓСЋ РїРѕС‚РѕРј РїРѕ РјРµСЂРµ Р°РЅР°Р»РёР·Р° Params РѕС‚СЃРµРєР°С‚СЊ С…РІРѕСЃС‚
+    ' РїРѕСЃС‚РµРїРµРЅРЅРѕ СЂР°СЃРїСЂРµРґРµР»СЏСЏ РµРіРѕ РїРѕ РѕСЃС‚Р°РІС€РёРјСЃСЏ.
+' РїРѕРєР° РёРјРµС‚СЊ РІРІРёРґСѓ СЌС‚Рѕ РєР°Рє РѕРіСЂР°РЅРёС‡РµРЅРёРµ РґРѕРїСѓСЃС‚РёРјС‹С… С€Р°Р±Р»РѕРЅРѕРІ
             Select Case Method
             Case 1:     rEnd = InStrLike(cBeg(j), Source, Part, Found)
             Case 2:     rEnd = InStrRegEx(cBeg(j), Source, Part, Found)
             Case Else:  rEnd = InStr(cBeg(j), Source, Part): If rEnd > 0 Then Found = Part Else Found = vbNullString
             End Select
             End If
-        ' если кусок не найден - вычеркиваем фрагмент из дальнейшей обработки и переходим к следующему
+        ' РµСЃР»Рё РєСѓСЃРѕРє РЅРµ РЅР°Р№РґРµРЅ - РІС‹С‡РµСЂРєРёРІР°РµРј С„СЂР°РіРјРµРЅС‚ РёР· РґР°Р»СЊРЅРµР№С€РµР№ РѕР±СЂР°Р±РѕС‚РєРё Рё РїРµСЂРµС…РѕРґРёРј Рє СЃР»РµРґСѓСЋС‰РµРјСѓ
             bOK = rEnd > 0
             If Not bOK Then GoTo HandleNotOk
-        ' текущий вариант подтвержден - извлекаем значение именованной переменной
+        ' С‚РµРєСѓС‰РёР№ РІР°СЂРёР°РЅС‚ РїРѕРґС‚РІРµСЂР¶РґРµРЅ - РёР·РІР»РµРєР°РµРј Р·РЅР°С‡РµРЅРёРµ РёРјРµРЅРѕРІР°РЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
             Item = Mid$(Source, cBeg(j), rEnd - cBeg(j))
-'' <<< здесь можно проверить соответствие Item заданному в Params
+'' <<< Р·РґРµСЃСЊ РјРѕР¶РЅРѕ РїСЂРѕРІРµСЂРёС‚СЊ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ Item Р·Р°РґР°РЅРЅРѕРјСѓ РІ Params
 '            If Len(Params) > 0 Then
-'    '         ' если Item не соотв Params - текущий фрагмент не значение переменной,
-'    '         ' а возможный фрагмент шаблона - ??? подумать как реагировать
+'    '         ' РµСЃР»Рё Item РЅРµ СЃРѕРѕС‚РІ Params - С‚РµРєСѓС‰РёР№ С„СЂР°РіРјРµРЅС‚ РЅРµ Р·РЅР°С‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№,
+'    '         ' Р° РІРѕР·РјРѕР¶РЅС‹Р№ С„СЂР°РіРјРµРЅС‚ С€Р°Р±Р»РѕРЅР° - ??? РїРѕРґСѓРјР°С‚СЊ РєР°Рє СЂРµР°РіРёСЂРѕРІР°С‚СЊ
 'Stop
 '                Item = p_TermModify(Item, Params, Operation:=0)
 '                bOk = ??? '
 '            End If
 '            If Not bOk then GoTo HandleNotOk
-    ' сохраняем позицию найденого фрагмента для дальнейшего использования
+    ' СЃРѕС…СЂР°РЅСЏРµРј РїРѕР·РёС†РёСЋ РЅР°Р№РґРµРЅРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р° РґР»СЏ РґР°Р»СЊРЅРµР№С€РµРіРѕ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ
             rBeg = rEnd + Len(Found)
-            cBeg.Remove (j): If j <= cBeg.Count Then cBeg.Add rBeg, Before:=j Else cBeg.Add rBeg, After:=cBeg.Count
-    ' формируем имя в коллекции для извлекаемого элемента
-        ' если сохраняем единственный результат - берём извлечённое имя переменной из шаблона
-        ' если сохраняем все результаты - формируем на основе имени переменной из шаблона и индекса элемента в коллекции
+            With cBeg
+                .Remove (j)
+                If .Count Then
+                    If j <= .Count Then
+                        .Add rBeg, Before:=j
+                    Else
+                        .Add rBeg, After:=.Count
+                    End If
+                Else
+                        .Add rBeg
+                End If
+            End With
+    ' С„РѕСЂРјРёСЂСѓРµРј РёРјСЏ РІ РєРѕР»Р»РµРєС†РёРё РґР»СЏ РёР·РІР»РµРєР°РµРјРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
+        ' РµСЃР»Рё СЃРѕС…СЂР°РЅСЏРµРј РµРґРёРЅСЃС‚РІРµРЅРЅС‹Р№ СЂРµР·СѓР»СЊС‚Р°С‚ - Р±РµСЂС‘Рј РёР·РІР»РµС‡С‘РЅРЅРѕРµ РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№ РёР· С€Р°Р±Р»РѕРЅР°
+        ' РµСЃР»Рё СЃРѕС…СЂР°РЅСЏРµРј РІСЃРµ СЂРµР·СѓР»СЊС‚Р°С‚С‹ - С„РѕСЂРјРёСЂСѓРµРј РЅР° РѕСЃРЅРѕРІРµ РёРјРµРЅРё РїРµСЂРµРјРµРЅРЅРѕР№ РёР· С€Р°Р±Р»РѕРЅР° Рё РёРЅРґРµРєСЃР° СЌР»РµРјРµРЅС‚Р° РІ РєРѕР»Р»РµРєС†РёРё
             sKey = Key
             If ReplaceExisting = 1 And j > 1 Then sKey = sKey & MultiSfx & (j - 1)
-            ' имеет смысл сохранять результаты в NamedTerms так,
-            ' чтобы все имеющие отношение к одному индексу хранились подряд
-            ' это облегчит удаление если ветка впоследствии окажется забракованной
+            ' РёРјРµРµС‚ СЃРјС‹СЃР» СЃРѕС…СЂР°РЅСЏС‚СЊ СЂРµР·СѓР»СЊС‚Р°С‚С‹ РІ NamedTerms С‚Р°Рє,
+            ' С‡С‚РѕР±С‹ РІСЃРµ РёРјРµСЋС‰РёРµ РѕС‚РЅРѕС€РµРЅРёРµ Рє РѕРґРЅРѕРјСѓ РёРЅРґРµРєСЃСѓ С…СЂР°РЅРёР»РёСЃСЊ РїРѕРґСЂСЏРґ
+            ' СЌС‚Рѕ РѕР±Р»РµРіС‡РёС‚ СѓРґР°Р»РµРЅРёРµ РµСЃР»Рё РІРµС‚РєР° РІРїРѕСЃР»РµРґСЃС‚РІРёРё РѕРєР°Р¶РµС‚СЃСЏ Р·Р°Р±СЂР°РєРѕРІР°РЅРЅРѕР№
 'Stop
             If NamedTerms.Count = 0 Then NamedTerms.Add Item, sKey Else NamedTerms.Add Item, sKey, After:=j * i - 1    ', Before:=
-            ' увеличиваем индекс совпадения в результате
+            ' СѓРІРµР»РёС‡РёРІР°РµРј РёРЅРґРµРєСЃ СЃРѕРІРїР°РґРµРЅРёСЏ РІ СЂРµР·СѓР»СЊС‚Р°С‚Рµ
             If ReplaceExisting = 1 Then j = j + 1 Else Exit Do
             GoTo HandleNextVar
 HandleNotOk:
-    ' текущий вариант не подтвержден
-        ' удаляем его из коллекции совпадений для предотвращения дальнейшего разбора этой ветки
+    ' С‚РµРєСѓС‰РёР№ РІР°СЂРёР°РЅС‚ РЅРµ РїРѕРґС‚РІРµСЂР¶РґРµРЅ
+        ' СѓРґР°Р»СЏРµРј РµРіРѕ РёР· РєРѕР»Р»РµРєС†РёРё СЃРѕРІРїР°РґРµРЅРёР№ РґР»СЏ РїСЂРµРґРѕС‚РІСЂР°С‰РµРЅРёСЏ РґР°Р»СЊРЅРµР№С€РµРіРѕ СЂР°Р·Р±РѕСЂР° СЌС‚РѕР№ РІРµС‚РєРё
             cBeg.Remove (j)
-        ' также надо исключить найденые именованные переменные неподтвержденного варианта
+        ' С‚Р°РєР¶Рµ РЅР°РґРѕ РёСЃРєР»СЋС‡РёС‚СЊ РЅР°Р№РґРµРЅС‹Рµ РёРјРµРЅРѕРІР°РЅРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ РЅРµРїРѕРґС‚РІРµСЂР¶РґРµРЅРЅРѕРіРѕ РІР°СЂРёР°РЅС‚Р°
             If ReplaceExisting <> 1 Then
-            ' для поиска единичных совпадений - просто очистить NamedTerms и aKeys
+            ' РґР»СЏ РїРѕРёСЃРєР° РµРґРёРЅРёС‡РЅС‹С… СЃРѕРІРїР°РґРµРЅРёР№ - РїСЂРѕСЃС‚Рѕ РѕС‡РёСЃС‚РёС‚СЊ NamedTerms Рё aKeys
                 Set NamedTerms = New Collection
                 If ReplaceExisting = -1 Then j = cBeg.Count
             Else
-            ' для множественных - надо убрать предыдущие результаты
-            ' не совпавшей (текущей) ветки по индексу j в NamedTerms
+            ' РґР»СЏ РјРЅРѕР¶РµСЃС‚РІРµРЅРЅС‹С… - РЅР°РґРѕ СѓР±СЂР°С‚СЊ РїСЂРµРґС‹РґСѓС‰РёРµ СЂРµР·СѓР»СЊС‚Р°С‚С‹
+            ' РЅРµ СЃРѕРІРїР°РІС€РµР№ (С‚РµРєСѓС‰РµР№) РІРµС‚РєРё РїРѕ РёРЅРґРµРєСЃСѓ j РІ NamedTerms
                 For x = 1 To i - 1: NamedTerms.Remove (j * i - x): Next x
             End If
 HandleNextVar:
         Loop
 HandleNext:
         If tEnd > Len(Template) Then Exit Do
-' извлекаем из именной переменной собственно имя без дополнительных модификаторов
+' РёР·РІР»РµРєР°РµРј РёР· РёРјРµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ СЃРѕР±СЃС‚РІРµРЅРЅРѕ РёРјСЏ Р±РµР· РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹С… РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ
         Key = p_TermModify(Xpr, Params, Operation:=1)
-' переводим указатель в строке шаблона на символ после найденной именной переменной
+' РїРµСЂРµРІРѕРґРёРј СѓРєР°Р·Р°С‚РµР»СЊ РІ СЃС‚СЂРѕРєРµ С€Р°Р±Р»РѕРЅР° РЅР° СЃРёРјРІРѕР» РїРѕСЃР»Рµ РЅР°Р№РґРµРЅРЅРѕР№ РёРјРµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
         tBeg = tEnd + Len(Xpr) + bLen
         tEnd = tBeg
     Loop
 'HandleExitDo:
     If bKeys Then Keys = p_GetCollKeys(NamedTerms)
 HandleExit:  PlaceHoldersGet = Result: Exit Function
-HandleError: Result = False: Err.Clear: Resume HandleExit
+HandleError: Result = False: Resume 0: Err.Clear: Resume HandleExit
 End Function
 Private Function p_FindNamedPlaceHolder(ByRef Source As String, _
     Optional ByRef NAME As String, _
     Optional ByRef sBeg As Long = 1, Optional ByRef sEnd As Long = 0, _
     Optional LBr As String = "[%", Optional RBr As String = "%]") As Boolean
-' ищет в строке именную переменную, ограниченную разделителями, возвращает её имя и границы
+' РёС‰РµС‚ РІ СЃС‚СЂРѕРєРµ РёРјРµРЅРЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ, РѕРіСЂР°РЅРёС‡РµРЅРЅСѓСЋ СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё, РІРѕР·РІСЂР°С‰Р°РµС‚ РµС‘ РёРјСЏ Рё РіСЂР°РЅРёС†С‹
 '-------------------------
-' Source - строка в которой производится поиск
-' Name - имя найденной переменной (без скобок)
-' sBeg - позиция начала найденной переменной в строке (включая скобки)
-' sEnd - позиция конца найденной переменной в строке (включая скобки)
-' LBr/RBr - левая/правая скобки отмечающие границы имени переменной (напр %Param1%)
+' Source - СЃС‚СЂРѕРєР° РІ РєРѕС‚РѕСЂРѕР№ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РїРѕРёСЃРє
+' Name - РёРјСЏ РЅР°Р№РґРµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ (Р±РµР· СЃРєРѕР±РѕРє)
+' sBeg - РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РЅР°Р№РґРµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ РІ СЃС‚СЂРѕРєРµ (РІРєР»СЋС‡Р°СЏ СЃРєРѕР±РєРё)
+' sEnd - РїРѕР·РёС†РёСЏ РєРѕРЅС†Р° РЅР°Р№РґРµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ РІ СЃС‚СЂРѕРєРµ (РІРєР»СЋС‡Р°СЏ СЃРєРѕР±РєРё)
+' LBr/RBr - Р»РµРІР°СЏ/РїСЂР°РІР°СЏ СЃРєРѕР±РєРё РѕС‚РјРµС‡Р°СЋС‰РёРµ РіСЂР°РЅРёС†С‹ РёРјРµРЅРё РїРµСЂРµРјРµРЅРЅРѕР№ (РЅР°РїСЂ %Param1%)
 '-------------------------
 Dim Result As Boolean: Result = False
     On Error GoTo HandleError
     If Len(Source) = 0 Then GoTo HandleExit
 Dim pBeg As Long, pEnd As Long
-    ' ищем в выражении левую скобку
+    ' РёС‰РµРј РІ РІС‹СЂР°Р¶РµРЅРёРё Р»РµРІСѓСЋ СЃРєРѕР±РєСѓ
     pBeg = InStr(sBeg, Source, LBr): If pBeg = 0 Then GoTo HandleExit Else sBeg = pBeg: pBeg = pBeg + Len(LBr)
-    ' ищем в выражении правую скобку
+    ' РёС‰РµРј РІ РІС‹СЂР°Р¶РµРЅРёРё РїСЂР°РІСѓСЋ СЃРєРѕР±РєСѓ
     pEnd = InStr(pBeg, Source, RBr): If pEnd = 0 Then GoTo HandleExit Else sEnd = pEnd + Len(RBr)
-    ' получаем строку между скобками
+    ' РїРѕР»СѓС‡Р°РµРј СЃС‚СЂРѕРєСѓ РјРµР¶РґСѓ СЃРєРѕР±РєР°РјРё
     NAME = Mid$(Source, pBeg, pEnd - pBeg)
     Result = True 'Len(Name) > 0
 HandleExit:  p_FindNamedPlaceHolder = Result: Exit Function
@@ -943,47 +953,47 @@ End Function
 
 Private Function p_TermModify(ByVal Term As String, ByRef Params As String, _
     Optional Operation = 0, Optional ReplaceExisting As Integer = False) As String
-' обрабатывает строку с модификаторами
+' РѕР±СЂР°Р±Р°С‚С‹РІР°РµС‚ СЃС‚СЂРѕРєСѓ СЃ РјРѕРґРёС„РёРєР°С‚РѕСЂР°РјРё
 '-------------------------
-' Term      - обрабатываемое значение
-' Params    - строка параметров
-' Operation - параметр определяющий тип обработки
-'   0 - применяет очищенную строку модификаторов Params к значению Term и возвращает в Result
-'   1 - определяет наличие в строке модификаторов, возвращает:
-'       в Params - очищенную строку модификаторов, в Result - имя параметра
-' сделано в одной функции чтобы все элементы описания формата модификаторов хранились в одном месте
-' ReplaceExisting - флаг определяющий поведение при обнаружении параметров с одинаковым именем при разборе параметров
-'   0 - сработает первый, последующие будут игнорироваться
-'  -1 - параметры одного типа будут заменяться - сработает последний
+' Term      - РѕР±СЂР°Р±Р°С‚С‹РІР°РµРјРѕРµ Р·РЅР°С‡РµРЅРёРµ
+' Params    - СЃС‚СЂРѕРєР° РїР°СЂР°РјРµС‚СЂРѕРІ
+' Operation - РїР°СЂР°РјРµС‚СЂ РѕРїСЂРµРґРµР»СЏСЋС‰РёР№ С‚РёРї РѕР±СЂР°Р±РѕС‚РєРё
+'   0 - РїСЂРёРјРµРЅСЏРµС‚ РѕС‡РёС‰РµРЅРЅСѓСЋ СЃС‚СЂРѕРєСѓ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ Params Рє Р·РЅР°С‡РµРЅРёСЋ Term Рё РІРѕР·РІСЂР°С‰Р°РµС‚ РІ Result
+'   1 - РѕРїСЂРµРґРµР»СЏРµС‚ РЅР°Р»РёС‡РёРµ РІ СЃС‚СЂРѕРєРµ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ, РІРѕР·РІСЂР°С‰Р°РµС‚:
+'       РІ Params - РѕС‡РёС‰РµРЅРЅСѓСЋ СЃС‚СЂРѕРєСѓ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ, РІ Result - РёРјСЏ РїР°СЂР°РјРµС‚СЂР°
+' СЃРґРµР»Р°РЅРѕ РІ РѕРґРЅРѕР№ С„СѓРЅРєС†РёРё С‡С‚РѕР±С‹ РІСЃРµ СЌР»РµРјРµРЅС‚С‹ РѕРїРёСЃР°РЅРёСЏ С„РѕСЂРјР°С‚Р° РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ С…СЂР°РЅРёР»РёСЃСЊ РІ РѕРґРЅРѕРј РјРµСЃС‚Рµ
+' ReplaceExisting - С„Р»Р°Рі РѕРїСЂРµРґРµР»СЏСЋС‰РёР№ РїРѕРІРµРґРµРЅРёРµ РїСЂРё РѕР±РЅР°СЂСѓР¶РµРЅРёРё РїР°СЂР°РјРµС‚СЂРѕРІ СЃ РѕРґРёРЅР°РєРѕРІС‹Рј РёРјРµРЅРµРј РїСЂРё СЂР°Р·Р±РѕСЂРµ РїР°СЂР°РјРµС‚СЂРѕРІ
+'   0 - СЃСЂР°Р±РѕС‚Р°РµС‚ РїРµСЂРІС‹Р№, РїРѕСЃР»РµРґСѓСЋС‰РёРµ Р±СѓРґСѓС‚ РёРіРЅРѕСЂРёСЂРѕРІР°С‚СЊСЃСЏ
+'  -1 - РїР°СЂР°РјРµС‚СЂС‹ РѕРґРЅРѕРіРѕ С‚РёРїР° Р±СѓРґСѓС‚ Р·Р°РјРµРЅСЏС‚СЊСЃСЏ - СЃСЂР°Р±РѕС‚Р°РµС‚ РїРѕСЃР»РµРґРЅРёР№
 '-------------------------
-' v.1.0.3       : 05.02.2020 - для удобства настройки выделены в отдельные функции распознавание допустимых имен и параметров модификаторов
+' v.1.0.3       : 05.02.2020 - РґР»СЏ СѓРґРѕР±СЃС‚РІР° РЅР°СЃС‚СЂРѕР№РєРё РІС‹РґРµР»РµРЅС‹ РІ РѕС‚РґРµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё СЂР°СЃРїРѕР·РЅР°РІР°РЅРёРµ РґРѕРїСѓСЃС‚РёРјС‹С… РёРјРµРЅ Рё РїР°СЂР°РјРµС‚СЂРѕРІ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ
 '-------------------------
-' Формат строки модификаторов: {Модификатор1:Параметр1-1,...,Параметр1-X1;...;МодификаторN:ПараметрN-1,...,ПараметрN-XN}
-Const c_ModLBr = "{", c_ModRBr = "}" ' скобки выделяющие строку модификаторов в выражении
-Const cXprDelim = ";" ' разделитель выражений модификаторов в строке
-Const cNamDelim = ":" ' разделитель имени/параметров модификатора
-Const cParDelim = "," ' разделитель параметров модификатора
+' Р¤РѕСЂРјР°С‚ СЃС‚СЂРѕРєРё РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ: {РњРѕРґРёС„РёРєР°С‚РѕСЂ1:РџР°СЂР°РјРµС‚СЂ1-1,...,РџР°СЂР°РјРµС‚СЂ1-X1;...;РњРѕРґРёС„РёРєР°С‚РѕСЂN:РџР°СЂР°РјРµС‚СЂN-1,...,РџР°СЂР°РјРµС‚СЂN-XN}
+Const c_ModLBr = "{", c_ModRBr = "}" ' СЃРєРѕР±РєРё РІС‹РґРµР»СЏСЋС‰РёРµ СЃС‚СЂРѕРєСѓ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ РІ РІС‹СЂР°Р¶РµРЅРёРё
+Const cXprDelim = ";" ' СЂР°Р·РґРµР»РёС‚РµР»СЊ РІС‹СЂР°Р¶РµРЅРёР№ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ РІ СЃС‚СЂРѕРєРµ
+Const cNamDelim = ":" ' СЂР°Р·РґРµР»РёС‚РµР»СЊ РёРјРµРЅРё/РїР°СЂР°РјРµС‚СЂРѕРІ РјРѕРґРёС„РёРєР°С‚РѕСЂР°
+Const cParDelim = "," ' СЂР°Р·РґРµР»РёС‚РµР»СЊ РїР°СЂР°РјРµС‚СЂРѕРІ РјРѕРґРёС„РёРєР°С‚РѕСЂР°
 Dim Pos As Long
 Dim Result As String: Result = Term
     On Error GoTo HandleError
     If Len(Term) = 0 Then GoTo HandleExit
     Select Case Operation
     Case 0
-' обработка Term и применение параметров модификатора
+' РѕР±СЂР°Р±РѕС‚РєР° Term Рё РїСЂРёРјРµРЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РјРѕРґРёС„РёРєР°С‚РѕСЂР°
         If Len(Params) = 0 Then GoTo HandleExit
         Dim Xpr, par As String
-    ' получаем массив модфикаторов с параметрами
+    ' РїРѕР»СѓС‡Р°РµРј РјР°СЃСЃРёРІ РјРѕРґС„РёРєР°С‚РѕСЂРѕРІ СЃ РїР°СЂР°РјРµС‚СЂР°РјРё
         For Each Xpr In Split(Params, cXprDelim)
-    ' перебираем наборы модификаторов
-        ' получаем тип модификатора и список его параметров
+    ' РїРµСЂРµР±РёСЂР°РµРј РЅР°Р±РѕСЂС‹ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ
+        ' РїРѕР»СѓС‡Р°РµРј С‚РёРї РјРѕРґРёС„РёРєР°С‚РѕСЂР° Рё СЃРїРёСЃРѕРє РµРіРѕ РїР°СЂР°РјРµС‚СЂРѕРІ
             Pos = InStr(1, Xpr, cNamDelim)
             If Pos > 0 Then par = Mid$(Xpr, Pos + Len(cNamDelim)): Xpr = Left$(Xpr, Pos - 1)
-    ' применяем модификатор
+    ' РїСЂРёРјРµРЅСЏРµРј РјРѕРґРёС„РёРєР°С‚РѕСЂ
             Result = p_TermModifyXprGet(Result, Xpr, par, cParDelim, ReplaceExisting)
         Next Xpr
     Case Else
-' извлечение из Term имени параметра, определение наличия в ней модификаторов
-    ' раскрываем скобки и извлекаем строку модификаторов
+' РёР·РІР»РµС‡РµРЅРёРµ РёР· Term РёРјРµРЅРё РїР°СЂР°РјРµС‚СЂР°, РѕРїСЂРµРґРµР»РµРЅРёРµ РЅР°Р»РёС‡РёСЏ РІ РЅРµР№ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ
+    ' СЂР°СЃРєСЂС‹РІР°РµРј СЃРєРѕР±РєРё Рё РёР·РІР»РµРєР°РµРј СЃС‚СЂРѕРєСѓ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ
         Result = Term: Params = vbNullString
         Pos = InStr(1, Result, c_ModLBr): If Pos = 0 Then GoTo HandleExit
         If Right$(Result, Len(c_ModRBr)) <> c_ModRBr Then GoTo HandleExit
@@ -998,15 +1008,15 @@ Private Function p_TermModifyXprGet(Term As String, _
     Modificator, Optional Params As String, _
     Optional ParDelim As String, _
     Optional ReplaceExisting As Integer = False) As String
-' применяет модификатор к значению и возвращает результат
+' РїСЂРёРјРµРЅСЏРµС‚ РјРѕРґРёС„РёРєР°С‚РѕСЂ Рє Р·РЅР°С‡РµРЅРёСЋ Рё РІРѕР·РІСЂР°С‰Р°РµС‚ СЂРµР·СѓР»СЊС‚Р°С‚
 '-------------------------
-' Term - обрабатываемое значение
-' Modificator - имя модификатора применяемого к значению
-' Params - набор параметров модификатора
-' ParDelim - разделитель параметров в списке
-' ReplaceExisting - флаг определяющий способ реакции на однотипные параметры
+' Term - РѕР±СЂР°Р±Р°С‚С‹РІР°РµРјРѕРµ Р·РЅР°С‡РµРЅРёРµ
+' Modificator - РёРјСЏ РјРѕРґРёС„РёРєР°С‚РѕСЂР° РїСЂРёРјРµРЅСЏРµРјРѕРіРѕ Рє Р·РЅР°С‡РµРЅРёСЋ
+' Params - РЅР°Р±РѕСЂ РїР°СЂР°РјРµС‚СЂРѕРІ РјРѕРґРёС„РёРєР°С‚РѕСЂР°
+' ParDelim - СЂР°Р·РґРµР»РёС‚РµР»СЊ РїР°СЂР°РјРµС‚СЂРѕРІ РІ СЃРїРёСЃРєРµ
+' ReplaceExisting - С„Р»Р°Рі РѕРїСЂРµРґРµР»СЏСЋС‰РёР№ СЃРїРѕСЃРѕР± СЂРµР°РєС†РёРё РЅР° РѕРґРЅРѕС‚РёРїРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹
 '-------------------------
-' v.1.0.2       : 31.01.2020 - изменён способ передачи аргументов функциям модификаторов на более удобный
+' v.1.0.2       : 31.01.2020 - РёР·РјРµРЅС‘РЅ СЃРїРѕСЃРѕР± РїРµСЂРµРґР°С‡Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ С„СѓРЅРєС†РёСЏРј РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ РЅР° Р±РѕР»РµРµ СѓРґРѕР±РЅС‹Р№
 '-------------------------
 Dim Result As String: Result = Term
     On Error GoTo HandleError
@@ -1014,15 +1024,15 @@ Dim Result As String: Result = Term
 Dim sFun As String, sKey As String, sVal
 Dim cPar As Collection
     Select Case LCase(Modificator)
-' <<< здесь нужно описать допустимые имена модификаторов и формат вызываемых ими функций
-' !!! следить за порядком аргументов в пользовательских функциях !!! - по имени передавать не получается, пропускать параметры тоже нельзя
-    Case "верхрег", "ucase":    Result = UCase(Result)
-    Case "нижрег", "lcase":     Result = LCase(Result)
-    Case "первверхрег", "pcase": Result = StrConv(Result, vbProperCase)
-    Case "склонять", "decline":   sFun = "DeclineWords('" & Result & "'"
-                ' получаем параметры модификатора
+' <<< Р·РґРµСЃСЊ РЅСѓР¶РЅРѕ РѕРїРёСЃР°С‚СЊ РґРѕРїСѓСЃС‚РёРјС‹Рµ РёРјРµРЅР° РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ Рё С„РѕСЂРјР°С‚ РІС‹Р·С‹РІР°РµРјС‹С… РёРјРё С„СѓРЅРєС†РёР№
+' !!! СЃР»РµРґРёС‚СЊ Р·Р° РїРѕСЂСЏРґРєРѕРј Р°СЂРіСѓРјРµРЅС‚РѕРІ РІ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС… С„СѓРЅРєС†РёСЏС… !!! - РїРѕ РёРјРµРЅРё РїРµСЂРµРґР°РІР°С‚СЊ РЅРµ РїРѕР»СѓС‡Р°РµС‚СЃСЏ, РїСЂРѕРїСѓСЃРєР°С‚СЊ РїР°СЂР°РјРµС‚СЂС‹ С‚РѕР¶Рµ РЅРµР»СЊР·СЏ
+    Case "РІРµСЂС…СЂРµРі", "ucase":    Result = UCase(Result)
+    Case "РЅРёР¶СЂРµРі", "lcase":     Result = LCase(Result)
+    Case "РїРµСЂРІРІРµСЂС…СЂРµРі", "pcase": Result = StrConv(Result, vbProperCase)
+    Case "СЃРєР»РѕРЅСЏС‚СЊ", "decline":   sFun = "DeclineWords('" & Result & "'"
+                ' РїРѕР»СѓС‡Р°РµРј РїР°СЂР°РјРµС‚СЂС‹ РјРѕРґРёС„РёРєР°С‚РѕСЂР°
                     Set cPar = p_TermModifyParGet(Params, ParDelim, ReplaceExisting)
-                ' заполняем параметры функции
+                ' Р·Р°РїРѕР»РЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹ С„СѓРЅРєС†РёРё
                     sKey = "NewCase": sFun = sFun & "," & IIf(p_IsExist(sKey, cPar, sVal), sVal, 0)
                     sKey = "NewNumb": sFun = sFun & "," & IIf(p_IsExist(sKey, cPar, sVal), sVal, 0)
                     sKey = "NewGend": sFun = sFun & "," & IIf(p_IsExist(sKey, cPar, sVal), sVal, 0)
@@ -1031,10 +1041,10 @@ Dim cPar As Collection
                     'sKey = "SkipWords": sFun = sFun & "," & IIf(p_IsExist(sKey, cPar, sVal), sVal, vbNullString)
                     sFun = sFun & ")"
                     If p_IsEvalutable(sFun, Result) Then Else Err.Raise vbObjectError + 512
-    Case "числовтекст", "numtowords": sFun = "NumToWords(" & Result
-                ' получаем параметры модификатора
+    Case "С‡РёСЃР»РѕРІС‚РµРєСЃС‚", "numtowords": sFun = "NumToWords(" & Result
+                ' РїРѕР»СѓС‡Р°РµРј РїР°СЂР°РјРµС‚СЂС‹ РјРѕРґРёС„РёРєР°С‚РѕСЂР°
                     Set cPar = p_TermModifyParGet(Params, ParDelim, ReplaceExisting)
-                ' заполняем параметры функции
+                ' Р·Р°РїРѕР»РЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹ С„СѓРЅРєС†РёРё
                     sKey = "NewCase": sFun = sFun & "," & IIf(p_IsExist(sKey, cPar, sVal), sVal, 0)
                     sKey = "NewNumb": sFun = sFun & "," & IIf(p_IsExist(sKey, cPar, sVal), sVal, 0)
                     sKey = "NewGend": sFun = sFun & "," & IIf(p_IsExist(sKey, cPar, sVal), sVal, 0)
@@ -1046,16 +1056,16 @@ Dim cPar As Collection
                     'sKey = "TranslateFrac": sFun = sFun & "," & IIf(p_IsExist(sKey, cPar, sVal), sVal, 0)
                     sFun = sFun & ")"
                     If p_IsEvalutable(sFun, Result) Then Else Err.Raise vbObjectError + 512
-    Case "всписке", "in" ' проверка принадлежности значения списку допустимых значений, заданному в Params
-        ' из PlaceHolderGet - извлечение значения из строки - проверяем вероятное значение по списку - при соответствии - возвращаем, при несоответствии продолжаем поиск в строке
-        ' из PlaceHolderSet - установка значения в строке - проверяем подставляемое значение на соответствие списку - если соответствует - подставляем, а если нет - ???
-                ' получаем параметры модификатора (список допустимых значений)
+    Case "РІСЃРїРёСЃРєРµ", "in" ' РїСЂРѕРІРµСЂРєР° РїСЂРёРЅР°РґР»РµР¶РЅРѕСЃС‚Рё Р·РЅР°С‡РµРЅРёСЏ СЃРїРёСЃРєСѓ РґРѕРїСѓСЃС‚РёРјС‹С… Р·РЅР°С‡РµРЅРёР№, Р·Р°РґР°РЅРЅРѕРјСѓ РІ Params
+        ' РёР· PlaceHolderGet - РёР·РІР»РµС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РёР· СЃС‚СЂРѕРєРё - РїСЂРѕРІРµСЂСЏРµРј РІРµСЂРѕСЏС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РїРѕ СЃРїРёСЃРєСѓ - РїСЂРё СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё - РІРѕР·РІСЂР°С‰Р°РµРј, РїСЂРё РЅРµСЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё РїСЂРѕРґРѕР»Р¶Р°РµРј РїРѕРёСЃРє РІ СЃС‚СЂРѕРєРµ
+        ' РёР· PlaceHolderSet - СѓСЃС‚Р°РЅРѕРІРєР° Р·РЅР°С‡РµРЅРёСЏ РІ СЃС‚СЂРѕРєРµ - РїСЂРѕРІРµСЂСЏРµРј РїРѕРґСЃС‚Р°РІР»СЏРµРјРѕРµ Р·РЅР°С‡РµРЅРёРµ РЅР° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ СЃРїРёСЃРєСѓ - РµСЃР»Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ - РїРѕРґСЃС‚Р°РІР»СЏРµРј, Р° РµСЃР»Рё РЅРµС‚ - ???
+                ' РїРѕР»СѓС‡Р°РµРј РїР°СЂР°РјРµС‚СЂС‹ РјРѕРґРёС„РёРєР°С‚РѕСЂР° (СЃРїРёСЃРѕРє РґРѕРїСѓСЃС‚РёРјС‹С… Р·РЅР°С‡РµРЅРёР№)
                     Result = vbNullString
                     Set cPar = p_TermModifyParGet(Params, ParDelim, ReplaceExisting)
                     For Each sVal In cPar
                         If Left$(Term, Len(sVal)) = sVal Then Result = sVal: Exit For
                     Next sVal
-    Case "тип", "is"     ' проверка соответствия типу, заданному в Params
+    Case "С‚РёРї", "is"     ' РїСЂРѕРІРµСЂРєР° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ С‚РёРїСѓ, Р·Р°РґР°РЅРЅРѕРјСѓ РІ Params
                     Result = vbNullString
                     Set cPar = p_TermModifyParGet(Params, ParDelim, ReplaceExisting)
                     Dim l As Long
@@ -1063,21 +1073,21 @@ Dim cPar As Collection
                         For l = Len(Term) To 1 Step -1
                             sKey = Left$(Term, l)
                             Select Case sVal
-                            Case "число", "num":    If IsNumeric(sKey) Then Result = sKey
-                            Case "дата", "date":    If IsDate(sKey) Then Result = sKey
-                            Case "слово", "word":   sFun = "^[a-zA-Zа-яА-ЯёЁ]*$": RegEx.Pattern = sFun: If RegEx.Test(sKey) Then Result = sKey
-                            Case "текст", "text":   Result = sKey ' под текст подходит всё
-                            Case "словорус", "rus": sFun = "^[а-яА-ЯёЁ]*$": RegEx.Pattern = sFun: If RegEx.Test(sKey) Then Result = sKey
-                            Case "словоанг", "eng": sFun = "^[a-zA-Z]*$": RegEx.Pattern = sFun: If RegEx.Test(sKey) Then Result = sKey
-                            'Case "имя", "var":   sFun = "^[a-zA-Zа-яА-ЯёЁ][_a-zA-Zа-яА-ЯёЁ0-9]*$": RegEx.Pattern = sFun: If RegEx.Test(sKey) Then Result = sKey
-                            Case Else: GoTo HandleExit ' можно сделать проверку на какой-то определённый набор символов
+                            Case "С‡РёСЃР»Рѕ", "num":    If IsNumeric(sKey) Then Result = sKey
+                            Case "РґР°С‚Р°", "date":    If IsDate(sKey) Then Result = sKey
+                            Case "СЃР»РѕРІРѕ", "word":   sFun = "^[a-zA-ZР°-СЏРђ-РЇС‘РЃ]*$": RegEx.Pattern = sFun: If RegEx.Test(sKey) Then Result = sKey
+                            Case "С‚РµРєСЃС‚", "text":   Result = sKey ' РїРѕРґ С‚РµРєСЃС‚ РїРѕРґС…РѕРґРёС‚ РІСЃС‘
+                            Case "СЃР»РѕРІРѕСЂСѓСЃ", "rus": sFun = "^[Р°-СЏРђ-РЇС‘РЃ]*$": RegEx.Pattern = sFun: If RegEx.Test(sKey) Then Result = sKey
+                            Case "СЃР»РѕРІРѕР°РЅРі", "eng": sFun = "^[a-zA-Z]*$": RegEx.Pattern = sFun: If RegEx.Test(sKey) Then Result = sKey
+                            'Case "РёРјСЏ", "var":   sFun = "^[a-zA-ZР°-СЏРђ-РЇС‘РЃ][_a-zA-ZР°-СЏРђ-РЇС‘РЃ0-9]*$": RegEx.Pattern = sFun: If RegEx.Test(sKey) Then Result = sKey
+                            Case Else: GoTo HandleExit ' РјРѕР¶РЅРѕ СЃРґРµР»Р°С‚СЊ РїСЂРѕРІРµСЂРєСѓ РЅР° РєР°РєРѕР№-С‚Рѕ РѕРїСЂРµРґРµР»С‘РЅРЅС‹Р№ РЅР°Р±РѕСЂ СЃРёРјРІРѕР»РѕРІ
                             End Select
                             If Len(Result) > 0 Then Exit For
                         Next l
                         If Len(Result) > 0 Then Exit For
                     Next sVal
-'    Case "если","if"     ' проверка условия возвращает вариант соответствующий условию
-'    Case "выбор","choose"    ' проверка нескольких условий возвращает вариант соответствующий первому истинному условию
+'    Case "РµСЃР»Рё","if"     ' РїСЂРѕРІРµСЂРєР° СѓСЃР»РѕРІРёСЏ РІРѕР·РІСЂР°С‰Р°РµС‚ РІР°СЂРёР°РЅС‚ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№ СѓСЃР»РѕРІРёСЋ
+'    Case "РІС‹Р±РѕСЂ","choose"    ' РїСЂРѕРІРµСЂРєР° РЅРµСЃРєРѕР»СЊРєРёС… СѓСЃР»РѕРІРёР№ РІРѕР·РІСЂР°С‰Р°РµС‚ РІР°СЂРёР°РЅС‚ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№ РїРµСЂРІРѕРјСѓ РёСЃС‚РёРЅРЅРѕРјСѓ СѓСЃР»РѕРІРёСЋ
     Case Else
     End Select
 HandleExit:  p_TermModifyXprGet = Result: Exit Function
@@ -1086,35 +1096,35 @@ End Function
 Private Function p_TermModifyParGet(Params As String, _
     Optional ParDelim As String, _
     Optional ReplaceExisting As Integer = False) As Collection
-' сопоставляет имена параметров модификаторов именам и значениям параметров функций и фозвращает в виде коллекции
+' СЃРѕРїРѕСЃС‚Р°РІР»СЏРµС‚ РёРјРµРЅР° РїР°СЂР°РјРµС‚СЂРѕРІ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ РёРјРµРЅР°Рј Рё Р·РЅР°С‡РµРЅРёСЏРј РїР°СЂР°РјРµС‚СЂРѕРІ С„СѓРЅРєС†РёР№ Рё С„РѕР·РІСЂР°С‰Р°РµС‚ РІ РІРёРґРµ РєРѕР»Р»РµРєС†РёРё
 '-------------------------
-' Params - набор параметров модификатора
-' ParDelim - разделитель параметров в списке
-' ReplaceExisting - флаг определяющий способ реакции на однотипные параметры
+' Params - РЅР°Р±РѕСЂ РїР°СЂР°РјРµС‚СЂРѕРІ РјРѕРґРёС„РёРєР°С‚РѕСЂР°
+' ParDelim - СЂР°Р·РґРµР»РёС‚РµР»СЊ РїР°СЂР°РјРµС‚СЂРѕРІ РІ СЃРїРёСЃРєРµ
+' ReplaceExisting - С„Р»Р°Рі РѕРїСЂРµРґРµР»СЏСЋС‰РёР№ СЃРїРѕСЃРѕР± СЂРµР°РєС†РёРё РЅР° РѕРґРЅРѕС‚РёРїРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹
 Dim sKey As String, sVal 'As String
 Dim cPar As New Collection, par
     For Each par In Split(Params, ParDelim)
         Select Case LCase(par)
-' <<< здесь нужно описать допустимые имена параметров функций, вызываемых модификаторами и их значения
-        Case "колич":   sKey = "NewType": sVal = NumeralOrdinal
-        Case "поряд":   sKey = "NewType": sVal = NumeralCardinal
-        Case "им":      sKey = "NewCase": sVal = DeclineCaseImen
-        Case "род":     sKey = "NewCase": sVal = DeclineCaseRod
-        Case "дат":     sKey = "NewCase": sVal = DeclineCaseDat
-        Case "вин":     sKey = "NewCase": sVal = DeclineCaseVin
-        Case "тв":      sKey = "NewCase": sVal = DeclineCaseTvor
-        Case "пред":    sKey = "NewCase": sVal = DeclineCasePred
-        Case "ед":      sKey = "NewNumb": sVal = DeclineNumbSingle
-        Case "мн":      sKey = "NewNumb": sVal = DeclineNumbPlural
-        Case "муж":     sKey = "NewGend": sVal = DeclineGendMale
-        Case "жен":     sKey = "NewGend": sVal = DeclineGendFem
-        Case "cр":      sKey = "NewGend": sVal = DeclineGendNeut
-        Case "одуш":    sKey = "Animate": sVal = True
-        Case "фио":     sKey = "IsFio":   sVal = True
-        Case Else:      sKey = c_idxPref & par: sVal = par ' прочие просто добавляем как есть может они зачем-то нужны
-        'Case Else:      GoTo HandleNext                    ' неизвестные пропускаем
+' <<< Р·РґРµСЃСЊ РЅСѓР¶РЅРѕ РѕРїРёСЃР°С‚СЊ РґРѕРїСѓСЃС‚РёРјС‹Рµ РёРјРµРЅР° РїР°СЂР°РјРµС‚СЂРѕРІ С„СѓРЅРєС†РёР№, РІС‹Р·С‹РІР°РµРјС‹С… РјРѕРґРёС„РёРєР°С‚РѕСЂР°РјРё Рё РёС… Р·РЅР°С‡РµРЅРёСЏ
+        Case "РєРѕР»РёС‡":   sKey = "NewType": sVal = NumeralOrdinal
+        Case "РїРѕСЂСЏРґ":   sKey = "NewType": sVal = NumeralCardinal
+        Case "РёРј":      sKey = "NewCase": sVal = DeclineCaseImen
+        Case "СЂРѕРґ":     sKey = "NewCase": sVal = DeclineCaseRod
+        Case "РґР°С‚":     sKey = "NewCase": sVal = DeclineCaseDat
+        Case "РІРёРЅ":     sKey = "NewCase": sVal = DeclineCaseVin
+        Case "С‚РІ":      sKey = "NewCase": sVal = DeclineCaseTvor
+        Case "РїСЂРµРґ":    sKey = "NewCase": sVal = DeclineCasePred
+        Case "РµРґ":      sKey = "NewNumb": sVal = DeclineNumbSingle
+        Case "РјРЅ":      sKey = "NewNumb": sVal = DeclineNumbPlural
+        Case "РјСѓР¶":     sKey = "NewGend": sVal = DeclineGendMale
+        Case "Р¶РµРЅ":     sKey = "NewGend": sVal = DeclineGendFem
+        Case "cСЂ":      sKey = "NewGend": sVal = DeclineGendNeut
+        Case "РѕРґСѓС€":    sKey = "Animate": sVal = True
+        Case "С„РёРѕ":     sKey = "IsFio":   sVal = True
+        Case Else:      sKey = c_idxPref & par: sVal = par ' РїСЂРѕС‡РёРµ РїСЂРѕСЃС‚Рѕ РґРѕР±Р°РІР»СЏРµРј РєР°Рє РµСЃС‚СЊ РјРѕР¶РµС‚ РѕРЅРё Р·Р°С‡РµРј-С‚Рѕ РЅСѓР¶РЅС‹
+        'Case Else:      GoTo HandleNext                    ' РЅРµРёР·РІРµСЃС‚РЅС‹Рµ РїСЂРѕРїСѓСЃРєР°РµРј
         End Select
-    ' добавляем параметр в коллекцию
+    ' РґРѕР±Р°РІР»СЏРµРј РїР°СЂР°РјРµС‚СЂ РІ РєРѕР»Р»РµРєС†РёСЋ
         If p_IsExist(sKey, cPar) Then If Not ReplaceExisting Then GoTo HandleNext Else cPar.Remove sKey
         cPar.Add sVal, sKey
 HandleNext: Next par: Set p_TermModifyParGet = cPar
@@ -1125,198 +1135,198 @@ Public Function GroupsGet(Source As String, _
     Optional UsePlaceHolders As Boolean = False, _
     Optional Templates, Optional TermDelim = "@", Optional TempDelim = ";", _
     Optional aGroups) As Boolean
-' возвращает коллекцию групп содержащихся в строке (выражений заключенных в скобки)
+' РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕР»Р»РµРєС†РёСЋ РіСЂСѓРїРї СЃРѕРґРµСЂР¶Р°С‰РёС…СЃСЏ РІ СЃС‚СЂРѕРєРµ (РІС‹СЂР°Р¶РµРЅРёР№ Р·Р°РєР»СЋС‡РµРЅРЅС‹С… РІ СЃРєРѕР±РєРё)
 '-------------------------
-' Source    - выражение содержащее скобки
-' cGroups   - (возвращаемое) коллекция содержимого скобок индекс элемента соответствует уровню скобки в порядке разбора
-'             именованные индексы соответствуют порядковому номеру с префиксом Br
-'             коллекция нужна для возможности использования результата соместно с функциями PlaceHoldersGet/Set
-' UsePlaceHolders - если True в Text, будут возвращены выражения содержащее подстановочные ссылки на соотв элементы массива результата
-'             вида: ([%1%])+([%2%]), где 1,2.. - индексы элементов коллекции cGroups хранящей содержимое скобок
-'             иначе - полное текстовое выражение содержащееся в скобках.
-' Templates - строка или массив строк содержащий шаблоны допустимых групп
-'             т.к. скобки проверяются прямым перебором слева-направо, для более-менее корректной работы
-'             надо чтобы шаблоны были упорядочены по мере усложнения в порядке возможного срабатывания
-' TermDelim - разделитель элементов (замещающий символ для обозначения извлекаемого элемента группы) в строке шаблона
-' TempDelim - разделитель шаблонов в строке
-' aGroups   - (возвращаемое) массив позиций элементов строки (уровней групп/границ групп/содержимого групп) нужно только если хотите отслеживать позиции в строке
-' возвращает: True  - если выражение успешно разобрано,
-'             False - если выражение содержит незакрытые скобки или не корректно
+' Source    - РІС‹СЂР°Р¶РµРЅРёРµ СЃРѕРґРµСЂР¶Р°С‰РµРµ СЃРєРѕР±РєРё
+' cGroups   - (РІРѕР·РІСЂР°С‰Р°РµРјРѕРµ) РєРѕР»Р»РµРєС†РёСЏ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ СЃРєРѕР±РѕРє РёРЅРґРµРєСЃ СЌР»РµРјРµРЅС‚Р° СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ СѓСЂРѕРІРЅСЋ СЃРєРѕР±РєРё РІ РїРѕСЂСЏРґРєРµ СЂР°Р·Р±РѕСЂР°
+'             РёРјРµРЅРѕРІР°РЅРЅС‹Рµ РёРЅРґРµРєСЃС‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‚ РїРѕСЂСЏРґРєРѕРІРѕРјСѓ РЅРѕРјРµСЂСѓ СЃ РїСЂРµС„РёРєСЃРѕРј Br
+'             РєРѕР»Р»РµРєС†РёСЏ РЅСѓР¶РЅР° РґР»СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ СЂРµР·СѓР»СЊС‚Р°С‚Р° СЃРѕРјРµСЃС‚РЅРѕ СЃ С„СѓРЅРєС†РёСЏРјРё PlaceHoldersGet/Set
+' UsePlaceHolders - РµСЃР»Рё True РІ Text, Р±СѓРґСѓС‚ РІРѕР·РІСЂР°С‰РµРЅС‹ РІС‹СЂР°Р¶РµРЅРёСЏ СЃРѕРґРµСЂР¶Р°С‰РµРµ РїРѕРґСЃС‚Р°РЅРѕРІРѕС‡РЅС‹Рµ СЃСЃС‹Р»РєРё РЅР° СЃРѕРѕС‚РІ СЌР»РµРјРµРЅС‚С‹ РјР°СЃСЃРёРІР° СЂРµР·СѓР»СЊС‚Р°С‚Р°
+'             РІРёРґР°: ([%1%])+([%2%]), РіРґРµ 1,2.. - РёРЅРґРµРєСЃС‹ СЌР»РµРјРµРЅС‚РѕРІ РєРѕР»Р»РµРєС†РёРё cGroups С…СЂР°РЅСЏС‰РµР№ СЃРѕРґРµСЂР¶РёРјРѕРµ СЃРєРѕР±РѕРє
+'             РёРЅР°С‡Рµ - РїРѕР»РЅРѕРµ С‚РµРєСЃС‚РѕРІРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ СЃРѕРґРµСЂР¶Р°С‰РµРµСЃСЏ РІ СЃРєРѕР±РєР°С….
+' Templates - СЃС‚СЂРѕРєР° РёР»Рё РјР°СЃСЃРёРІ СЃС‚СЂРѕРє СЃРѕРґРµСЂР¶Р°С‰РёР№ С€Р°Р±Р»РѕРЅС‹ РґРѕРїСѓСЃС‚РёРјС‹С… РіСЂСѓРїРї
+'             С‚.Рє. СЃРєРѕР±РєРё РїСЂРѕРІРµСЂСЏСЋС‚СЃСЏ РїСЂСЏРјС‹Рј РїРµСЂРµР±РѕСЂРѕРј СЃР»РµРІР°-РЅР°РїСЂР°РІРѕ, РґР»СЏ Р±РѕР»РµРµ-РјРµРЅРµРµ РєРѕСЂСЂРµРєС‚РЅРѕР№ СЂР°Р±РѕС‚С‹
+'             РЅР°РґРѕ С‡С‚РѕР±С‹ С€Р°Р±Р»РѕРЅС‹ Р±С‹Р»Рё СѓРїРѕСЂСЏРґРѕС‡РµРЅС‹ РїРѕ РјРµСЂРµ СѓСЃР»РѕР¶РЅРµРЅРёСЏ РІ РїРѕСЂСЏРґРєРµ РІРѕР·РјРѕР¶РЅРѕРіРѕ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ
+' TermDelim - СЂР°Р·РґРµР»РёС‚РµР»СЊ СЌР»РµРјРµРЅС‚РѕРІ (Р·Р°РјРµС‰Р°СЋС‰РёР№ СЃРёРјРІРѕР» РґР»СЏ РѕР±РѕР·РЅР°С‡РµРЅРёСЏ РёР·РІР»РµРєР°РµРјРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РіСЂСѓРїРїС‹) РІ СЃС‚СЂРѕРєРµ С€Р°Р±Р»РѕРЅР°
+' TempDelim - СЂР°Р·РґРµР»РёС‚РµР»СЊ С€Р°Р±Р»РѕРЅРѕРІ РІ СЃС‚СЂРѕРєРµ
+' aGroups   - (РІРѕР·РІСЂР°С‰Р°РµРјРѕРµ) РјР°СЃСЃРёРІ РїРѕР·РёС†РёР№ СЌР»РµРјРµРЅС‚РѕРІ СЃС‚СЂРѕРєРё (СѓСЂРѕРІРЅРµР№ РіСЂСѓРїРї/РіСЂР°РЅРёС† РіСЂСѓРїРї/СЃРѕРґРµСЂР¶РёРјРѕРіРѕ РіСЂСѓРїРї) РЅСѓР¶РЅРѕ С‚РѕР»СЊРєРѕ РµСЃР»Рё С…РѕС‚РёС‚Рµ РѕС‚СЃР»РµР¶РёРІР°С‚СЊ РїРѕР·РёС†РёРё РІ СЃС‚СЂРѕРєРµ
+' РІРѕР·РІСЂР°С‰Р°РµС‚: True  - РµСЃР»Рё РІС‹СЂР°Р¶РµРЅРёРµ СѓСЃРїРµС€РЅРѕ СЂР°Р·РѕР±СЂР°РЅРѕ,
+'             False - РµСЃР»Рё РІС‹СЂР°Р¶РµРЅРёРµ СЃРѕРґРµСЂР¶РёС‚ РЅРµР·Р°РєСЂС‹С‚С‹Рµ СЃРєРѕР±РєРё РёР»Рё РЅРµ РєРѕСЂСЂРµРєС‚РЅРѕ
 '-------------------------
-' v.1.0.2       : 12.03.2024 - первая попытка переделать скобки под шаблоны
-' v.1.0.1       : 21.12.2022 - исправлены многочисленные ошибки. (всё еще сильно экспериментальная)
-' v.1.0.0       : 24.03.2020 - исходная (очень кривая и глючная) версия
+' v.1.0.2       : 12.03.2024 - РїРµСЂРІР°СЏ РїРѕРїС‹С‚РєР° РїРµСЂРµРґРµР»Р°С‚СЊ СЃРєРѕР±РєРё РїРѕРґ С€Р°Р±Р»РѕРЅС‹
+' v.1.0.1       : 21.12.2022 - РёСЃРїСЂР°РІР»РµРЅС‹ РјРЅРѕРіРѕС‡РёСЃР»РµРЅРЅС‹Рµ РѕС€РёР±РєРё. (РІСЃС‘ РµС‰Рµ СЃРёР»СЊРЅРѕ СЌРєСЃРїРµСЂРёРјРµРЅС‚Р°Р»СЊРЅР°СЏ)
+' v.1.0.0       : 24.03.2020 - РёСЃС…РѕРґРЅР°СЏ (РѕС‡РµРЅСЊ РєСЂРёРІР°СЏ Рё РіР»СЋС‡РЅР°СЏ) РІРµСЂСЃРёСЏ
 '-------------------------
-' Примеры:
+' РџСЂРёРјРµСЂС‹:
 ' 1) strText = "Do: If True Then 1 Else 0 End If: Loop"
 '    strTemp = "If @ Then @ Else @ End If;Do: @: Loop"
 '    Call GroupsGet(strText, cGroup, True, strTemp)
 ' 2) strText = "((5+2)+3*(4+5)^4)-97"
 '    Call GroupsGet(strText, cGroup, True)
 '-------------------------
-' ToDo: - алгоритм срабатывает на первый подходящий шаблон, но элементы могут встречаться в разных шаблонах и правильным может оказаться не первый, - надо предусмотреть
-'         возможные решения:
-'           1) "ошибка-возврат" - при разборе по сработавшему шаблону после ошибки возвращаемся в стеке к началу выражения в строке и продолжаем разбор со следующего шаблона
-'               минус - ногократные проверки одних и тех же фрагментов
-'           2) "выбраковка" - при разборе формируем коллекцию всех сработавших на фрагмент шаблонов и вычёркиваем их по мере продвижения по шаблону
-'               минус - придется в стек загонять коллекции из пар номер шаблона/элемента
-'           3) "упорядочивание" - перед началом работы расположить шаблоны по мере их усложнения в порядке возможного срабатывания
-'               минус - непонятно по каким критериям (отобрать начинающиеся одинаково, расположить по возростанию длины элемента, .. ещё???)
-'               и не факт что это возможно для конкретного набора шаблонов, возможны неоднозначности из-за повторов и необязательных элементов
-'           думаю оптимально будет гибрид из 3 и 1.
-'           сначала элементарное упорядочивание правил (до разбора), чтобы уменьшить количество возвратов,
-'           а то что не исключили сортировкой отловим повторами при разборе
-'       - распознавание повторяющихся и необязательных элементов в шаблонах например (@[,@]) м.б. (@);(@,@),(@,@,@) и т.п.
+' ToDo: - Р°Р»РіРѕСЂРёС‚Рј СЃСЂР°Р±Р°С‚С‹РІР°РµС‚ РЅР° РїРµСЂРІС‹Р№ РїРѕРґС…РѕРґСЏС‰РёР№ С€Р°Р±Р»РѕРЅ, РЅРѕ СЌР»РµРјРµРЅС‚С‹ РјРѕРіСѓС‚ РІСЃС‚СЂРµС‡Р°С‚СЊСЃСЏ РІ СЂР°Р·РЅС‹С… С€Р°Р±Р»РѕРЅР°С… Рё РїСЂР°РІРёР»СЊРЅС‹Рј РјРѕР¶РµС‚ РѕРєР°Р·Р°С‚СЊСЃСЏ РЅРµ РїРµСЂРІС‹Р№, - РЅР°РґРѕ РїСЂРµРґСѓСЃРјРѕС‚СЂРµС‚СЊ
+'         РІРѕР·РјРѕР¶РЅС‹Рµ СЂРµС€РµРЅРёСЏ:
+'           1) "РѕС€РёР±РєР°-РІРѕР·РІСЂР°С‚" - РїСЂРё СЂР°Р·Р±РѕСЂРµ РїРѕ СЃСЂР°Р±РѕС‚Р°РІС€РµРјСѓ С€Р°Р±Р»РѕРЅСѓ РїРѕСЃР»Рµ РѕС€РёР±РєРё РІРѕР·РІСЂР°С‰Р°РµРјСЃСЏ РІ СЃС‚РµРєРµ Рє РЅР°С‡Р°Р»Сѓ РІС‹СЂР°Р¶РµРЅРёСЏ РІ СЃС‚СЂРѕРєРµ Рё РїСЂРѕРґРѕР»Р¶Р°РµРј СЂР°Р·Р±РѕСЂ СЃРѕ СЃР»РµРґСѓСЋС‰РµРіРѕ С€Р°Р±Р»РѕРЅР°
+'               РјРёРЅСѓСЃ - РЅРѕРіРѕРєСЂР°С‚РЅС‹Рµ РїСЂРѕРІРµСЂРєРё РѕРґРЅРёС… Рё С‚РµС… Р¶Рµ С„СЂР°РіРјРµРЅС‚РѕРІ
+'           2) "РІС‹Р±СЂР°РєРѕРІРєР°" - РїСЂРё СЂР°Р·Р±РѕСЂРµ С„РѕСЂРјРёСЂСѓРµРј РєРѕР»Р»РµРєС†РёСЋ РІСЃРµС… СЃСЂР°Р±РѕС‚Р°РІС€РёС… РЅР° С„СЂР°РіРјРµРЅС‚ С€Р°Р±Р»РѕРЅРѕРІ Рё РІС‹С‡С‘СЂРєРёРІР°РµРј РёС… РїРѕ РјРµСЂРµ РїСЂРѕРґРІРёР¶РµРЅРёСЏ РїРѕ С€Р°Р±Р»РѕРЅСѓ
+'               РјРёРЅСѓСЃ - РїСЂРёРґРµС‚СЃСЏ РІ СЃС‚РµРє Р·Р°РіРѕРЅСЏС‚СЊ РєРѕР»Р»РµРєС†РёРё РёР· РїР°СЂ РЅРѕРјРµСЂ С€Р°Р±Р»РѕРЅР°/СЌР»РµРјРµРЅС‚Р°
+'           3) "СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ" - РїРµСЂРµРґ РЅР°С‡Р°Р»РѕРј СЂР°Р±РѕС‚С‹ СЂР°СЃРїРѕР»РѕР¶РёС‚СЊ С€Р°Р±Р»РѕРЅС‹ РїРѕ РјРµСЂРµ РёС… СѓСЃР»РѕР¶РЅРµРЅРёСЏ РІ РїРѕСЂСЏРґРєРµ РІРѕР·РјРѕР¶РЅРѕРіРѕ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ
+'               РјРёРЅСѓСЃ - РЅРµРїРѕРЅСЏС‚РЅРѕ РїРѕ РєР°РєРёРј РєСЂРёС‚РµСЂРёСЏРј (РѕС‚РѕР±СЂР°С‚СЊ РЅР°С‡РёРЅР°СЋС‰РёРµСЃСЏ РѕРґРёРЅР°РєРѕРІРѕ, СЂР°СЃРїРѕР»РѕР¶РёС‚СЊ РїРѕ РІРѕР·СЂРѕСЃС‚Р°РЅРёСЋ РґР»РёРЅС‹ СЌР»РµРјРµРЅС‚Р°, .. РµС‰С‘???)
+'               Рё РЅРµ С„Р°РєС‚ С‡С‚Рѕ СЌС‚Рѕ РІРѕР·РјРѕР¶РЅРѕ РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РЅР°Р±РѕСЂР° С€Р°Р±Р»РѕРЅРѕРІ, РІРѕР·РјРѕР¶РЅС‹ РЅРµРѕРґРЅРѕР·РЅР°С‡РЅРѕСЃС‚Рё РёР·-Р·Р° РїРѕРІС‚РѕСЂРѕРІ Рё РЅРµРѕР±СЏР·Р°С‚РµР»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
+'           РґСѓРјР°СЋ РѕРїС‚РёРјР°Р»СЊРЅРѕ Р±СѓРґРµС‚ РіРёР±СЂРёРґ РёР· 3 Рё 1.
+'           СЃРЅР°С‡Р°Р»Р° СЌР»РµРјРµРЅС‚Р°СЂРЅРѕРµ СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїСЂР°РІРёР» (РґРѕ СЂР°Р·Р±РѕСЂР°), С‡С‚РѕР±С‹ СѓРјРµРЅСЊС€РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ РІРѕР·РІСЂР°С‚РѕРІ,
+'           Р° С‚Рѕ С‡С‚Рѕ РЅРµ РёСЃРєР»СЋС‡РёР»Рё СЃРѕСЂС‚РёСЂРѕРІРєРѕР№ РѕС‚Р»РѕРІРёРј РїРѕРІС‚РѕСЂР°РјРё РїСЂРё СЂР°Р·Р±РѕСЂРµ
+'       - СЂР°СЃРїРѕР·РЅР°РІР°РЅРёРµ РїРѕРІС‚РѕСЂСЏСЋС‰РёС…СЃСЏ Рё РЅРµРѕР±СЏР·Р°С‚РµР»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ РІ С€Р°Р±Р»РѕРЅР°С… РЅР°РїСЂРёРјРµСЂ (@[,@]) Рј.Р±. (@);(@,@),(@,@,@) Рё С‚.Рї.
 '-------------------------
-#Const TestErr = False          ' проверять ошибку несогласованных скобок
-Const cPref = "Br"              ' префикс именованного элемента коллекции
+#Const TestErr = False          ' РїСЂРѕРІРµСЂСЏС‚СЊ РѕС€РёР±РєСѓ РЅРµСЃРѕРіР»Р°СЃРѕРІР°РЅРЅС‹С… СЃРєРѕР±РѕРє
+Const cPref = "Br"              ' РїСЂРµС„РёРєСЃ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РєРѕР»Р»РµРєС†РёРё
 Const errUnclosedExp = vbObjectError + 511
 Const errIncompleteExp = vbObjectError + 512
 Dim Result As Boolean ': Result = False
 On Error GoTo HandleError
     If Len(Source) = 0 Then Result = True: GoTo HandleExit
-' задаем допустимые шаблоны групп (скобок)
+' Р·Р°РґР°РµРј РґРѕРїСѓСЃС‚РёРјС‹Рµ С€Р°Р±Р»РѕРЅС‹ РіСЂСѓРїРї (СЃРєРѕР±РѕРє)
 Dim sTerm, sName As String
-Dim aTemp                       ' массив массивов элементов шаблона
-Dim t As Long                   ' индекс шаблона в массиве
+Dim aTemp                       ' РјР°СЃСЃРёРІ РјР°СЃСЃРёРІРѕРІ СЌР»РµРјРµРЅС‚РѕРІ С€Р°Р±Р»РѕРЅР°
+Dim t As Long                   ' РёРЅРґРµРєСЃ С€Р°Р±Р»РѕРЅР° РІ РјР°СЃСЃРёРІРµ
     If IsMissing(Templates) Then
-' не задано - берём набор скобок по-умолчанию
+' РЅРµ Р·Р°РґР°РЅРѕ - Р±РµСЂС‘Рј РЅР°Р±РѕСЂ СЃРєРѕР±РѕРє РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ
         aTemp = Array(Array("(", ")"), Array("[", "]"), Array("{", "}"), Array("<", ">"), Array("%", "%"), Array("'", "'"), Array("""", """"))
     ElseIf IsArray(Templates) Then
-' задано одномерным массивом (не проверяется)
+' Р·Р°РґР°РЅРѕ РѕРґРЅРѕРјРµСЂРЅС‹Рј РјР°СЃСЃРёРІРѕРј (РЅРµ РїСЂРѕРІРµСЂСЏРµС‚СЃСЏ)
         ReDim aTemp(LBound(aTemp), UBound(aTemp)): For t = LBound(aTemp) To UBound(aTemp): aTemp(t) = Split(Templates(t), TermDelim): Next t
     Else
-' задано строкой
+' Р·Р°РґР°РЅРѕ СЃС‚СЂРѕРєРѕР№
         ReDim aTemp(0 To 0): For Each sTerm In Split(Templates, TempDelim): ReDim Preserve aTemp(0 To t): aTemp(t) = Split(sTerm, TermDelim): t = t + 1: Next sTerm
     End If
-Dim l As Long           ' индекс проверяемого элемента шаблона = LBound(aTemp(t)) - открывающая скобка, =UBound(aTemp(t)) - закрывающая скобка, остальное - промежуточные скобки
-Dim i As Long           ' позиция символа в разбираемой строке
-Dim j As Long           ' индекс стека
-Dim g As Long           ' индекс элемента массива для хранения результата разбора
-Dim aStack() As Long    ' имитируем стек скобок
-Const sStep = 3         ' шаг элементов массива стека
-                ' +0    '(.TempNum) номер шаблона по массиву
-                ' +1    '(.TempItm) номер элемента шаблона
-                ' +2    '(.TempBeg) позиция начала подстроки в исходной строке (включая скобки)
-'Dim aGroups() As Long ' массив для хранения результата разбора
-Const gStep = 7         ' шаг элементов массива позиций элементов
-                ' +0    '(.TextLev) уровень вложенности (0-вне скобок, 1-внешние скобки, ... n-скобки n-уровня)
-                ' +1    '(.TextBeg) позиция начала текста подстроки в исходной строке (после открывающей скобки)
-                ' +2    '(.TextEnd) позиция конца текста подстроки в исходной строке (до закрывающей скобки)
-                ' +3    '(.TempBeg) позиция начала подстроки в исходной строке (включая скобки)
-                ' +4    '(.TempEnd) позиция конца подстроки в исходной строке (включая скобки)
-                ' +5    '(.TempNum) номер шаблона по массиву
-                ' +6    '(.TempItm) номер элемента в шаблоне
+Dim l As Long           ' РёРЅРґРµРєСЃ РїСЂРѕРІРµСЂСЏРµРјРѕРіРѕ СЌР»РµРјРµРЅС‚Р° С€Р°Р±Р»РѕРЅР° = LBound(aTemp(t)) - РѕС‚РєСЂС‹РІР°СЋС‰Р°СЏ СЃРєРѕР±РєР°, =UBound(aTemp(t)) - Р·Р°РєСЂС‹РІР°СЋС‰Р°СЏ СЃРєРѕР±РєР°, РѕСЃС‚Р°Р»СЊРЅРѕРµ - РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅС‹Рµ СЃРєРѕР±РєРё
+Dim i As Long           ' РїРѕР·РёС†РёСЏ СЃРёРјРІРѕР»Р° РІ СЂР°Р·Р±РёСЂР°РµРјРѕР№ СЃС‚СЂРѕРєРµ
+Dim j As Long           ' РёРЅРґРµРєСЃ СЃС‚РµРєР°
+Dim g As Long           ' РёРЅРґРµРєСЃ СЌР»РµРјРµРЅС‚Р° РјР°СЃСЃРёРІР° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЂРµР·СѓР»СЊС‚Р°С‚Р° СЂР°Р·Р±РѕСЂР°
+Dim aStack() As Long    ' РёРјРёС‚РёСЂСѓРµРј СЃС‚РµРє СЃРєРѕР±РѕРє
+Const sStep = 3         ' С€Р°Рі СЌР»РµРјРµРЅС‚РѕРІ РјР°СЃСЃРёРІР° СЃС‚РµРєР°
+                ' +0    '(.TempNum) РЅРѕРјРµСЂ С€Р°Р±Р»РѕРЅР° РїРѕ РјР°СЃСЃРёРІСѓ
+                ' +1    '(.TempItm) РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° С€Р°Р±Р»РѕРЅР°
+                ' +2    '(.TempBeg) РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РІРєР»СЋС‡Р°СЏ СЃРєРѕР±РєРё)
+'Dim aGroups() As Long ' РјР°СЃСЃРёРІ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЂРµР·СѓР»СЊС‚Р°С‚Р° СЂР°Р·Р±РѕСЂР°
+Const gStep = 7         ' С€Р°Рі СЌР»РµРјРµРЅС‚РѕРІ РјР°СЃСЃРёРІР° РїРѕР·РёС†РёР№ СЌР»РµРјРµРЅС‚РѕРІ
+                ' +0    '(.TextLev) СѓСЂРѕРІРµРЅСЊ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё (0-РІРЅРµ СЃРєРѕР±РѕРє, 1-РІРЅРµС€РЅРёРµ СЃРєРѕР±РєРё, ... n-СЃРєРѕР±РєРё n-СѓСЂРѕРІРЅСЏ)
+                ' +1    '(.TextBeg) РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° С‚РµРєСЃС‚Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РїРѕСЃР»Рµ РѕС‚РєСЂС‹РІР°СЋС‰РµР№ СЃРєРѕР±РєРё)
+                ' +2    '(.TextEnd) РїРѕР·РёС†РёСЏ РєРѕРЅС†Р° С‚РµРєСЃС‚Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РґРѕ Р·Р°РєСЂС‹РІР°СЋС‰РµР№ СЃРєРѕР±РєРё)
+                ' +3    '(.TempBeg) РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РІРєР»СЋС‡Р°СЏ СЃРєРѕР±РєРё)
+                ' +4    '(.TempEnd) РїРѕР·РёС†РёСЏ РєРѕРЅС†Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РІРєР»СЋС‡Р°СЏ СЃРєРѕР±РєРё)
+                ' +5    '(.TempNum) РЅРѕРјРµСЂ С€Р°Р±Р»РѕРЅР° РїРѕ РјР°СЃСЃРёРІСѓ
+                ' +6    '(.TempItm) РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° РІ С€Р°Р±Р»РѕРЅРµ
 Dim iBeg As Long, iEnd As Long, iLen As Long
     ReDim aGroups(1 To 1) As Long
     Set cGroups = New Collection
-' ищем парные скобки в строке используя стек
+' РёС‰РµРј РїР°СЂРЅС‹Рµ СЃРєРѕР±РєРё РІ СЃС‚СЂРѕРєРµ РёСЃРїРѕР»СЊР·СѓСЏ СЃС‚РµРє
     i = 1
     Do Until i > Len(Source)
-' проверяем символы в текущей позиции
-        iLen = 1        ' просматриваем строку посимвольно
+' РїСЂРѕРІРµСЂСЏРµРј СЃРёРјРІРѕР»С‹ РІ С‚РµРєСѓС‰РµР№ РїРѕР·РёС†РёРё
+        iLen = 1        ' РїСЂРѕСЃРјР°С‚СЂРёРІР°РµРј СЃС‚СЂРѕРєСѓ РїРѕСЃРёРјРІРѕР»СЊРЅРѕ
         If j > 0 Then
-    ' если в стеке есть незакрытые скобки
-            ' проверяем следующий элемент для шаблона с вершины стека
-            t = aStack(j - 2)                       '(.TempNum) номер шаблона по массиву
-            l = aStack(j - 1)                       '(.TempItm) номер элемента шаблона
+    ' РµСЃР»Рё РІ СЃС‚РµРєРµ РµСЃС‚СЊ РЅРµР·Р°РєСЂС‹С‚С‹Рµ СЃРєРѕР±РєРё
+            ' РїСЂРѕРІРµСЂСЏРµРј СЃР»РµРґСѓСЋС‰РёР№ СЌР»РµРјРµРЅС‚ РґР»СЏ С€Р°Р±Р»РѕРЅР° СЃ РІРµСЂС€РёРЅС‹ СЃС‚РµРєР°
+            t = aStack(j - 2)                       '(.TempNum) РЅРѕРјРµСЂ С€Р°Р±Р»РѕРЅР° РїРѕ РјР°СЃСЃРёРІСѓ
+            l = aStack(j - 1)                       '(.TempItm) РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° С€Р°Р±Р»РѕРЅР°
             sTerm = aTemp(t)(l + 1)
             If sTerm = Mid$(Source, i, Len(sTerm)) Then
-            ' если совпадает - извлекаем фрагмент строки в результат
-            ' заносим фрагмент в результат
+            ' РµСЃР»Рё СЃРѕРІРїР°РґР°РµС‚ - РёР·РІР»РµРєР°РµРј С„СЂР°РіРјРµРЅС‚ СЃС‚СЂРѕРєРё РІ СЂРµР·СѓР»СЊС‚Р°С‚
+            ' Р·Р°РЅРѕСЃРёРј С„СЂР°РіРјРµРЅС‚ РІ СЂРµР·СѓР»СЊС‚Р°С‚
                 g = g + gStep: ReDim Preserve aGroups(1 To g) 'As Long
-                iLen = Len(aTemp(t)(l))             ' длина подстроки предыдущего элемента шаблона
-                iBeg = aStack(j - 0)                ' позиция начала подстроки предыдущего элемента шаблона в исходной строке
-                iEnd = iBeg + iLen                  ' позиция конца подстроки предыдущего элемента шаблона в исходной строке
-                iLen = Len(sTerm)                   ' длина подстроки текущего элемента шаблона
-                l = l + 1                           ' переходим к следующему элементу текщего шаблона
+                iLen = Len(aTemp(t)(l))             ' РґР»РёРЅР° РїРѕРґСЃС‚СЂРѕРєРё РїСЂРµРґС‹РґСѓС‰РµРіРѕ СЌР»РµРјРµРЅС‚Р° С€Р°Р±Р»РѕРЅР°
+                iBeg = aStack(j - 0)                ' РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РїРѕРґСЃС‚СЂРѕРєРё РїСЂРµРґС‹РґСѓС‰РµРіРѕ СЌР»РµРјРµРЅС‚Р° С€Р°Р±Р»РѕРЅР° РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ
+                iEnd = iBeg + iLen                  ' РїРѕР·РёС†РёСЏ РєРѕРЅС†Р° РїРѕРґСЃС‚СЂРѕРєРё РїСЂРµРґС‹РґСѓС‰РµРіРѕ СЌР»РµРјРµРЅС‚Р° С€Р°Р±Р»РѕРЅР° РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ
+                iLen = Len(sTerm)                   ' РґР»РёРЅР° РїРѕРґСЃС‚СЂРѕРєРё С‚РµРєСѓС‰РµРіРѕ СЌР»РµРјРµРЅС‚Р° С€Р°Р±Р»РѕРЅР°
+                l = l + 1                           ' РїРµСЂРµС…РѕРґРёРј Рє СЃР»РµРґСѓСЋС‰РµРјСѓ СЌР»РµРјРµРЅС‚Сѓ С‚РµРєС‰РµРіРѕ С€Р°Р±Р»РѕРЅР°
                 
-                aGroups(g - 6) = j \ sStep        '(.TextLev) уровень вложенности (0-вне скобок, 1-внешние скобки, ... n-скобки n-уровня)
-                aGroups(g - 5) = iEnd             '(.TextBeg) позиция начала текста подстроки в исходной строке (после открывающей скобки)
-                aGroups(g - 4) = i                '(.TextEnd) позиция конца текста подстроки в исходной строке (до закрывающей скобки)
-                aGroups(g - 3) = iBeg             '(.TempBeg) позиция начала подстроки в исходной строке (включая скобки)
-                aGroups(g - 2) = i + iLen         '(.TempEnd) позиция конца подстроки в исходной строке (включая скобки)
-                aGroups(g - 1) = t                '(.TempNum) номер шаблона по массиву
-                aGroups(g - 0) = l                '(.TempItm) номер элемента в шаблоне
-            ' заносим содержимое скобки в результирующую коллекцию
-                sTerm = Mid$(Source, iEnd, i - iEnd)                    ' очищенный от внешних скобок фрагмент
-                sName = cPref & (g \ gStep): cGroups.Add sTerm, sName   ' добавляем в коллекцию
+                aGroups(g - 6) = j \ sStep        '(.TextLev) СѓСЂРѕРІРµРЅСЊ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё (0-РІРЅРµ СЃРєРѕР±РѕРє, 1-РІРЅРµС€РЅРёРµ СЃРєРѕР±РєРё, ... n-СЃРєРѕР±РєРё n-СѓСЂРѕРІРЅСЏ)
+                aGroups(g - 5) = iEnd             '(.TextBeg) РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° С‚РµРєСЃС‚Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РїРѕСЃР»Рµ РѕС‚РєСЂС‹РІР°СЋС‰РµР№ СЃРєРѕР±РєРё)
+                aGroups(g - 4) = i                '(.TextEnd) РїРѕР·РёС†РёСЏ РєРѕРЅС†Р° С‚РµРєСЃС‚Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РґРѕ Р·Р°РєСЂС‹РІР°СЋС‰РµР№ СЃРєРѕР±РєРё)
+                aGroups(g - 3) = iBeg             '(.TempBeg) РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РІРєР»СЋС‡Р°СЏ СЃРєРѕР±РєРё)
+                aGroups(g - 2) = i + iLen         '(.TempEnd) РїРѕР·РёС†РёСЏ РєРѕРЅС†Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РІРєР»СЋС‡Р°СЏ СЃРєРѕР±РєРё)
+                aGroups(g - 1) = t                '(.TempNum) РЅРѕРјРµСЂ С€Р°Р±Р»РѕРЅР° РїРѕ РјР°СЃСЃРёРІСѓ
+                aGroups(g - 0) = l                '(.TempItm) РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° РІ С€Р°Р±Р»РѕРЅРµ
+            ' Р·Р°РЅРѕСЃРёРј СЃРѕРґРµСЂР¶РёРјРѕРµ СЃРєРѕР±РєРё РІ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰СѓСЋ РєРѕР»Р»РµРєС†РёСЋ
+                sTerm = Mid$(Source, iEnd, i - iEnd)                    ' РѕС‡РёС‰РµРЅРЅС‹Р№ РѕС‚ РІРЅРµС€РЅРёС… СЃРєРѕР±РѕРє С„СЂР°РіРјРµРЅС‚
+                sName = cPref & (g \ gStep): cGroups.Add sTerm, sName   ' РґРѕР±Р°РІР»СЏРµРј РІ РєРѕР»Р»РµРєС†РёСЋ
                 If l = UBound(aTemp(t)) Then
-            ' если текущий элемент закрывающий - уменьшаем вершину стека
-                    j = j - sStep: If j > 0 Then ReDim Preserve aStack(1 To j) Else Erase aStack   ' уменьшаем стек
+            ' РµСЃР»Рё С‚РµРєСѓС‰РёР№ СЌР»РµРјРµРЅС‚ Р·Р°РєСЂС‹РІР°СЋС‰РёР№ - СѓРјРµРЅСЊС€Р°РµРј РІРµСЂС€РёРЅСѓ СЃС‚РµРєР°
+                    j = j - sStep: If j > 0 Then ReDim Preserve aStack(1 To j) Else Erase aStack   ' СѓРјРµРЅСЊС€Р°РµРј СЃС‚РµРє
                 Else
-            ' иначе увеличиваем в стеке уровень элемента шаблона и его позицию
-                    aStack(j - 1) = l               '(.TempLev) номер элемента шаблона
-                    aStack(j - 0) = i               '(.TempBeg) позиция начала подстроки в исходной строке (включая скобки)
+            ' РёРЅР°С‡Рµ СѓРІРµР»РёС‡РёРІР°РµРј РІ СЃС‚РµРєРµ СѓСЂРѕРІРµРЅСЊ СЌР»РµРјРµРЅС‚Р° С€Р°Р±Р»РѕРЅР° Рё РµРіРѕ РїРѕР·РёС†РёСЋ
+                    aStack(j - 1) = l               '(.TempLev) РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° С€Р°Р±Р»РѕРЅР°
+                    aStack(j - 0) = i               '(.TempBeg) РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РІРєР»СЋС‡Р°СЏ СЃРєРѕР±РєРё)
                 End If
-                GoTo HandleNextSym                  ' фрагмент найден и разобран - переход к следующему символу
+                GoTo HandleNextSym                  ' С„СЂР°РіРјРµРЅС‚ РЅР°Р№РґРµРЅ Рё СЂР°Р·РѕР±СЂР°РЅ - РїРµСЂРµС…РѕРґ Рє СЃР»РµРґСѓСЋС‰РµРјСѓ СЃРёРјРІРѕР»Сѓ
             End If
         End If
-' проверяем первый (открывающий) элемент всех шаблонов
+' РїСЂРѕРІРµСЂСЏРµРј РїРµСЂРІС‹Р№ (РѕС‚РєСЂС‹РІР°СЋС‰РёР№) СЌР»РµРјРµРЅС‚ РІСЃРµС… С€Р°Р±Р»РѕРЅРѕРІ
         For t = LBound(aTemp) To UBound(aTemp)
             l = LBound(aTemp(t)): sTerm = aTemp(t)(l)
             If sTerm = Mid(Source, i, Len(sTerm)) Then
-            ' если открывающий элемент совпадает с текущим фрагментом строки
+            ' РµСЃР»Рё РѕС‚РєСЂС‹РІР°СЋС‰РёР№ СЌР»РµРјРµРЅС‚ СЃРѕРІРїР°РґР°РµС‚ СЃ С‚РµРєСѓС‰РёРј С„СЂР°РіРјРµРЅС‚РѕРј СЃС‚СЂРѕРєРё
                 If l < UBound(aTemp(t)) Then
-                ' если текущий элемент не закрывающий (простые разделители сразу и открывающие и закрывающие) - заносим его в стек
-                    j = j + sStep: ReDim Preserve aStack(1 To j) ' увеличиваем стек
-                    aStack(j - 2) = t               '(.TempNum) номер шаблона по массиву
-                    aStack(j - 1) = l               '(.TempItm) номер элемента шаблона
-                    aStack(j - 0) = i               '(.TempBeg) позиция начала подстроки в исходной строке (включая скобки)
+                ' РµСЃР»Рё С‚РµРєСѓС‰РёР№ СЌР»РµРјРµРЅС‚ РЅРµ Р·Р°РєСЂС‹РІР°СЋС‰РёР№ (РїСЂРѕСЃС‚С‹Рµ СЂР°Р·РґРµР»РёС‚РµР»Рё СЃСЂР°Р·Сѓ Рё РѕС‚РєСЂС‹РІР°СЋС‰РёРµ Рё Р·Р°РєСЂС‹РІР°СЋС‰РёРµ) - Р·Р°РЅРѕСЃРёРј РµРіРѕ РІ СЃС‚РµРє
+                    j = j + sStep: ReDim Preserve aStack(1 To j) ' СѓРІРµР»РёС‡РёРІР°РµРј СЃС‚РµРє
+                    aStack(j - 2) = t               '(.TempNum) РЅРѕРјРµСЂ С€Р°Р±Р»РѕРЅР° РїРѕ РјР°СЃСЃРёРІСѓ
+                    aStack(j - 1) = l               '(.TempItm) РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° С€Р°Р±Р»РѕРЅР°
+                    aStack(j - 0) = i               '(.TempBeg) РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РІРєР»СЋС‡Р°СЏ СЃРєРѕР±РєРё)
                 End If
-                iLen = Len(sTerm)                   ' смещаем позицию в строке на длину найденного фрагмента
-                GoTo HandleNextSym ': Exit For      ' фрагмент найден и разобран - переход к следующему символу
+                iLen = Len(sTerm)                   ' СЃРјРµС‰Р°РµРј РїРѕР·РёС†РёСЋ РІ СЃС‚СЂРѕРєРµ РЅР° РґР»РёРЅСѓ РЅР°Р№РґРµРЅРЅРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+                GoTo HandleNextSym ': Exit For      ' С„СЂР°РіРјРµРЅС‚ РЅР°Р№РґРµРЅ Рё СЂР°Р·РѕР±СЂР°РЅ - РїРµСЂРµС…РѕРґ Рє СЃР»РµРґСѓСЋС‰РµРјСѓ СЃРёРјРІРѕР»Сѓ
             End If
         Next t
 #If TestErr Then
-' можно дополнительно выполнить проверку незакрытых скобок - проверить соответствие все м остальным скобкам не являющимся открывающими и вернуть позицию ошибки
+' РјРѕР¶РЅРѕ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕ РІС‹РїРѕР»РЅРёС‚СЊ РїСЂРѕРІРµСЂРєСѓ РЅРµР·Р°РєСЂС‹С‚С‹С… СЃРєРѕР±РѕРє - РїСЂРѕРІРµСЂРёС‚СЊ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РІСЃРµ Рј РѕСЃС‚Р°Р»СЊРЅС‹Рј СЃРєРѕР±РєР°Рј РЅРµ СЏРІР»СЏСЋС‰РёРјСЃСЏ РѕС‚РєСЂС‹РІР°СЋС‰РёРјРё Рё РІРµСЂРЅСѓС‚СЊ РїРѕР·РёС†РёСЋ РѕС€РёР±РєРё
         For t = LBound(aTemp) To UBound(aTemp)
             For l = LBound(aTemp(t)) + 1 To UBound(aTemp(t))
             sTerm = aTemp(t)(l): If sTerm = Mid$(Source, i, Len(sTerm)) Then sName = aTemp(t)(l - 1): Err.Raise errIncompleteExp
         Next l: Next t
 #End If
-' текущий фрагмент строки - содержимое скобки - просто переходим к следующему символу
-HandleNextSym: i = i + iLen    ' смещаем указатель в строке на следующий после проанализированного символ
+' С‚РµРєСѓС‰РёР№ С„СЂР°РіРјРµРЅС‚ СЃС‚СЂРѕРєРё - СЃРѕРґРµСЂР¶РёРјРѕРµ СЃРєРѕР±РєРё - РїСЂРѕСЃС‚Рѕ РїРµСЂРµС…РѕРґРёРј Рє СЃР»РµРґСѓСЋС‰РµРјСѓ СЃРёРјРІРѕР»Сѓ
+HandleNextSym: i = i + iLen    ' СЃРјРµС‰Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РІ СЃС‚СЂРѕРєРµ РЅР° СЃР»РµРґСѓСЋС‰РёР№ РїРѕСЃР»Рµ РїСЂРѕР°РЅР°Р»РёР·РёСЂРѕРІР°РЅРЅРѕРіРѕ СЃРёРјРІРѕР»
     Loop
 '#If TestErr Then
-'' проверяем наличие в стеке незакрытых скобок
+'' РїСЂРѕРІРµСЂСЏРµРј РЅР°Р»РёС‡РёРµ РІ СЃС‚РµРєРµ РЅРµР·Р°РєСЂС‹С‚С‹С… СЃРєРѕР±РѕРє
     If j <> 0 Then sTerm = Join(aTemp(aStack(j - 2)), "..."): i = aStack(j): Err.Raise errUnclosedExp
 '#End If
     Erase aStack
-' если UsePlaceHolders=False необходимости добавлять внешнее выражение в результат нет,
-' т.к. оно совпадает с Source, но для единообразия - сделаем.
-    ' добавляем внешний уровень массива результата для исходной строки
-' заносим фрагмент в результат
+' РµСЃР»Рё UsePlaceHolders=False РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РґРѕР±Р°РІР»СЏС‚СЊ РІРЅРµС€РЅРµРµ РІС‹СЂР°Р¶РµРЅРёРµ РІ СЂРµР·СѓР»СЊС‚Р°С‚ РЅРµС‚,
+' С‚.Рє. РѕРЅРѕ СЃРѕРІРїР°РґР°РµС‚ СЃ Source, РЅРѕ РґР»СЏ РµРґРёРЅРѕРѕР±СЂР°Р·РёСЏ - СЃРґРµР»Р°РµРј.
+    ' РґРѕР±Р°РІР»СЏРµРј РІРЅРµС€РЅРёР№ СѓСЂРѕРІРµРЅСЊ РјР°СЃСЃРёРІР° СЂРµР·СѓР»СЊС‚Р°С‚Р° РґР»СЏ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё
+' Р·Р°РЅРѕСЃРёРј С„СЂР°РіРјРµРЅС‚ РІ СЂРµР·СѓР»СЊС‚Р°С‚
     g = g + gStep: ReDim Preserve aGroups(1 To g) 'As tTerm
-    'aGroups(g - 6) = 0                '(.TextLev) уровень вложенности (0-вне скобок)
-    aGroups(g - 5) = 1                '(.TextBeg) позиция начала текста подстроки в исходной строке (после открывающей скобки)
-    aGroups(g - 4) = Len(Source) + 1  '(.TextEnd) позиция конца текста подстроки в исходной строке (до закрывающей скобки)
-    aGroups(g - 3) = 1                '(.TempBeg) позиция начала подстроки в исходной строке (включая скобки)
-    aGroups(g - 2) = Len(Source) + 1  '(.TempEnd) позиция конца подстроки в исходной строке (включая скобки)
-    aGroups(g - 1) = -1               '(.TempNum) номер шаблона по массиву
-    aGroups(g - 0) = -1               '(.TempItm) номер элемента в шаблоне
+    'aGroups(g - 6) = 0                '(.TextLev) СѓСЂРѕРІРµРЅСЊ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё (0-РІРЅРµ СЃРєРѕР±РѕРє)
+    aGroups(g - 5) = 1                '(.TextBeg) РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° С‚РµРєСЃС‚Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РїРѕСЃР»Рµ РѕС‚РєСЂС‹РІР°СЋС‰РµР№ СЃРєРѕР±РєРё)
+    aGroups(g - 4) = Len(Source) + 1  '(.TextEnd) РїРѕР·РёС†РёСЏ РєРѕРЅС†Р° С‚РµРєСЃС‚Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РґРѕ Р·Р°РєСЂС‹РІР°СЋС‰РµР№ СЃРєРѕР±РєРё)
+    aGroups(g - 3) = 1                '(.TempBeg) РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РІРєР»СЋС‡Р°СЏ СЃРєРѕР±РєРё)
+    aGroups(g - 2) = Len(Source) + 1  '(.TempEnd) РїРѕР·РёС†РёСЏ РєРѕРЅС†Р° РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (РІРєР»СЋС‡Р°СЏ СЃРєРѕР±РєРё)
+    aGroups(g - 1) = -1               '(.TempNum) РЅРѕРјРµСЂ С€Р°Р±Р»РѕРЅР° РїРѕ РјР°СЃСЃРёРІСѓ
+    aGroups(g - 0) = -1               '(.TempItm) РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° РІ С€Р°Р±Р»РѕРЅРµ
     sTerm = Source                      '
-    sName = cPref & (g \ gStep): cGroups.Add sTerm, sName     ' добавляем в коллекцию
+    sName = cPref & (g \ gStep): cGroups.Add sTerm, sName     ' РґРѕР±Р°РІР»СЏРµРј РІ РєРѕР»Р»РµРєС†РёСЋ
     Result = True:
-' если надо создавать шаблоны разбора выражений в скобках - делаем это
+' РµСЃР»Рё РЅР°РґРѕ СЃРѕР·РґР°РІР°С‚СЊ С€Р°Р±Р»РѕРЅС‹ СЂР°Р·Р±РѕСЂР° РІС‹СЂР°Р¶РµРЅРёР№ РІ СЃРєРѕР±РєР°С… - РґРµР»Р°РµРј СЌС‚Рѕ
     If UsePlaceHolders Then Call p_GroupsPlaceHoldersSet(cGroups, aGroups)
 HandleExit:     GroupsGet = Result: Exit Function
 HandleError:    Select Case Err
-    Case errUnclosedExp:    Debug.Print "Ошибка! Незавершённое выражение """ & sTerm & """ в позиции " & i & " в строке: """ & Source & """"
-    Case errIncompleteExp:  Debug.Print "Ошибка! """ & sTerm & """ без """ & sName & """ в позиции " & i & " в строке: """ & Source & """"
+    Case errUnclosedExp:    Debug.Print "РћС€РёР±РєР°! РќРµР·Р°РІРµСЂС€С‘РЅРЅРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ """ & sTerm & """ РІ РїРѕР·РёС†РёРё " & i & " РІ СЃС‚СЂРѕРєРµ: """ & Source & """"
+    Case errIncompleteExp:  Debug.Print "РћС€РёР±РєР°! """ & sTerm & """ Р±РµР· """ & sName & """ РІ РїРѕР·РёС†РёРё " & i & " РІ СЃС‚СЂРѕРєРµ: """ & Source & """"
     Case Else: Stop: Resume 0
     End Select
     Result = False: Err.Clear: Resume HandleExit
 End Function
 Private Function p_GroupsPlaceHoldersSet(ByRef cGroups As Collection, aGroups) As Boolean
-' пересортирует коллекцию элементов разобранных групп заменяя элементы символами подстановки
+' РїРµСЂРµСЃРѕСЂС‚РёСЂСѓРµС‚ РєРѕР»Р»РµРєС†РёСЋ СЌР»РµРјРµРЅС‚РѕРІ СЂР°Р·РѕР±СЂР°РЅРЅС‹С… РіСЂСѓРїРї Р·Р°РјРµРЅСЏСЏ СЌР»РµРјРµРЅС‚С‹ СЃРёРјРІРѕР»Р°РјРё РїРѕРґСЃС‚Р°РЅРѕРІРєРё
 Dim Result As Boolean ': Result = False
-' вынесено в отдельную функцию для упрощения читаемости
+' РІС‹РЅРµСЃРµРЅРѕ РІ РѕС‚РґРµР»СЊРЅСѓСЋ С„СѓРЅРєС†РёСЋ РґР»СЏ СѓРїСЂРѕС‰РµРЅРёСЏ С‡РёС‚Р°РµРјРѕСЃС‚Рё
 On Error GoTo HandleError
-Const cLBr = "[%", cRBr = "%]"  ' скобки для ссылок на элементы массива результата.
-Const cPref = "Br"              ' префикс именованного элемента коллекции
-Const gStep = 7                 ' шаг элементов массива позиций элементов
-Dim g As Long                   ' индекс элемента массива для хранения результата разбора
+Const cLBr = "[%", cRBr = "%]"  ' СЃРєРѕР±РєРё РґР»СЏ СЃСЃС‹Р»РѕРє РЅР° СЌР»РµРјРµРЅС‚С‹ РјР°СЃСЃРёРІР° СЂРµР·СѓР»СЊС‚Р°С‚Р°.
+Const cPref = "Br"              ' РїСЂРµС„РёРєСЃ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РєРѕР»Р»РµРєС†РёРё
+Const gStep = 7                 ' С€Р°Рі СЌР»РµРјРµРЅС‚РѕРІ РјР°СЃСЃРёРІР° РїРѕР·РёС†РёР№ СЌР»РµРјРµРЅС‚РѕРІ
+Dim g As Long                   ' РёРЅРґРµРєСЃ СЌР»РµРјРµРЅС‚Р° РјР°СЃСЃРёРІР° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЂРµР·СѓР»СЊС‚Р°С‚Р° СЂР°Р·Р±РѕСЂР°
 Dim i As Long, j As Long, iMin As Long
 Dim iBeg As Long, iEnd As Long
 Dim jBeg As Long, jEnd As Long
@@ -1324,49 +1334,49 @@ Dim iLvl As Long, jLvl As Long
 Dim sTerm, sName As String
     i = UBound(aGroups) \ gStep: iMin = 1
     Do While i > iMin 'For i = i To 2 Step -1
-' разбираем все нижестоящие элементы массива в обратном порядке
-    ' элементы в массиве отсортированы так что наружные (те у которых Level меньше) будут выше
-    ' проверяем - если границы проверяемого (j) элемента лежат внутри разбираемого (i)
-    ' заменяем содержимое проверяемого элемента в разбираемом на символьный указатель
-    ' смещаем позицию границы проверки в разбираемом элементе до границ неразобранного фрагмента
+' СЂР°Р·Р±РёСЂР°РµРј РІСЃРµ РЅРёР¶РµСЃС‚РѕСЏС‰РёРµ СЌР»РµРјРµРЅС‚С‹ РјР°СЃСЃРёРІР° РІ РѕР±СЂР°С‚РЅРѕРј РїРѕСЂСЏРґРєРµ
+    ' СЌР»РµРјРµРЅС‚С‹ РІ РјР°СЃСЃРёРІРµ РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅС‹ С‚Р°Рє С‡С‚Рѕ РЅР°СЂСѓР¶РЅС‹Рµ (С‚Рµ Сѓ РєРѕС‚РѕСЂС‹С… Level РјРµРЅСЊС€Рµ) Р±СѓРґСѓС‚ РІС‹С€Рµ
+    ' РїСЂРѕРІРµСЂСЏРµРј - РµСЃР»Рё РіСЂР°РЅРёС†С‹ РїСЂРѕРІРµСЂСЏРµРјРѕРіРѕ (j) СЌР»РµРјРµРЅС‚Р° Р»РµР¶Р°С‚ РІРЅСѓС‚СЂРё СЂР°Р·Р±РёСЂР°РµРјРѕРіРѕ (i)
+    ' Р·Р°РјРµРЅСЏРµРј СЃРѕРґРµСЂР¶РёРјРѕРµ РїСЂРѕРІРµСЂСЏРµРјРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РІ СЂР°Р·Р±РёСЂР°РµРјРѕРј РЅР° СЃРёРјРІРѕР»СЊРЅС‹Р№ СѓРєР°Р·Р°С‚РµР»СЊ
+    ' СЃРјРµС‰Р°РµРј РїРѕР·РёС†РёСЋ РіСЂР°РЅРёС†С‹ РїСЂРѕРІРµСЂРєРё РІ СЂР°Р·Р±РёСЂР°РµРјРѕРј СЌР»РµРјРµРЅС‚Рµ РґРѕ РіСЂР°РЅРёС† РЅРµСЂР°Р·РѕР±СЂР°РЅРЅРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°
             j = iMin
-        ' текст фрагмента до разбора
+        ' С‚РµРєСЃС‚ С„СЂР°РіРјРµРЅС‚Р° РґРѕ СЂР°Р·Р±РѕСЂР°
             sName = cPref & i
             sTerm = cGroups(sName)
-        ' уровень и границы разбираемого фрагмента в исходной строке
+        ' СѓСЂРѕРІРµРЅСЊ Рё РіСЂР°РЅРёС†С‹ СЂР°Р·Р±РёСЂР°РµРјРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р° РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ
             g = (i - 1) * gStep + 1
             iLvl = aGroups(g + 0)
             iBeg = aGroups(g + 1)
             iEnd = aGroups(g + 2)
         Do While j < i 'For j = 1 To i - 1
-    ' проверяем все нижестоящие элементы массива в прямом порядке по разбираемому
-        ' уровень и границы разбираемого фрагмента в исходной строке
+    ' РїСЂРѕРІРµСЂСЏРµРј РІСЃРµ РЅРёР¶РµСЃС‚РѕСЏС‰РёРµ СЌР»РµРјРµРЅС‚С‹ РјР°СЃСЃРёРІР° РІ РїСЂСЏРјРѕРј РїРѕСЂСЏРґРєРµ РїРѕ СЂР°Р·Р±РёСЂР°РµРјРѕРјСѓ
+        ' СѓСЂРѕРІРµРЅСЊ Рё РіСЂР°РЅРёС†С‹ СЂР°Р·Р±РёСЂР°РµРјРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р° РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ
             g = (j - 1) * gStep + 1
-        ' проверяемый элемент должен принадлежать предыдущему уровню вложенности относительно разбираемого
+        ' РїСЂРѕРІРµСЂСЏРµРјС‹Р№ СЌР»РµРјРµРЅС‚ РґРѕР»Р¶РµРЅ РїСЂРёРЅР°РґР»РµР¶Р°С‚СЊ РїСЂРµРґС‹РґСѓС‰РµРјСѓ СѓСЂРѕРІРЅСЋ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ СЂР°Р·Р±РёСЂР°РµРјРѕРіРѕ
             jLvl = aGroups(g + 0): If iLvl <> (jLvl - 1) Then GoTo HandleNextJ    'iLvl > jLvl -> Next j
-        ' границы проверяемого элемента должены лежать в пределах границ разбираемого
+        ' РіСЂР°РЅРёС†С‹ РїСЂРѕРІРµСЂСЏРµРјРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РґРѕР»Р¶РµРЅС‹ Р»РµР¶Р°С‚СЊ РІ РїСЂРµРґРµР»Р°С… РіСЂР°РЅРёС† СЂР°Р·Р±РёСЂР°РµРјРѕРіРѕ
             jBeg = aGroups(g + 1): If iBeg > jBeg Then GoTo HandleNextJ           'iBeg > jBeg -> Next j
             jEnd = aGroups(g + 2): If iEnd < jEnd Then GoTo HandleNextJ           'iEnd < jEnd -> Next j
-        ' если прямой перебор j
-            ' нужно считать от конца строки (начало фрагмента меняется)
+        ' РµСЃР»Рё РїСЂСЏРјРѕР№ РїРµСЂРµР±РѕСЂ j
+            ' РЅСѓР¶РЅРѕ СЃС‡РёС‚Р°С‚СЊ РѕС‚ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё (РЅР°С‡Р°Р»Рѕ С„СЂР°РіРјРµРЅС‚Р° РјРµРЅСЏРµС‚СЃСЏ)
             sTerm = Left$(sTerm, Len(sTerm) - (iEnd - jBeg)) & cLBr & j & cRBr & Right$(sTerm, iEnd - jEnd)
-        ' и сдвигать нижнюю границу просматриваемого фрагмента
-            iBeg = aGroups(g + 3) + 1     ' смещаем позицию на начало неразобранного фрагмента на позицию после найденной
-            If j = iMin Then iMin = j + 1   ' смещаем указатель нижней границы проверяемых элементов массива
-                                            ' (найденный нижний элемент уже не встретится нет смысла его проверять снова)
-        '' если обратный перебор j
-        '    ' нужно считать от начала строки (конец фрагмента меняется)
+        ' Рё СЃРґРІРёРіР°С‚СЊ РЅРёР¶РЅСЋСЋ РіСЂР°РЅРёС†Сѓ РїСЂРѕСЃРјР°С‚СЂРёРІР°РµРјРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+            iBeg = aGroups(g + 3) + 1     ' СЃРјРµС‰Р°РµРј РїРѕР·РёС†РёСЋ РЅР° РЅР°С‡Р°Р»Рѕ РЅРµСЂР°Р·РѕР±СЂР°РЅРЅРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р° РЅР° РїРѕР·РёС†РёСЋ РїРѕСЃР»Рµ РЅР°Р№РґРµРЅРЅРѕР№
+            If j = iMin Then iMin = j + 1   ' СЃРјРµС‰Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅРёР¶РЅРµР№ РіСЂР°РЅРёС†С‹ РїСЂРѕРІРµСЂСЏРµРјС‹С… СЌР»РµРјРµРЅС‚РѕРІ РјР°СЃСЃРёРІР°
+                                            ' (РЅР°Р№РґРµРЅРЅС‹Р№ РЅРёР¶РЅРёР№ СЌР»РµРјРµРЅС‚ СѓР¶Рµ РЅРµ РІСЃС‚СЂРµС‚РёС‚СЃСЏ РЅРµС‚ СЃРјС‹СЃР»Р° РµРіРѕ РїСЂРѕРІРµСЂСЏС‚СЊ СЃРЅРѕРІР°)
+        '' РµСЃР»Рё РѕР±СЂР°С‚РЅС‹Р№ РїРµСЂРµР±РѕСЂ j
+        '    ' РЅСѓР¶РЅРѕ СЃС‡РёС‚Р°С‚СЊ РѕС‚ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё (РєРѕРЅРµС† С„СЂР°РіРјРµРЅС‚Р° РјРµРЅСЏРµС‚СЃСЏ)
         '    ??? 'sTerm = Left$(sTerm, (iEnd - jBeg + 1)) & cLBr & j & cRBr & Right$(sTerm, Len(sTerm) - iBeg - jEnd)
-        '    ' и сдвигать верхнюю границу просматриваемого фрагмента
-        '    iEnd = aGroups(g + 4) - 1      ' смещаем позицию на конец неразобранного фрагмента на позицию до найденной
+        '    ' Рё СЃРґРІРёРіР°С‚СЊ РІРµСЂС…РЅСЋСЋ РіСЂР°РЅРёС†Сѓ РїСЂРѕСЃРјР°С‚СЂРёРІР°РµРјРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+        '    iEnd = aGroups(g + 4) - 1      ' СЃРјРµС‰Р°РµРј РїРѕР·РёС†РёСЋ РЅР° РєРѕРЅРµС† РЅРµСЂР°Р·РѕР±СЂР°РЅРЅРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р° РЅР° РїРѕР·РёС†РёСЋ РґРѕ РЅР°Р№РґРµРЅРЅРѕР№
         '    ??? 'If j = iMin Then iMin = j   '
-        ' проверяем полностью ли разобран фрагмент
-            If iEnd <= iBeg Then Exit Do   ' разбор текущего фрагмента окончен
-            If i = iMin Then iMin = i + 1   ' ??? смещаем указатель нижней границы проверяемых элементов массива
-                                            ' (полностью разобранный нижний элемент уже не встретится нет смысла его проверять снова)
+        ' РїСЂРѕРІРµСЂСЏРµРј РїРѕР»РЅРѕСЃС‚СЊСЋ Р»Рё СЂР°Р·РѕР±СЂР°РЅ С„СЂР°РіРјРµРЅС‚
+            If iEnd <= iBeg Then Exit Do   ' СЂР°Р·Р±РѕСЂ С‚РµРєСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р° РѕРєРѕРЅС‡РµРЅ
+            If i = iMin Then iMin = i + 1   ' ??? СЃРјРµС‰Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅРёР¶РЅРµР№ РіСЂР°РЅРёС†С‹ РїСЂРѕРІРµСЂСЏРµРјС‹С… СЌР»РµРјРµРЅС‚РѕРІ РјР°СЃСЃРёРІР°
+                                            ' (РїРѕР»РЅРѕСЃС‚СЊСЋ СЂР°Р·РѕР±СЂР°РЅРЅС‹Р№ РЅРёР¶РЅРёР№ СЌР»РµРјРµРЅС‚ СѓР¶Рµ РЅРµ РІСЃС‚СЂРµС‚РёС‚СЃСЏ РЅРµС‚ СЃРјС‹СЃР»Р° РµРіРѕ РїСЂРѕРІРµСЂСЏС‚СЊ СЃРЅРѕРІР°)
 HandleNextJ: j = j + 1
     Loop 'Next j
-    ' возвращаем результат разбора в коллекцию
+    ' РІРѕР·РІСЂР°С‰Р°РµРј СЂРµР·СѓР»СЊС‚Р°С‚ СЂР°Р·Р±РѕСЂР° РІ РєРѕР»Р»РµРєС†РёСЋ
         With cGroups: .Remove sName: .Add sTerm, sName, After:=i - 1: End With
 HandleNextI: i = i - 1
     Loop 'Next i
@@ -1376,18 +1386,18 @@ End Function
 Public Function GroupText(Source As String, idx As Long, _
     Optional Templates, Optional TermDelim = "@", Optional TempDelim = ";" _
     ) As String
-' возвращает содержимое группы символов из строки (выражение заключенное в скобки)
+' РІРѕР·РІСЂР°С‰Р°РµС‚ СЃРѕРґРµСЂР¶РёРјРѕРµ РіСЂСѓРїРїС‹ СЃРёРјРІРѕР»РѕРІ РёР· СЃС‚СЂРѕРєРё (РІС‹СЂР°Р¶РµРЅРёРµ Р·Р°РєР»СЋС‡РµРЅРЅРѕРµ РІ СЃРєРѕР±РєРё)
 '-------------------------
-' Source    - выражение содержащее скобки
-' Idx       - индекс группы содержимое которой необходимо
-' Templates - строка или массив строк содержащий шаблоны допустимых групп
-'             т.к. скобки проверяются прямым перебором составные скобки надо ставить вначале
-' TermDelim  - разделитель элементов (замещающий символ для обозначения извлекаемого элемента группы) в строке шаблона
-' TempDelim  - разделитель шаблонов в строке
+' Source    - РІС‹СЂР°Р¶РµРЅРёРµ СЃРѕРґРµСЂР¶Р°С‰РµРµ СЃРєРѕР±РєРё
+' Idx       - РёРЅРґРµРєСЃ РіСЂСѓРїРїС‹ СЃРѕРґРµСЂР¶РёРјРѕРµ РєРѕС‚РѕСЂРѕР№ РЅРµРѕР±С…РѕРґРёРјРѕ
+' Templates - СЃС‚СЂРѕРєР° РёР»Рё РјР°СЃСЃРёРІ СЃС‚СЂРѕРє СЃРѕРґРµСЂР¶Р°С‰РёР№ С€Р°Р±Р»РѕРЅС‹ РґРѕРїСѓСЃС‚РёРјС‹С… РіСЂСѓРїРї
+'             С‚.Рє. СЃРєРѕР±РєРё РїСЂРѕРІРµСЂСЏСЋС‚СЃСЏ РїСЂСЏРјС‹Рј РїРµСЂРµР±РѕСЂРѕРј СЃРѕСЃС‚Р°РІРЅС‹Рµ СЃРєРѕР±РєРё РЅР°РґРѕ СЃС‚Р°РІРёС‚СЊ РІРЅР°С‡Р°Р»Рµ
+' TermDelim  - СЂР°Р·РґРµР»РёС‚РµР»СЊ СЌР»РµРјРµРЅС‚РѕРІ (Р·Р°РјРµС‰Р°СЋС‰РёР№ СЃРёРјРІРѕР» РґР»СЏ РѕР±РѕР·РЅР°С‡РµРЅРёСЏ РёР·РІР»РµРєР°РµРјРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РіСЂСѓРїРїС‹) РІ СЃС‚СЂРѕРєРµ С€Р°Р±Р»РѕРЅР°
+' TempDelim  - СЂР°Р·РґРµР»РёС‚РµР»СЊ С€Р°Р±Р»РѕРЅРѕРІ РІ СЃС‚СЂРѕРєРµ
 '-------------------------
 On Error GoTo HandleError
 Dim cGroups As Collection: Call GroupsGet(Source, cGroups, , Templates, TermDelim, TempDelim)    'If Not .. Then Err.Raise vbObjectError + 512 'Exit Function
-    GroupText = cGroups(idx) ' Техт
+    GroupText = cGroups(idx) ' РўРµС…С‚
 HandleExit:  Exit Function
 HandleError: Err.Clear: Resume HandleExit
 End Function
@@ -1395,57 +1405,57 @@ Public Function InStrLike(Start As Long, _
     String1 As String, String2 As String, _
     Optional Found As String, _
     Optional Compare As VbCompareMethod = vbTextCompare) As Long
-' InStr позволяющий искать совпадения по маске выражений Like
+' InStr РїРѕР·РІРѕР»СЏСЋС‰РёР№ РёСЃРєР°С‚СЊ СЃРѕРІРїР°РґРµРЅРёСЏ РїРѕ РјР°СЃРєРµ РІС‹СЂР°Р¶РµРЅРёР№ Like
 '-------------------------
-' Start     - начальная позиция
-' String1   - строка в которой производим поиск
-' String2   - строка содержащая строку маски поиска
-' Found     - (возвращаемое) найденая по маске подстрока
-' Compare   - способ сравнения
-' возвращает позицию первого вхождения String2 в String1 начиная с позиции Start
+' Start     - РЅР°С‡Р°Р»СЊРЅР°СЏ РїРѕР·РёС†РёСЏ
+' String1   - СЃС‚СЂРѕРєР° РІ РєРѕС‚РѕСЂРѕР№ РїСЂРѕРёР·РІРѕРґРёРј РїРѕРёСЃРє
+' String2   - СЃС‚СЂРѕРєР° СЃРѕРґРµСЂР¶Р°С‰Р°СЏ СЃС‚СЂРѕРєСѓ РјР°СЃРєРё РїРѕРёСЃРєР°
+' Found     - (РІРѕР·РІСЂР°С‰Р°РµРјРѕРµ) РЅР°Р№РґРµРЅР°СЏ РїРѕ РјР°СЃРєРµ РїРѕРґСЃС‚СЂРѕРєР°
+' Compare   - СЃРїРѕСЃРѕР± СЃСЂР°РІРЅРµРЅРёСЏ
+' РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР·РёС†РёСЋ РїРµСЂРІРѕРіРѕ РІС…РѕР¶РґРµРЅРёСЏ String2 РІ String1 РЅР°С‡РёРЅР°СЏ СЃ РїРѕР·РёС†РёРё Start
 '-------------------------
-' v.1.0.1       : 05.02.2020 - переписал для лучшего понимания и компактности кода
+' v.1.0.1       : 05.02.2020 - РїРµСЂРµРїРёСЃР°Р» РґР»СЏ Р»СѓС‡С€РµРіРѕ РїРѕРЅРёРјР°РЅРёСЏ Рё РєРѕРјРїР°РєС‚РЅРѕСЃС‚Рё РєРѕРґР°
 ' v.1.0.0       : 23.02.2003 - original by VictorB212 from http://www.vbforums.com/showthread.php?232259-InStrLike-(debugging-help-required)
 '-------------------------
-Const cSymBeg = "^" ' символ привязки к началу (как в RegEx) - бессмысленен т.к результат всегда будет Start или 0
-Const cSymEnd = "$" ' символ привязки к концу
+Const cSymBeg = "^" ' СЃРёРјРІРѕР» РїСЂРёРІСЏР·РєРё Рє РЅР°С‡Р°Р»Сѓ (РєР°Рє РІ RegEx) - Р±РµСЃСЃРјС‹СЃР»РµРЅРµРЅ С‚.Рє СЂРµР·СѓР»СЊС‚Р°С‚ РІСЃРµРіРґР° Р±СѓРґРµС‚ Start РёР»Рё 0
+Const cSymEnd = "$" ' СЃРёРјРІРѕР» РїСЂРёРІСЏР·РєРё Рє РєРѕРЅС†Сѓ
 Dim Result As Long: Result = False
     On Error GoTo HandleError
     If Start <= 0 Then Start = 1
     Found = vbNullString
 Dim S1 As String, S2 As String
     S1 = Mid$(String1, Start): S2 = String2
-' формируем шаблон с учетом якорей
+' С„РѕСЂРјРёСЂСѓРµРј С€Р°Р±Р»РѕРЅ СЃ СѓС‡РµС‚РѕРј СЏРєРѕСЂРµР№
 Dim bBeg As Boolean: bBeg = Left$(String2, Len(cSymBeg)) = cSymBeg:  If bBeg Then S2 = Mid$(S2, Len(cSymBeg) + 1) Else S2 = "*" & S2
 Dim bEnd As Boolean: bEnd = Right$(String2, Len(cSymEnd)) = cSymEnd: If bEnd Then S2 = Left$(S2, Len(S2) - Len(cSymBeg)) Else S2 = S2 & "*"
     If Compare = vbTextCompare Then S1 = UCase$(S1): S2 = UCase$(S2)
-' предварительная проверка соответствия строки шаблону
+' РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅР°СЏ РїСЂРѕРІРµСЂРєР° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ СЃС‚СЂРѕРєРё С€Р°Р±Р»РѕРЅСѓ
 Dim iSgn As Integer: iSgn = S1 Like S2: If Not iSgn Then GoTo HandleExit
 Dim lLen As Long, lPos As Long
-' ищем правую границу
+' РёС‰РµРј РїСЂР°РІСѓСЋ РіСЂР°РЅРёС†Сѓ
 HandleRightBound:
     lLen = Len(S1): lPos = lLen
-    If bEnd Then GoTo HandleLeftBound           ' если привязка к правому краю - правая граница известна - ищем левую
+    If bEnd Then GoTo HandleLeftBound           ' РµСЃР»Рё РїСЂРёРІСЏР·РєР° Рє РїСЂР°РІРѕРјСѓ РєСЂР°СЋ - РїСЂР°РІР°СЏ РіСЂР°РЅРёС†Р° РёР·РІРµСЃС‚РЅР° - РёС‰РµРј Р»РµРІСѓСЋ
     Do
         If Not iSgn Then iSgn = 1 Else If Not (Left$(S1, lPos - 1) Like S2) Then Exit Do
-        lLen = lLen \ 2: If lLen < 1 Then lLen = 1  ' делим диапазон пополам
-        lPos = lPos + iSgn * lLen                   ' уменьшаем границу если совпадает, иначе - увеличиваем
-        iSgn = Left$(S1, lPos) Like S2              ' проверяем совпадение
+        lLen = lLen \ 2: If lLen < 1 Then lLen = 1  ' РґРµР»РёРј РґРёР°РїР°Р·РѕРЅ РїРѕРїРѕР»Р°Рј
+        lPos = lPos + iSgn * lLen                   ' СѓРјРµРЅСЊС€Р°РµРј РіСЂР°РЅРёС†Сѓ РµСЃР»Рё СЃРѕРІРїР°РґР°РµС‚, РёРЅР°С‡Рµ - СѓРІРµР»РёС‡РёРІР°РµРј
+        iSgn = Left$(S1, lPos) Like S2              ' РїСЂРѕРІРµСЂСЏРµРј СЃРѕРІРїР°РґРµРЅРёРµ
     Loop
-' ищем левую границу
+' РёС‰РµРј Р»РµРІСѓСЋ РіСЂР°РЅРёС†Сѓ
 HandleLeftBound:
-    S1 = Left$(S1, lPos)                            ' обрезаем справа по найденой границе
+    S1 = Left$(S1, lPos)                            ' РѕР±СЂРµР·Р°РµРј СЃРїСЂР°РІР° РїРѕ РЅР°Р№РґРµРЅРѕР№ РіСЂР°РЅРёС†Рµ
     lLen = Len(S1)
-    If bBeg Then lPos = 0: GoTo Handleresult        ' если привязка к левому краю - левая граница известна - получаем результат
+    If bBeg Then lPos = 0: GoTo Handleresult        ' РµСЃР»Рё РїСЂРёРІСЏР·РєР° Рє Р»РµРІРѕРјСѓ РєСЂР°СЋ - Р»РµРІР°СЏ РіСЂР°РЅРёС†Р° РёР·РІРµСЃС‚РЅР° - РїРѕР»СѓС‡Р°РµРј СЂРµР·СѓР»СЊС‚Р°С‚
     lPos = lLen                     '
     Do
         If Not iSgn Then iSgn = 1 Else If Not (Right$(S1, lPos - 1) Like S2) Then Exit Do
-        lLen = lLen \ 2: If lLen < 1 Then lLen = 1  ' делим диапазон пополам
-        lPos = lPos + iSgn * lLen                   ' уменьшаем границу если совпадает, иначе - увеличиваем
-        iSgn = Right$(S1, lPos) Like S2             ' проверяем совпадение
+        lLen = lLen \ 2: If lLen < 1 Then lLen = 1  ' РґРµР»РёРј РґРёР°РїР°Р·РѕРЅ РїРѕРїРѕР»Р°Рј
+        lPos = lPos + iSgn * lLen                   ' СѓРјРµРЅСЊС€Р°РµРј РіСЂР°РЅРёС†Сѓ РµСЃР»Рё СЃРѕРІРїР°РґР°РµС‚, РёРЅР°С‡Рµ - СѓРІРµР»РёС‡РёРІР°РµРј
+        iSgn = Right$(S1, lPos) Like S2             ' РїСЂРѕРІРµСЂСЏРµРј СЃРѕРІРїР°РґРµРЅРёРµ
     Loop
     lLen = lPos: lPos = Len(S1) - lPos
-' возвращаем результат
+' РІРѕР·РІСЂР°С‰Р°РµРј СЂРµР·СѓР»СЊС‚Р°С‚
 Handleresult:
     Result = Start + lPos: If Result Then Found = Mid$(String1, Result, lLen)
 HandleExit:  InStrLike = Result: Exit Function
@@ -1456,13 +1466,13 @@ Public Function InStrRegEx( _
     String1 As String, String2 As String, _
     Optional Found As String, _
     Optional Compare As VbCompareMethod = vbTextCompare) As Long
-' InStr позволяющий искать совпадения по маске выражений RegEx
+' InStr РїРѕР·РІРѕР»СЏСЋС‰РёР№ РёСЃРєР°С‚СЊ СЃРѕРІРїР°РґРµРЅРёСЏ РїРѕ РјР°СЃРєРµ РІС‹СЂР°Р¶РµРЅРёР№ RegEx
 '-------------------------
-' Start     - начальная позиция
-' String1   - строка в которой производим поиск
-' String2   - строка содержащая строку маски поиска
-' Found     - (возвращаемое) найденая по маске подстрока
-' возвращает позицию первого вхождения String2 в String1 начиная с позиции Start
+' Start     - РЅР°С‡Р°Р»СЊРЅР°СЏ РїРѕР·РёС†РёСЏ
+' String1   - СЃС‚СЂРѕРєР° РІ РєРѕС‚РѕСЂРѕР№ РїСЂРѕРёР·РІРѕРґРёРј РїРѕРёСЃРє
+' String2   - СЃС‚СЂРѕРєР° СЃРѕРґРµСЂР¶Р°С‰Р°СЏ СЃС‚СЂРѕРєСѓ РјР°СЃРєРё РїРѕРёСЃРєР°
+' Found     - (РІРѕР·РІСЂР°С‰Р°РµРјРѕРµ) РЅР°Р№РґРµРЅР°СЏ РїРѕ РјР°СЃРєРµ РїРѕРґСЃС‚СЂРѕРєР°
+' РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР·РёС†РёСЋ РїРµСЂРІРѕРіРѕ РІС…РѕР¶РґРµРЅРёСЏ String2 РІ String1 РЅР°С‡РёРЅР°СЏ СЃ РїРѕР·РёС†РёРё Start
 '-------------------------
 ' v.1.0.0       : 25.08.2010 - original by BC_Programmer https://www.computerhope.com/forum/index.php?topic=109171.msg736986#msg736986
 '-------------------------
@@ -1472,7 +1482,7 @@ Dim Result As Long: Result = False
     Found = vbNullString
 Dim S1 As String: S1 = Mid$(String1, Start)   'shortened version of String1
 Dim oMatches As Object, oMatch As Object
-    ' вызов RegExp и передача ему маски
+    ' РІС‹Р·РѕРІ RegExp Рё РїРµСЂРµРґР°С‡Р° РµРјСѓ РјР°СЃРєРё
     With RegEx: .IgnoreCase = (Compare = vbTextCompare): .Pattern = String2: Set oMatches = .Execute(S1): End With
     If oMatches.Count = 0 Then GoTo HandleError
     For Each oMatch In oMatches
@@ -1489,17 +1499,17 @@ Public Function InStrAll( _
     Optional Found, _
     Optional Method As Integer = 0, _
     Optional Compare As VbCompareMethod = vbTextCompare)
-' InStr позволяющий искать все совпадения по подстроке
+' InStr РїРѕР·РІРѕР»СЏСЋС‰РёР№ РёСЃРєР°С‚СЊ РІСЃРµ СЃРѕРІРїР°РґРµРЅРёСЏ РїРѕ РїРѕРґСЃС‚СЂРѕРєРµ
 Const c_strProcedure = "InStrAll"
-' Start     - начальная позиция
-' String1   - строка в которой производим поиск
-' String2   - строка содержащая строку маски поиска
-' Found     - (возвращаемое) массив найденных по маске подстрок
-' Method    - способ сравнения подстрок шаблона
-'   0 - по простой подстроке (InStr)
-'   1 - по Like подстроке (InStrLike)
-'   2 - по RegEx выражению (InStrRegEx)
-' возвращает массив позиций вхождения String2 в String1 начиная с позиции Start
+' Start     - РЅР°С‡Р°Р»СЊРЅР°СЏ РїРѕР·РёС†РёСЏ
+' String1   - СЃС‚СЂРѕРєР° РІ РєРѕС‚РѕСЂРѕР№ РїСЂРѕРёР·РІРѕРґРёРј РїРѕРёСЃРє
+' String2   - СЃС‚СЂРѕРєР° СЃРѕРґРµСЂР¶Р°С‰Р°СЏ СЃС‚СЂРѕРєСѓ РјР°СЃРєРё РїРѕРёСЃРєР°
+' Found     - (РІРѕР·РІСЂР°С‰Р°РµРјРѕРµ) РјР°СЃСЃРёРІ РЅР°Р№РґРµРЅРЅС‹С… РїРѕ РјР°СЃРєРµ РїРѕРґСЃС‚СЂРѕРє
+' Method    - СЃРїРѕСЃРѕР± СЃСЂР°РІРЅРµРЅРёСЏ РїРѕРґСЃС‚СЂРѕРє С€Р°Р±Р»РѕРЅР°
+'   0 - РїРѕ РїСЂРѕСЃС‚РѕР№ РїРѕРґСЃС‚СЂРѕРєРµ (InStr)
+'   1 - РїРѕ Like РїРѕРґСЃС‚СЂРѕРєРµ (InStrLike)
+'   2 - РїРѕ RegEx РІС‹СЂР°Р¶РµРЅРёСЋ (InStrRegEx)
+' РІРѕР·РІСЂР°С‰Р°РµС‚ РјР°СЃСЃРёРІ РїРѕР·РёС†РёР№ РІС…РѕР¶РґРµРЅРёСЏ String2 РІ String1 РЅР°С‡РёРЅР°СЏ СЃ РїРѕР·РёС†РёРё Start
 '-------------------------
 ' v.1.0.0       : 16.07.2020 -
 '-------------------------
@@ -1534,12 +1544,12 @@ Public Static Function InStrCount( _
     Optional ByVal Start As Long = 1, _
     Optional ByVal Compare As VbCompareMethod = vbBinaryCompare _
     ) As Long
-' возвращает количество подстрок в строке
+' РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРґСЃС‚СЂРѕРє РІ СЃС‚СЂРѕРєРµ
 Const c_strProcedure = "InStrCount"
-' Text - текст в котором производится поиск
-' Find - искомая подстрока подсчёт количества вхождений которой производится
-' Start - начальная позиция поиска
-' Compare - тип сравнения
+' Text - С‚РµРєСЃС‚ РІ РєРѕС‚РѕСЂРѕРј РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РїРѕРёСЃРє
+' Find - РёСЃРєРѕРјР°СЏ РїРѕРґСЃС‚СЂРѕРєР° РїРѕРґСЃС‡С‘С‚ РєРѕР»РёС‡РµСЃС‚РІР° РІС…РѕР¶РґРµРЅРёР№ РєРѕС‚РѕСЂРѕР№ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ
+' Start - РЅР°С‡Р°Р»СЊРЅР°СЏ РїРѕР·РёС†РёСЏ РїРѕРёСЃРєР°
+' Compare - С‚РёРї СЃСЂР°РІРЅРµРЅРёСЏ
 '-------------------------
 ' v.1.0.1       : 21.11.2001 - original InStrCount04 by Jost Schwider, jost@schwider.de from http://www.xbeat.net/vbspeed/c_InStrCount.htm#InStrCount04
 '-------------------------
@@ -1553,29 +1563,29 @@ Dim FindChar2 As Integer
 Dim i As Long
 
     If Compare = vbBinaryCompare Then
-' двоичное сравнение
+' РґРІРѕРёС‡РЅРѕРµ СЃСЂР°РІРЅРµРЅРёРµ
         FindLen = Len(Find)
         If FindLen Then
-    ' проверка первого совпадения
+    ' РїСЂРѕРІРµСЂРєР° РїРµСЂРІРѕРіРѕ СЃРѕРІРїР°РґРµРЅРёСЏ
             If Start < 2 Then Start = InStrB(Text, Find) Else Start = InStrB(Start + Start - 1, Text, Find)
             If Start Then
-        ' ищем последующие вхождения
+        ' РёС‰РµРј РїРѕСЃР»РµРґСѓСЋС‰РёРµ РІС…РѕР¶РґРµРЅРёСЏ
                 InStrCount = 1
                 If FindLen <= MODEMARGIN Then
-            ' для длин искомой подстроки до MODEMARGIN - быстрый способ
-                ' подготовка текстового массива
+            ' РґР»СЏ РґР»РёРЅ РёСЃРєРѕРјРѕР№ РїРѕРґСЃС‚СЂРѕРєРё РґРѕ MODEMARGIN - Р±С‹СЃС‚СЂС‹Р№ СЃРїРѕСЃРѕР±
+                ' РїРѕРґРіРѕС‚РѕРІРєР° С‚РµРєСЃС‚РѕРІРѕРіРѕ РјР°СЃСЃРёРІР°
                     If TextPtr = 0 Then ReDim TextAsc(1 To 1): TextData = VarPtr(TextAsc(1)):
                     CopyMemory TextPtr, ByVal VarPtrArray(TextAsc), PTR_LENGTH: TextPtr = TextPtr + 8 + PTR_LENGTH
-                ' инициализация массива
+                ' РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РјР°СЃСЃРёРІР°
                     CopyMemory ByVal TextPtr, ByVal VarPtr(Text), PTR_LENGTH            'pvData
                     CopyMemory ByVal TextPtr + PTR_LENGTH, Len(Text), 4 ' PTR_LENGTH    'nElements
                     Select Case FindLen
-                    Case 1 ' в буфере один знак
+                    Case 1 ' РІ Р±СѓС„РµСЂРµ РѕРґРёРЅ Р·РЅР°Рє
                         FindChar1 = AscW(Find)
                         For Start = Start \ 2 + 2 To Len(Text)
                             If TextAsc(Start) = FindChar1 Then InStrCount = InStrCount + 1
                         Next Start
-                    Case 2 ' в буфере два знака
+                    Case 2 ' РІ Р±СѓС„РµСЂРµ РґРІР° Р·РЅР°РєР°
                         FindChar1 = AscW(Find): FindChar2 = AscW(Right$(Find, 1))
                         For Start = Start \ 2 + 3 To Len(Text) - 1
                             If TextAsc(Start) = FindChar1 Then
@@ -1584,10 +1594,10 @@ Dim i As Long
                                 End If
                             End If
                         Next Start
-                    Case Else ' в буфере больше двух знаков
+                    Case Else ' РІ Р±СѓС„РµСЂРµ Р±РѕР»СЊС€Рµ РґРІСѓС… Р·РЅР°РєРѕРІ
                         CopyMemory ByVal VarPtr(FindAsc(0)), ByVal StrPtr(Find), FindLen + FindLen
                         FindLen = FindLen - 1
-                        ' первые два знака
+                        ' РїРµСЂРІС‹Рµ РґРІР° Р·РЅР°РєР°
                         FindChar1 = FindAsc(0): FindChar2 = FindAsc(1)
                         For Start = Start \ 2 + 2 + FindLen To Len(Text) - FindLen
                             If TextAsc(Start) = FindChar1 Then
@@ -1602,11 +1612,11 @@ Dim i As Long
                             End If
                         Next Start
                     End Select
-                ' восстанавливаем значения из массива
+                ' РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј Р·РЅР°С‡РµРЅРёСЏ РёР· РјР°СЃСЃРёРІР°
                     CopyMemory ByVal TextPtr, TextData, PTR_LENGTH 'pvData
                     CopyMemory ByVal TextPtr + PTR_LENGTH, 1&, 4 'PTR_LENGTH  'nElements
                 Else
-            ' для больших длин - обычный способ
+            ' РґР»СЏ Р±РѕР»СЊС€РёС… РґР»РёРЅ - РѕР±С‹С‡РЅС‹Р№ СЃРїРѕСЃРѕР±
                     FindLen = FindLen + FindLen
                     Start = InStrB(Start + FindLen, Text, Find)
                     Do While Start
@@ -1617,8 +1627,8 @@ Dim i As Long
             End If 'Start
         End If 'FindLen
     Else
-' текстовое сравнение
-    ' игнорируем верхний регистр
+' С‚РµРєСЃС‚РѕРІРѕРµ СЃСЂР°РІРЅРµРЅРёРµ
+    ' РёРіРЅРѕСЂРёСЂСѓРµРј РІРµСЂС…РЅРёР№ СЂРµРіРёСЃС‚СЂ
         InStrCount = InStrCount(LCase$(Text), LCase$(Find), Start)
     End If
 End Function
@@ -1643,10 +1653,10 @@ Public Function WordWrap( _
     ByRef Text As String, _
     ByVal Width As Long, _
     Optional ByRef CountLines As Long) As String
-' разбивает строку на заданное количество символов с использованием символа разрыва строки.
+' СЂР°Р·Р±РёРІР°РµС‚ СЃС‚СЂРѕРєСѓ РЅР° Р·Р°РґР°РЅРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРёРјРІРѕР»РѕРІ СЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј СЃРёРјРІРѕР»Р° СЂР°Р·СЂС‹РІР° СЃС‚СЂРѕРєРё.
 '-------------------------
-' Text  - разбиваемая строка
-' Width - длина строки в символах
+' Text  - СЂР°Р·Р±РёРІР°РµРјР°СЏ СЃС‚СЂРѕРєР°
+' Width - РґР»РёРЅР° СЃС‚СЂРѕРєРё РІ СЃРёРјРІРѕР»Р°С…
 '-------------------------
 ' v.1.0.0       : 13.09.2004 - original WordWrap01 by Donald, donald@xbeat.net from http://www.xbeat.net/vbspeed/c_WordWrap.htm#WordWrap01
 '-------------------------
@@ -1661,7 +1671,7 @@ Dim ubText As Long
     ReDim abTextOut(ubText * 3)     'dim to potential max
     For i = 0 To ubText
         Select Case abText(i)
-        Case 32, 45: posBreak = i   ' пробел и перенос
+        Case 32, 45: posBreak = i   ' РїСЂРѕР±РµР» Рё РїРµСЂРµРЅРѕСЃ
         Case Else
         End Select
         abTextOut(i + cntBreakChars) = abText(i)
@@ -1669,7 +1679,7 @@ Dim ubText As Long
         If lenLine > Width Then
             If posBreak > 0 Then
                 If posBreak = ubText Then Exit For ' don't break at the very end
-                ' разрыв после пробела или переноса
+                ' СЂР°Р·СЂС‹РІ РїРѕСЃР»Рµ РїСЂРѕР±РµР»Р° РёР»Рё РїРµСЂРµРЅРѕСЃР°
                 abTextOut(posBreak + cntBreakChars + 1) = 13  'CR
                 abTextOut(posBreak + cntBreakChars + 2) = 10  'LF
                 i = posBreak: posBreak = 0
@@ -1705,13 +1715,13 @@ Dim lChrPosition&
     lLenCompress = Len(sCompress)
     If lLenCompress <> 0 Then
         If lLenCompress = 1 Then
-    ' искомая строка состоиит из одного символа
+    ' РёСЃРєРѕРјР°СЏ СЃС‚СЂРѕРєР° СЃРѕСЃС‚РѕРёРёС‚ РёР· РѕРґРЅРѕРіРѕ СЃРёРјРІРѕР»Р°
             If lLenExpression < 10 Then
-        ' сжимаемая строка короткая
-                sFind = sCompress + sCompress ' ищем два одинаковых символа подряд
+        ' СЃР¶РёРјР°РµРјР°СЏ СЃС‚СЂРѕРєР° РєРѕСЂРѕС‚РєР°СЏ
+                sFind = sCompress + sCompress ' РёС‰РµРј РґРІР° РѕРґРёРЅР°РєРѕРІС‹С… СЃРёРјРІРѕР»Р° РїРѕРґСЂСЏРґ
                 Compress = sExpression
-                ' повтоторяем пока есть совпадения
-                ' этот метод хорошо работает на коротких строках
+                ' РїРѕРІС‚РѕС‚РѕСЂСЏРµРј РїРѕРєР° РµСЃС‚СЊ СЃРѕРІРїР°РґРµРЅРёСЏ
+                ' СЌС‚РѕС‚ РјРµС‚РѕРґ С…РѕСЂРѕС€Рѕ СЂР°Р±РѕС‚Р°РµС‚ РЅР° РєРѕСЂРѕС‚РєРёС… СЃС‚СЂРѕРєР°С…
                 Do
                     lChrPosition = InStr(1, Compress, sFind, Compare)
                     If lChrPosition = 0 Then Exit Function
@@ -1720,33 +1730,33 @@ Dim lChrPosition&
                     Compress = sExp + Compress
                 Loop
             Else
-    ' для длинных строк поиска
-        ' проверяем повторения строки поиска
+    ' РґР»СЏ РґР»РёРЅРЅС‹С… СЃС‚СЂРѕРє РїРѕРёСЃРєР°
+        ' РїСЂРѕРІРµСЂСЏРµРј РїРѕРІС‚РѕСЂРµРЅРёСЏ СЃС‚СЂРѕРєРё РїРѕРёСЃРєР°
             ' Ideally we'd check the the entire string for segment matches,
             ' but if we do that we'll be here for ever
             ' So, we'll use a reasonable compromise..
-        ' проверка первых 12 символов строки  дает 2/3 совпадений
+        ' РїСЂРѕРІРµСЂРєР° РїРµСЂРІС‹С… 12 СЃРёРјРІРѕР»РѕРІ СЃС‚СЂРѕРєРё  РґР°РµС‚ 2/3 СЃРѕРІРїР°РґРµРЅРёР№
             Dim sNewSearchString As String
                 sExp = Left$(sExpression, 12)
                 sNewSearchString = String$(8, sCompress)
                 lChrPosition = InStr(1, sExp, sNewSearchString, Compare)
-                ' если у нас длинная повторяющаяся строка поиска
+                ' РµСЃР»Рё Сѓ РЅР°СЃ РґР»РёРЅРЅР°СЏ РїРѕРІС‚РѕСЂСЏСЋС‰Р°СЏСЃСЏ СЃС‚СЂРѕРєР° РїРѕРёСЃРєР°
                 If lChrPosition > 0 Then
-        ' сжимаем односимвольные повторяющиеся строки в длинном выражении
+        ' СЃР¶РёРјР°РµРј РѕРґРЅРѕСЃРёРјРІРѕР»СЊРЅС‹Рµ РїРѕРІС‚РѕСЂСЏСЋС‰РёРµСЃСЏ СЃС‚СЂРѕРєРё РІ РґР»РёРЅРЅРѕРј РІС‹СЂР°Р¶РµРЅРёРё
                 Dim lLenNewSearchString As Long, lLenFind2 As Long, lStringSizeCounter As Long
                     lLenFind2 = lLenCompress + lLenCompress
                     lStringSizeCounter = (lLenExpression - lLenFind2)
                     ' Make new search string divisible by 2
                     lStringSizeCounter = lStringSizeCounter + (lStringSizeCounter And 1)
-                    ' создаем новую строку поиска
+                    ' СЃРѕР·РґР°РµРј РЅРѕРІСѓСЋ СЃС‚СЂРѕРєСѓ РїРѕРёСЃРєР°
                     sNewSearchString = String$(lStringSizeCounter, sCompress)
                     lLenNewSearchString = Len(sNewSearchString)
                     lStringSizeCounter = 0
                     Compress = sExpression
                     sFind = sCompress + sCompress
-                ' если мы ищем длинную строку быстрее искать сначала большие последовательности, затем - меньшие
-                ' поэтому для больших строк будем производить поиск постепенно уменьшая длину последовательности пока совпадение не будет найдено
-                ' этот метод показывает лучшую производительность с длинными последовательностями
+                ' РµСЃР»Рё РјС‹ РёС‰РµРј РґР»РёРЅРЅСѓСЋ СЃС‚СЂРѕРєСѓ Р±С‹СЃС‚СЂРµРµ РёСЃРєР°С‚СЊ СЃРЅР°С‡Р°Р»Р° Р±РѕР»СЊС€РёРµ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё, Р·Р°С‚РµРј - РјРµРЅСЊС€РёРµ
+                ' РїРѕСЌС‚РѕРјСѓ РґР»СЏ Р±РѕР»СЊС€РёС… СЃС‚СЂРѕРє Р±СѓРґРµРј РїСЂРѕРёР·РІРѕРґРёС‚СЊ РїРѕРёСЃРє РїРѕСЃС‚РµРїРµРЅРЅРѕ СѓРјРµРЅСЊС€Р°СЏ РґР»РёРЅСѓ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё РїРѕРєР° СЃРѕРІРїР°РґРµРЅРёРµ РЅРµ Р±СѓРґРµС‚ РЅР°Р№РґРµРЅРѕ
+                ' СЌС‚РѕС‚ РјРµС‚РѕРґ РїРѕРєР°Р·С‹РІР°РµС‚ Р»СѓС‡С€СѓСЋ РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚СЊ СЃ РґР»РёРЅРЅС‹РјРё РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЏРјРё
                     Do
                         Do
                             lChrPosition = InStr(1, Compress, sNewSearchString, Compare)
@@ -1768,7 +1778,7 @@ Dim lChrPosition&
                 End If
             End If
         End If
-' проверяем Unicode
+' РїСЂРѕРІРµСЂСЏРµРј Unicode
     ' We can save a lot of work by not passing Unicode strings to our byte arrays
     ' so we test for Unicode first and if true, use another Instring method
     Dim lCharacter As Long, lAsciiValue As Long
@@ -1797,20 +1807,20 @@ Dim lChrPosition&
                 Exit Function
             End If
         Next
-' сжатие с использованием байтового массива
+' СЃР¶Р°С‚РёРµ СЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј Р±Р°Р№С‚РѕРІРѕРіРѕ РјР°СЃСЃРёРІР°
     Dim bMatch As Boolean, bMatchResult1 As Boolean, bMatchResult2 As Boolean
     Dim lLenExpressionArray&, lLenCompressArray&, lbytePosition&, lNewCounter&
     Dim byExpressionArray() As Byte, byNewArray() As Byte, byCompressArray() As Byte
     Dim lNearEndofExpression&, lExpCounter&, lLenCompressArrayplus1&
     ' Set case according to status of comparison
         If Compare = vbTextCompare Then sExpression = LCase$(sExpression): sCompress = LCase$(sCompress)
-        ' преобразуем строку в байтовый массив
+        ' РїСЂРµРѕР±СЂР°Р·СѓРµРј СЃС‚СЂРѕРєСѓ РІ Р±Р°Р№С‚РѕРІС‹Р№ РјР°СЃСЃРёРІ
         byExpressionArray = sExpression: byCompressArray = sCompress
-        ' получаем размер байтового массива из ранее найденной длины строки (немного быстрее чем UBound)
+        ' РїРѕР»СѓС‡Р°РµРј СЂР°Р·РјРµСЂ Р±Р°Р№С‚РѕРІРѕРіРѕ РјР°СЃСЃРёРІР° РёР· СЂР°РЅРµРµ РЅР°Р№РґРµРЅРЅРѕР№ РґР»РёРЅС‹ СЃС‚СЂРѕРєРё (РЅРµРјРЅРѕРіРѕ Р±С‹СЃС‚СЂРµРµ С‡РµРј UBound)
         lLenExpressionArray = lLenExpression + lLenExpression - 1: lLenCompressArray = lLenCompress + lLenCompress - 1
         ReDim byNewArray(lLenExpressionArray): lNewCounter = 0
         bMatch = Left$(sExpression, 1) = sCompress
-' Cжимаем односимвольные поисковые строки при помощи байтового массива
+' CР¶РёРјР°РµРј РѕРґРЅРѕСЃРёРјРІРѕР»СЊРЅС‹Рµ РїРѕРёСЃРєРѕРІС‹Рµ СЃС‚СЂРѕРєРё РїСЂРё РїРѕРјРѕС‰Рё Р±Р°Р№С‚РѕРІРѕРіРѕ РјР°СЃСЃРёРІР°
         ' Equate character match in boolean terms, applying logic "And"
         If Not bMatch And (lLenCompressArray = 1) Then
             For lbytePosition = 1 To lLenExpressionArray
@@ -1832,7 +1842,7 @@ Dim lChrPosition&
                 lbytePosition = lbytePosition + 2
             Next
         Else
-' Сжимаем многосимвольную поисковую строку при помощи байтового массива
+' РЎР¶РёРјР°РµРј РјРЅРѕРіРѕСЃРёРјРІРѕР»СЊРЅСѓСЋ РїРѕРёСЃРєРѕРІСѓСЋ СЃС‚СЂРѕРєСѓ РїСЂРё РїРѕРјРѕС‰Рё Р±Р°Р№С‚РѕРІРѕРіРѕ РјР°СЃСЃРёРІР°
     ' For a 3 character compress string (could be any length here)
     ' if the expression contains "xbz" and the findstring is "abc"
     ' bMatchResult1 of ("x" And "a") = False
@@ -1912,17 +1922,17 @@ Dim lChrPosition&
             ' ..and try again
             Next
         End If
-' преобразуем byNewArray() в строку и изменяем размер строки на правильный (немного быстрее чем ReDim Preserve с байтовым массивом)
+' РїСЂРµРѕР±СЂР°Р·СѓРµРј byNewArray() РІ СЃС‚СЂРѕРєСѓ Рё РёР·РјРµРЅСЏРµРј СЂР°Р·РјРµСЂ СЃС‚СЂРѕРєРё РЅР° РїСЂР°РІРёР»СЊРЅС‹Р№ (РЅРµРјРЅРѕРіРѕ Р±С‹СЃС‚СЂРµРµ С‡РµРј ReDim Preserve СЃ Р±Р°Р№С‚РѕРІС‹Рј РјР°СЃСЃРёРІРѕРј)
         Compress = byNewArray: Compress = Left$(Compress, lNewCounter * 0.5)
         Exit Function
     Else
 ' Handle Error
-    ' если искомая последовательность была нулевой длины возвращаем исходное выражение
+    ' РµСЃР»Рё РёСЃРєРѕРјР°СЏ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ Р±С‹Р»Р° РЅСѓР»РµРІРѕР№ РґР»РёРЅС‹ РІРѕР·РІСЂР°С‰Р°РµРј РёСЃС…РѕРґРЅРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ
         Compress = sExpression
     End If
 End Function
 Public Function IsAscII(txt As String) As Boolean
-' проверяет является ли строка ASCII строкой
+' РїСЂРѕРІРµСЂСЏРµС‚ СЏРІР»СЏРµС‚СЃСЏ Р»Рё СЃС‚СЂРѕРєР° ASCII СЃС‚СЂРѕРєРѕР№
 '-------------------------
     If Len(txt) = LenB(txt) Then IsAscII = True: Exit Function
 Dim i As Long
@@ -1932,26 +1942,26 @@ Dim i As Long
     IsAscII = True
 End Function
 ' ==================
-' Функции для разбиения/модификации/формирования строк
+' Р¤СѓРЅРєС†РёРё РґР»СЏ СЂР°Р·Р±РёРµРЅРёСЏ/РјРѕРґРёС„РёРєР°С†РёРё/С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ СЃС‚СЂРѕРє
 ' ==================
 Public Function DelimStringGet(ByRef Source As String, _
     ByVal Pos As Long, _
     Optional Delim As String = " ", _
     Optional sBeg As Long, Optional sEnd As Long _
     ) As String
-' возвращает фрагмент строки с разделителями с указанным индексом
+' РІРѕР·РІСЂР°С‰Р°РµС‚ С„СЂР°РіРјРµРЅС‚ СЃС‚СЂРѕРєРё СЃ СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРЅРґРµРєСЃРѕРј
 '-------------------------
-' Source    - исходная строка
-' Pos       - позиция извлекаемой подстроки
-' Delim     - разделитель
-' sBeg,sEnd - возвращает позицию начала и окончания извлекаемой подстроки в исходной
+' Source    - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
+' Pos       - РїРѕР·РёС†РёСЏ РёР·РІР»РµРєР°РµРјРѕР№ РїРѕРґСЃС‚СЂРѕРєРё
+' Delim     - СЂР°Р·РґРµР»РёС‚РµР»СЊ
+' sBeg,sEnd - РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР·РёС†РёСЋ РЅР°С‡Р°Р»Р° Рё РѕРєРѕРЅС‡Р°РЅРёСЏ РёР·РІР»РµРєР°РµРјРѕР№ РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№
 '-------------------------
 Dim Result As String: Result = vbNullString
     If Len(Source) = 0 Then GoTo HandleExit
 '    If Pos < 1 then Goto HandleExit
-'' при помощи Split - красивый, но медленный вариант
+'' РїСЂРё РїРѕРјРѕС‰Рё Split - РєСЂР°СЃРёРІС‹Р№, РЅРѕ РјРµРґР»РµРЅРЅС‹Р№ РІР°СЂРёР°РЅС‚
     'Result = Split(Source, Delim)(Pos - 1)
-'' при помощи InStr - чуть длиннее, но сильно быстрее
+'' РїСЂРё РїРѕРјРѕС‰Рё InStr - С‡СѓС‚СЊ РґР»РёРЅРЅРµРµ, РЅРѕ СЃРёР»СЊРЅРѕ Р±С‹СЃС‚СЂРµРµ
     'Dim i As Long: i = 1: sBeg = 1
     'Do
     '    sEnd = InStr(sBeg, Source, Delim)
@@ -1960,8 +1970,8 @@ Dim Result As String: Result = vbNullString
     '    sBeg = sEnd + Len(Delim)
     'Loop
     'Result = Mid$(Source, sBeg, sEnd - sBeg)
-' вариант с единой функцией поиска подстроки - производительность близка к оригинальному Split, на больших строках незначительно его превосходит
-    ' позволяет использовать отрицательные позиции (с конца строки)
+' РІР°СЂРёР°РЅС‚ СЃ РµРґРёРЅРѕР№ С„СѓРЅРєС†РёРµР№ РїРѕРёСЃРєР° РїРѕРґСЃС‚СЂРѕРєРё - РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚СЊ Р±Р»РёР·РєР° Рє РѕСЂРёРіРёРЅР°Р»СЊРЅРѕРјСѓ Split, РЅР° Р±РѕР»СЊС€РёС… СЃС‚СЂРѕРєР°С… РЅРµР·РЅР°С‡РёС‚РµР»СЊРЅРѕ РµРіРѕ РїСЂРµРІРѕСЃС…РѕРґРёС‚
+    ' РїРѕР·РІРѕР»СЏРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рµ РїРѕР·РёС†РёРё (СЃ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё)
     Call p_GetSubstrBounds(Source, Pos, sBeg, sEnd, Delim)
     Result = Mid$(Source, sBeg, sEnd - sBeg)
 HandleExit:  DelimStringGet = Result: Exit Function
@@ -1972,23 +1982,23 @@ Public Function DelimStringDel(Source As String, _
     Optional Delim As String = " ", _
     Optional sBeg As Long, Optional sEnd As Long _
     ) As String
-' возвращает фрагмент строки с разделителями без элемента с указанным индексом
+' РІРѕР·РІСЂР°С‰Р°РµС‚ С„СЂР°РіРјРµРЅС‚ СЃС‚СЂРѕРєРё СЃ СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё Р±РµР· СЌР»РµРјРµРЅС‚Р° СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРЅРґРµРєСЃРѕРј
 '-------------------------
-' Source    - исходная строка
-' Pos       - позиция удаляемой подстроки
-' Delim     - разделитель
-' sBeg,sEnd - возвращает позицию удаленной подстроки
+' Source    - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
+' Pos       - РїРѕР·РёС†РёСЏ СѓРґР°Р»СЏРµРјРѕР№ РїРѕРґСЃС‚СЂРѕРєРё
+' Delim     - СЂР°Р·РґРµР»РёС‚РµР»СЊ
+' sBeg,sEnd - РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР·РёС†РёСЋ СѓРґР°Р»РµРЅРЅРѕР№ РїРѕРґСЃС‚СЂРѕРєРё
 '-------------------------
 Dim Result As String: Result = Source
     On Error GoTo HandleError
     If Len(Source) = 0 Then GoTo HandleExit
 '    If Pos < 1 then Goto HandleExit
-'' при помощи Split
+'' РїСЂРё РїРѕРјРѕС‰Рё Split
 'Dim arr() As String
 '    arr = Split(Result, Delim): arr(Pos - 1) = vbNullString
 '    Result = Replace(Join(arr, Delim), Delim & Delim, Delim): Erase arr()
-'' при помощи InStr аналогично DelimStringGet
-' вариант с единой функцией поиска подстроки - можно использовать отрицательные позиции (с конца строки)
+'' РїСЂРё РїРѕРјРѕС‰Рё InStr Р°РЅР°Р»РѕРіРёС‡РЅРѕ DelimStringGet
+' РІР°СЂРёР°РЅС‚ СЃ РµРґРёРЅРѕР№ С„СѓРЅРєС†РёРµР№ РїРѕРёСЃРєР° РїРѕРґСЃС‚СЂРѕРєРё - РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рµ РїРѕР·РёС†РёРё (СЃ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё)
     Call p_GetSubstrBounds(Source, Pos, sBeg, sEnd, Delim)
     If sBeg = 1 Then sEnd = sEnd + Len(Delim) Else sBeg = sBeg - Len(Delim)
     Result = Left$(Source, sBeg - 1) & Mid$(Source, sEnd)
@@ -2002,69 +2012,69 @@ Public Function DelimStringSet(Source As String, _
     Optional Overwrite As Boolean = False, _
     Optional sBeg As Long, Optional sEnd As Long _
     ) As String
-' вставляет в строку с разделителями элемент в позицию с указанным индексом
+' РІСЃС‚Р°РІР»СЏРµС‚ РІ СЃС‚СЂРѕРєСѓ СЃ СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё СЌР»РµРјРµРЅС‚ РІ РїРѕР·РёС†РёСЋ СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРЅРґРµРєСЃРѕРј
 '-------------------------
-' Source    - исходная строка
-' Pos       - позиция вставки элемента
-' Data      - вставляемая строка
-' Delim     - разделитель
-' SetUnique = False - вставка подстроки независимо от её наличия в исходной
-'           = True  - вставка будет произведена только если подстрока отсутствует в исходной, иначе - исходная строка останется без изменений
-'           = 1     - вставка будет произведена только если подстрока отсутствует в исходной, если подстрока уже присутствует в исходной, - подстрока будет удалена из исходной, а затем добавлена в указанную позицию
-' Overwrite = False - вставка со сдвигом (для Pos>0 вставка перед указанной позицией, для Pos<0 - после. т.о. Pos=1 - вставка вначало, а Pos=-1 - в конец строки)
-'           = True  - вставка с заменой  элемента строки в указанной позиции,
-'             (!)     в совокупности с SetUnique<>0 может приводить к неожиданным результатам
-' sBeg,sEnd - возвращает позицию начала и окончания вставленной подстроки в исходной
+' Source    - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
+' Pos       - РїРѕР·РёС†РёСЏ РІСЃС‚Р°РІРєРё СЌР»РµРјРµРЅС‚Р°
+' Data      - РІСЃС‚Р°РІР»СЏРµРјР°СЏ СЃС‚СЂРѕРєР°
+' Delim     - СЂР°Р·РґРµР»РёС‚РµР»СЊ
+' SetUnique = False - РІСЃС‚Р°РІРєР° РїРѕРґСЃС‚СЂРѕРєРё РЅРµР·Р°РІРёСЃРёРјРѕ РѕС‚ РµС‘ РЅР°Р»РёС‡РёСЏ РІ РёСЃС…РѕРґРЅРѕР№
+'           = True  - РІСЃС‚Р°РІРєР° Р±СѓРґРµС‚ РїСЂРѕРёР·РІРµРґРµРЅР° С‚РѕР»СЊРєРѕ РµСЃР»Рё РїРѕРґСЃС‚СЂРѕРєР° РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РІ РёСЃС…РѕРґРЅРѕР№, РёРЅР°С‡Рµ - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР° РѕСЃС‚Р°РЅРµС‚СЃСЏ Р±РµР· РёР·РјРµРЅРµРЅРёР№
+'           = 1     - РІСЃС‚Р°РІРєР° Р±СѓРґРµС‚ РїСЂРѕРёР·РІРµРґРµРЅР° С‚РѕР»СЊРєРѕ РµСЃР»Рё РїРѕРґСЃС‚СЂРѕРєР° РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РІ РёСЃС…РѕРґРЅРѕР№, РµСЃР»Рё РїРѕРґСЃС‚СЂРѕРєР° СѓР¶Рµ РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ РІ РёСЃС…РѕРґРЅРѕР№, - РїРѕРґСЃС‚СЂРѕРєР° Р±СѓРґРµС‚ СѓРґР°Р»РµРЅР° РёР· РёСЃС…РѕРґРЅРѕР№, Р° Р·Р°С‚РµРј РґРѕР±Р°РІР»РµРЅР° РІ СѓРєР°Р·Р°РЅРЅСѓСЋ РїРѕР·РёС†РёСЋ
+' Overwrite = False - РІСЃС‚Р°РІРєР° СЃРѕ СЃРґРІРёРіРѕРј (РґР»СЏ Pos>0 РІСЃС‚Р°РІРєР° РїРµСЂРµРґ СѓРєР°Р·Р°РЅРЅРѕР№ РїРѕР·РёС†РёРµР№, РґР»СЏ Pos<0 - РїРѕСЃР»Рµ. С‚.Рѕ. Pos=1 - РІСЃС‚Р°РІРєР° РІРЅР°С‡Р°Р»Рѕ, Р° Pos=-1 - РІ РєРѕРЅРµС† СЃС‚СЂРѕРєРё)
+'           = True  - РІСЃС‚Р°РІРєР° СЃ Р·Р°РјРµРЅРѕР№  СЌР»РµРјРµРЅС‚Р° СЃС‚СЂРѕРєРё РІ СѓРєР°Р·Р°РЅРЅРѕР№ РїРѕР·РёС†РёРё,
+'             (!)     РІ СЃРѕРІРѕРєСѓРїРЅРѕСЃС‚Рё СЃ SetUnique<>0 РјРѕР¶РµС‚ РїСЂРёРІРѕРґРёС‚СЊ Рє РЅРµРѕР¶РёРґР°РЅРЅС‹Рј СЂРµР·СѓР»СЊС‚Р°С‚Р°Рј
+' sBeg,sEnd - РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР·РёС†РёСЋ РЅР°С‡Р°Р»Р° Рё РѕРєРѕРЅС‡Р°РЅРёСЏ РІСЃС‚Р°РІР»РµРЅРЅРѕР№ РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№
 '-------------------------
-' v.1.0.1       : 09.08.2022 - добавлен параметр SetUnique для контроля уникальности вставляемых значений
+' v.1.0.1       : 09.08.2022 - РґРѕР±Р°РІР»РµРЅ РїР°СЂР°РјРµС‚СЂ SetUnique РґР»СЏ РєРѕРЅС‚СЂРѕР»СЏ СѓРЅРёРєР°Р»СЊРЅРѕСЃС‚Рё РІСЃС‚Р°РІР»СЏРµРјС‹С… Р·РЅР°С‡РµРЅРёР№
 '-------------------------
 Dim Result As String: Result = Source
     On Error GoTo HandleError
     If Len(Result) = 0 Then Result = Data: GoTo HandleExit
-    ' проверить исходную строку на наличие вхождений подстроки,
+    ' РїСЂРѕРІРµСЂРёС‚СЊ РёСЃС…РѕРґРЅСѓСЋ СЃС‚СЂРѕРєСѓ РЅР° РЅР°Р»РёС‡РёРµ РІС…РѕР¶РґРµРЅРёР№ РїРѕРґСЃС‚СЂРѕРєРё,
     If SetUnique Then
         Select Case SetUnique
-        Case 1      ' если вставляемый элемент уже есть в строке - удалить найденные вхождения и продолжить
+        Case 1      ' РµСЃР»Рё РІСЃС‚Р°РІР»СЏРµРјС‹Р№ СЌР»РµРјРµРЅС‚ СѓР¶Рµ РµСЃС‚СЊ РІ СЃС‚СЂРѕРєРµ - СѓРґР°Р»РёС‚СЊ РЅР°Р№РґРµРЅРЅС‹Рµ РІС…РѕР¶РґРµРЅРёСЏ Рё РїСЂРѕРґРѕР»Р¶РёС‚СЊ
             If Result = Data Then GoTo HandleExit
             Result = Replace(Result, Delim & Data & Delim, Delim)
             If Left$(Result, Len(Data & Delim)) = Data & Delim Then Result = Mid$(Result, Len(Data & Delim) + 1)
             If Right$(Result, Len(Delim & Data)) = Delim & Data Then Result = Left$(Result, Len(Result) - Len(Data & Delim))
-        Case True   ' если вставляемый элемент уже есть в строке - выход
+        Case True   ' РµСЃР»Рё РІСЃС‚Р°РІР»СЏРµРјС‹Р№ СЌР»РµРјРµРЅС‚ СѓР¶Рµ РµСЃС‚СЊ РІ СЃС‚СЂРѕРєРµ - РІС‹С…РѕРґ
             If Result = Data Then GoTo HandleExit
             sBeg = InStr(1, Result, Delim & Data & Delim): If sBeg Then sBeg = sBeg + Len(Delim): GoTo HandleExit
             If Left$(Result, Len(Data & Delim)) = Data & Delim Then sBeg = 1: GoTo HandleExit
             If Right$(Result, Len(Delim & Data)) = Delim & Data Then sBeg = Len(Result) - Len(Data) + 1: GoTo HandleExit
         End Select
     End If
-    ' проверить позицию вставки
+    ' РїСЂРѕРІРµСЂРёС‚СЊ РїРѕР·РёС†РёСЋ РІСЃС‚Р°РІРєРё
     Select Case Pos
     Case 1:     If Not Overwrite Then sBeg = 1:           Result = Data & Delim & Result: GoTo HandleExit
     Case -1:    If Not Overwrite Then sBeg = Len(Result): Result = Result & Delim & Data: GoTo HandleExit
     End Select
 '    If Pos < 1 then Goto HandleExit
-'' при помощи Split
+'' РїСЂРё РїРѕРјРѕС‰Рё Split
 '    Dim arr() As String:arr = Split(Result, Delim)
 '    If Overwrite Then arr(Pos - 1) = Data Else arr(Pos - 1) = Data & Delim & arr(Pos - 1)
 '    Result = Join(arr, Delim): Erase arr()
-'' при помощи InStr аналогично DelimStringGet
-' вариант с единой функцией поиска подстроки - можно использовать отрицательные позиции (с конца строки)
+'' РїСЂРё РїРѕРјРѕС‰Рё InStr Р°РЅР°Р»РѕРіРёС‡РЅРѕ DelimStringGet
+' РІР°СЂРёР°РЅС‚ СЃ РµРґРёРЅРѕР№ С„СѓРЅРєС†РёРµР№ РїРѕРёСЃРєР° РїРѕРґСЃС‚СЂРѕРєРё - РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рµ РїРѕР·РёС†РёРё (СЃ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё)
     If Overwrite Then
-    ' вставка с заменой
-        ' получаем позицию от начала, границы
+    ' РІСЃС‚Р°РІРєР° СЃ Р·Р°РјРµРЅРѕР№
+        ' РїРѕР»СѓС‡Р°РµРј РїРѕР·РёС†РёСЋ РѕС‚ РЅР°С‡Р°Р»Р°, РіСЂР°РЅРёС†С‹
         Call p_GetSubstrBounds(Result, Pos, sBeg, sEnd, Delim)
     Else
-    ' вставка со сдвигом
-        ' получаем позицию от начала, границы, проверяем выход за пределы строки
-        ' и сравниваем его с направлением просмотра строки (Sgn(Pos) = -1) д.б. до вызова ф-ции (переопределяет Pos)
+    ' РІСЃС‚Р°РІРєР° СЃРѕ СЃРґРІРёРіРѕРј
+        ' РїРѕР»СѓС‡Р°РµРј РїРѕР·РёС†РёСЋ РѕС‚ РЅР°С‡Р°Р»Р°, РіСЂР°РЅРёС†С‹, РїСЂРѕРІРµСЂСЏРµРј РІС‹С…РѕРґ Р·Р° РїСЂРµРґРµР»С‹ СЃС‚СЂРѕРєРё
+        ' Рё СЃСЂР°РІРЅРёРІР°РµРј РµРіРѕ СЃ РЅР°РїСЂР°РІР»РµРЅРёРµРј РїСЂРѕСЃРјРѕС‚СЂР° СЃС‚СЂРѕРєРё (Sgn(Pos) = -1) Рґ.Р±. РґРѕ РІС‹Р·РѕРІР° С„-С†РёРё (РїРµСЂРµРѕРїСЂРµРґРµР»СЏРµС‚ Pos)
         If (Sgn(Pos) = -1) = p_GetSubstrBounds(Result, Pos, sBeg, sEnd, Delim) Then
-        ' есть выход за пределы и направление от начала    (bRes = False; bDir = False)
-        ' или нет выхода за пределы и направление от конца (bRes = True;  bDir = True)
-        ' вставка после:  "PrevVal & Delim & NewVal"
+        ' РµСЃС‚СЊ РІС‹С…РѕРґ Р·Р° РїСЂРµРґРµР»С‹ Рё РЅР°РїСЂР°РІР»РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р°    (bRes = False; bDir = False)
+        ' РёР»Рё РЅРµС‚ РІС‹С…РѕРґР° Р·Р° РїСЂРµРґРµР»С‹ Рё РЅР°РїСЂР°РІР»РµРЅРёРµ РѕС‚ РєРѕРЅС†Р° (bRes = True;  bDir = True)
+        ' РІСЃС‚Р°РІРєР° РїРѕСЃР»Рµ:  "PrevVal & Delim & NewVal"
             Data = Mid$(Result, sBeg, sEnd - sBeg) & Delim & Data: Pos = Pos + 1
         Else
-        ' нет выхода за пределы и направление от начала    (bRes = True;  bDir = False)
-        ' или есть выход за пределы и направление от конца (bRes = False; bDir = True)
-        ' вставка перед: "NewVal & Delim & PrevVal"
+        ' РЅРµС‚ РІС‹С…РѕРґР° Р·Р° РїСЂРµРґРµР»С‹ Рё РЅР°РїСЂР°РІР»РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р°    (bRes = True;  bDir = False)
+        ' РёР»Рё РµСЃС‚СЊ РІС‹С…РѕРґ Р·Р° РїСЂРµРґРµР»С‹ Рё РЅР°РїСЂР°РІР»РµРЅРёРµ РѕС‚ РєРѕРЅС†Р° (bRes = False; bDir = True)
+        ' РІСЃС‚Р°РІРєР° РїРµСЂРµРґ: "NewVal & Delim & PrevVal"
             Data = Data & Delim & Mid$(Result, sBeg, sEnd - sBeg)
         End If
     End If
@@ -2075,10 +2085,10 @@ End Function
 Public Function DelimStringShrink(ByVal Source As String, _
     Optional Delim As String = " " _
     ) As String
-' удаляет из строки с разделителями повторяющиеся элементы оставляя только первое вхождение
+' СѓРґР°Р»СЏРµС‚ РёР· СЃС‚СЂРѕРєРё СЃ СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё РїРѕРІС‚РѕСЂСЏСЋС‰РёРµСЃСЏ СЌР»РµРјРµРЅС‚С‹ РѕСЃС‚Р°РІР»СЏСЏ С‚РѕР»СЊРєРѕ РїРµСЂРІРѕРµ РІС…РѕР¶РґРµРЅРёРµ
 '-------------------------
-' Source - исходная строка
-' Delim - разделитель
+' Source - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
+' Delim - СЂР°Р·РґРµР»РёС‚РµР»СЊ
 '-------------------------
 Dim Arr() As String, Col As Collection
 Dim Result As String
@@ -2086,20 +2096,20 @@ Dim Result As String
     On Error GoTo HandleError
     Result = Trim$(Source)
     If Len(Result) = 0 Then GoTo HandleExit
-' разбираем строку
+' СЂР°Р·Р±РёСЂР°РµРј СЃС‚СЂРѕРєСѓ
     'Call xSplit(Result, Arr, Delim)
     Arr = Split(Result, Delim)
     Set Col = New Collection
 Dim i As Long, iMax As Long: i = LBound(Arr): iMax = UBound(Arr)
     On Error Resume Next
-' переносим в коллекцию
+' РїРµСЂРµРЅРѕСЃРёРј РІ РєРѕР»Р»РµРєС†РёСЋ
 Dim Itm
     Do Until i > iMax
         Itm = Trim$(Arr(i))
         Col.Add Itm, c_idxPref & Itm: Err.Clear: i = i + 1
     Loop
     On Error GoTo HandleError
-' собираем строку
+' СЃРѕР±РёСЂР°РµРј СЃС‚СЂРѕРєСѓ
     Result = vbNullString
     For Each Itm In Col
         Result = Result & Delim & Itm
@@ -2113,11 +2123,11 @@ Public Function DelimStringSimile(ByVal String1 As String, ByVal String2 As Stri
     Optional Delim As String = " ", _
     Optional Compare As VbCompareMethod = vbTextCompare _
     ) As Boolean
-' ищет в строках с разделителями совпадающие элементы, возвращает True при нахождении первого совпадения
+' РёС‰РµС‚ РІ СЃС‚СЂРѕРєР°С… СЃ СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё СЃРѕРІРїР°РґР°СЋС‰РёРµ СЌР»РµРјРµРЅС‚С‹, РІРѕР·РІСЂР°С‰Р°РµС‚ True РїСЂРё РЅР°С…РѕР¶РґРµРЅРёРё РїРµСЂРІРѕРіРѕ СЃРѕРІРїР°РґРµРЅРёСЏ
 '-------------------------
-' String1, String2  - строки с разделителями элементы которых будут сравниваться между собой
-' Delim             - разделитель
-' Compare           - метод сравнения
+' String1, String2  - СЃС‚СЂРѕРєРё СЃ СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё СЌР»РµРјРµРЅС‚С‹ РєРѕС‚РѕСЂС‹С… Р±СѓРґСѓС‚ СЃСЂР°РІРЅРёРІР°С‚СЊСЃСЏ РјРµР¶РґСѓ СЃРѕР±РѕР№
+' Delim             - СЂР°Р·РґРµР»РёС‚РµР»СЊ
+' Compare           - РјРµС‚РѕРґ СЃСЂР°РІРЅРµРЅРёСЏ
 '-------------------------
 Dim Result As Boolean ':Result = False
     On Error GoTo HandleError
@@ -2141,15 +2151,15 @@ Public Function TokenStringGet(Source As String, _
     Optional DelimsLeft As String, Optional DelimsRight As String, _
     Optional sBeg As Long, Optional sEnd As Long _
     ) As String
-' возвращает фрагмент строки со множественными разделителями с указанным индексом
+' РІРѕР·РІСЂР°С‰Р°РµС‚ С„СЂР°РіРјРµРЅС‚ СЃС‚СЂРѕРєРё СЃРѕ РјРЅРѕР¶РµСЃС‚РІРµРЅРЅС‹РјРё СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРЅРґРµРєСЃРѕРј
 '-------------------------
-' Source    - исходная строка
-' Pos       - позиция извлекаемого элемента
-' Delims    - набор разделителей для разбиения исходной строки
-' IncEmpty  = False - пропуск пустых элементов - последовательные разделители будут рассматриваться как один
-'           = True  - результирующий массив будет включать пустые элементы между последовательными разделителями
-' DelimsLeft/DelimsRight    - возвращают разделители расположенные слева и справа от извлекаемого токена
-' sBeg,sEnd - возвращает позицию начала и окончания извлекаемой подстроки (токена) в исходной
+' Source    - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
+' Pos       - РїРѕР·РёС†РёСЏ РёР·РІР»РµРєР°РµРјРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
+' Delims    - РЅР°Р±РѕСЂ СЂР°Р·РґРµР»РёС‚РµР»РµР№ РґР»СЏ СЂР°Р·Р±РёРµРЅРёСЏ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё
+' IncEmpty  = False - РїСЂРѕРїСѓСЃРє РїСѓСЃС‚С‹С… СЌР»РµРјРµРЅС‚РѕРІ - РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹Рµ СЂР°Р·РґРµР»РёС‚РµР»Рё Р±СѓРґСѓС‚ СЂР°СЃСЃРјР°С‚СЂРёРІР°С‚СЊСЃСЏ РєР°Рє РѕРґРёРЅ
+'           = True  - СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РёР№ РјР°СЃСЃРёРІ Р±СѓРґРµС‚ РІРєР»СЋС‡Р°С‚СЊ РїСѓСЃС‚С‹Рµ СЌР»РµРјРµРЅС‚С‹ РјРµР¶РґСѓ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹РјРё СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё
+' DelimsLeft/DelimsRight    - РІРѕР·РІСЂР°С‰Р°СЋС‚ СЂР°Р·РґРµР»РёС‚РµР»Рё СЂР°СЃРїРѕР»РѕР¶РµРЅРЅС‹Рµ СЃР»РµРІР° Рё СЃРїСЂР°РІР° РѕС‚ РёР·РІР»РµРєР°РµРјРѕРіРѕ С‚РѕРєРµРЅР°
+' sBeg,sEnd - РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР·РёС†РёСЋ РЅР°С‡Р°Р»Р° Рё РѕРєРѕРЅС‡Р°РЅРёСЏ РёР·РІР»РµРєР°РµРјРѕР№ РїРѕРґСЃС‚СЂРѕРєРё (С‚РѕРєРµРЅР°) РІ РёСЃС…РѕРґРЅРѕР№
 '-------------------------
 Dim Result As String: Result = Source
     
@@ -2160,13 +2170,13 @@ Dim aMin As Long: aMin = 1
 Dim aMax As Long: aMax = Tokenize(Source, aData(), Delims, aPos(), IncEmpty)
     If Pos < 0 Then Pos = aMax + Pos + 1
     If Pos < aMin Then Pos = aMin Else If Pos > aMax Then Pos = aMax
-    ' блок разделителей до выбранного токена (слева)
+    ' Р±Р»РѕРє СЂР°Р·РґРµР»РёС‚РµР»РµР№ РґРѕ РІС‹Р±СЂР°РЅРЅРѕРіРѕ С‚РѕРєРµРЅР° (СЃР»РµРІР°)
     sEnd = aPos(Pos - 1): If Pos = 1 Then sBeg = 1 Else sBeg = aPos(Pos - 2) + Len(aData(Pos - 2))
     If sEnd > sBeg Then DelimsLeft = Mid$(Source, sBeg, sEnd - sBeg) Else DelimsLeft = vbNullString
-    ' блок разделителей после выбранного токена (справа)
+    ' Р±Р»РѕРє СЂР°Р·РґРµР»РёС‚РµР»РµР№ РїРѕСЃР»Рµ РІС‹Р±СЂР°РЅРЅРѕРіРѕ С‚РѕРєРµРЅР° (СЃРїСЂР°РІР°)
     sBeg = aPos(Pos - 1) + Len(aData(Pos - 1)): If Pos = aMax Then sEnd = Len(Source) Else sEnd = aPos(Pos)
     If sEnd > sBeg Then DelimsRight = Mid$(Source, sBeg, sEnd - sBeg) Else DelimsRight = vbNullString
-    ' значение токена
+    ' Р·РЅР°С‡РµРЅРёРµ С‚РѕРєРµРЅР°
     Result = aData(Pos - 1): sBeg = aPos(Pos - 1): sEnd = sBeg + Len(Result)
 HandleExit:  TokenStringGet = Result: Exit Function
 HandleError: Result = vbNullString: Err.Clear: Resume HandleExit
@@ -2179,18 +2189,18 @@ Public Function TokenStringSet(Source As String, _
     Optional NewDelim As String = " ", _
     Optional sBeg As Long, Optional sEnd As Long _
     ) As String
-' вставляет в строку со множественными разделителями элемент в позицию с указанным индексом
+' РІСЃС‚Р°РІР»СЏРµС‚ РІ СЃС‚СЂРѕРєСѓ СЃРѕ РјРЅРѕР¶РµСЃС‚РІРµРЅРЅС‹РјРё СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё СЌР»РµРјРµРЅС‚ РІ РїРѕР·РёС†РёСЋ СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРЅРґРµРєСЃРѕРј
 '-------------------------
-' Source    - исходная строка
-' Pos       - позиция вставки элемента
-' Data      - вставляемая строка
-' Delims    - набор разделителей для разбиения исходной строки
-' IncEmpty  = False - пропуск пустых элементов - последовательные разделители будут рассматриваться как один
-'           = True  - результирующий массив будет включать пустые элементы между последовательными разделителями
-' Overwrite = False - вставка со сдвигом (для Pos>0 вставка перед указанной позицией, для Pos<0 - после. т.о. Pos=1 - вставка вначало, а Pos=-1 - в конец строки)
-'           = True  - вставка с заменой  элемента строки в указанной позиции
-' NewDelim - добавляемые разделители (обязательно при Overwrite=False) вставляются после Data перед следующим токеном
-' sBeg,sEnd - возвращает позицию начала и окончания вставленной подстроки (токена) в исходной
+' Source    - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
+' Pos       - РїРѕР·РёС†РёСЏ РІСЃС‚Р°РІРєРё СЌР»РµРјРµРЅС‚Р°
+' Data      - РІСЃС‚Р°РІР»СЏРµРјР°СЏ СЃС‚СЂРѕРєР°
+' Delims    - РЅР°Р±РѕСЂ СЂР°Р·РґРµР»РёС‚РµР»РµР№ РґР»СЏ СЂР°Р·Р±РёРµРЅРёСЏ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё
+' IncEmpty  = False - РїСЂРѕРїСѓСЃРє РїСѓСЃС‚С‹С… СЌР»РµРјРµРЅС‚РѕРІ - РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹Рµ СЂР°Р·РґРµР»РёС‚РµР»Рё Р±СѓРґСѓС‚ СЂР°СЃСЃРјР°С‚СЂРёРІР°С‚СЊСЃСЏ РєР°Рє РѕРґРёРЅ
+'           = True  - СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РёР№ РјР°СЃСЃРёРІ Р±СѓРґРµС‚ РІРєР»СЋС‡Р°С‚СЊ РїСѓСЃС‚С‹Рµ СЌР»РµРјРµРЅС‚С‹ РјРµР¶РґСѓ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹РјРё СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё
+' Overwrite = False - РІСЃС‚Р°РІРєР° СЃРѕ СЃРґРІРёРіРѕРј (РґР»СЏ Pos>0 РІСЃС‚Р°РІРєР° РїРµСЂРµРґ СѓРєР°Р·Р°РЅРЅРѕР№ РїРѕР·РёС†РёРµР№, РґР»СЏ Pos<0 - РїРѕСЃР»Рµ. С‚.Рѕ. Pos=1 - РІСЃС‚Р°РІРєР° РІРЅР°С‡Р°Р»Рѕ, Р° Pos=-1 - РІ РєРѕРЅРµС† СЃС‚СЂРѕРєРё)
+'           = True  - РІСЃС‚Р°РІРєР° СЃ Р·Р°РјРµРЅРѕР№  СЌР»РµРјРµРЅС‚Р° СЃС‚СЂРѕРєРё РІ СѓРєР°Р·Р°РЅРЅРѕР№ РїРѕР·РёС†РёРё
+' NewDelim - РґРѕР±Р°РІР»СЏРµРјС‹Рµ СЂР°Р·РґРµР»РёС‚РµР»Рё (РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РїСЂРё Overwrite=False) РІСЃС‚Р°РІР»СЏСЋС‚СЃСЏ РїРѕСЃР»Рµ Data РїРµСЂРµРґ СЃР»РµРґСѓСЋС‰РёРј С‚РѕРєРµРЅРѕРј
+' sBeg,sEnd - РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР·РёС†РёСЋ РЅР°С‡Р°Р»Р° Рё РѕРєРѕРЅС‡Р°РЅРёСЏ РІСЃС‚Р°РІР»РµРЅРЅРѕР№ РїРѕРґСЃС‚СЂРѕРєРё (С‚РѕРєРµРЅР°) РІ РёСЃС…РѕРґРЅРѕР№
 '-------------------------
 Dim Result As String: Result = Source
     
@@ -2208,10 +2218,10 @@ Dim sTemp As String: sTemp = Data
     If Pos < aMin Then Pos = aMin Else If Pos > aMax Then Pos = aMax
     sBeg = aPos(Pos - 1)
     If Overwrite Then
-    ' замена текущего фрагмента строки заданным. имеющиеся разделители сохраняются
+    ' Р·Р°РјРµРЅР° С‚РµРєСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р° СЃС‚СЂРѕРєРё Р·Р°РґР°РЅРЅС‹Рј. РёРјРµСЋС‰РёРµСЃСЏ СЂР°Р·РґРµР»РёС‚РµР»Рё СЃРѕС…СЂР°РЅСЏСЋС‚СЃСЏ
         sEnd = sBeg + Len(aData(Pos - 1))
     Else
-    ' вставка строки перед указанной. добавить разделители (NewDelim)
+    ' РІСЃС‚Р°РІРєР° СЃС‚СЂРѕРєРё РїРµСЂРµРґ СѓРєР°Р·Р°РЅРЅРѕР№. РґРѕР±Р°РІРёС‚СЊ СЂР°Р·РґРµР»РёС‚РµР»Рё (NewDelim)
         sEnd = sBeg: sTemp = sTemp & NewDelim
     End If
     Result = Left$(Result, sBeg - 1) & sTemp & Mid$(Result, sEnd)
@@ -2225,17 +2235,17 @@ Public Function TokenStringDel(Source As String, _
     Optional SubDelims As Boolean = True, Optional NewDelim As String = " ", _
     Optional sBeg As Long, Optional sEnd As Long _
     ) As String
-' удаляет токен с указанным номером из строки со множественными разделителями
+' СѓРґР°Р»СЏРµС‚ С‚РѕРєРµРЅ СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РЅРѕРјРµСЂРѕРј РёР· СЃС‚СЂРѕРєРё СЃРѕ РјРЅРѕР¶РµСЃС‚РІРµРЅРЅС‹РјРё СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё
 '-------------------------
-' Source    - исходная строка
-' Pos       - позиция удаляемой подстроки
-' Delims    - набор разделителей для разбиения исходной строки
-' IncEmpty  = False - пропуск пустых элементов - последовательные разделители будут рассматриваться как один
-'           = True  - результирующий массив будет включать пустые элементы между последовательными разделителями
-' SubDelims = False - разделители вокруг удаляемого элемента остаются в итоговой строке,
-'           = True  - разделители оставшиеся после удаления элемента будут заменены на EndDelims
-' NewDelim - конечные разделители (обязательно при SubDelims = True) добавляются после Data перед следующим токеном
-' sBeg,sEnd - возвращает позицию удаленной подстроки (токена)
+' Source    - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
+' Pos       - РїРѕР·РёС†РёСЏ СѓРґР°Р»СЏРµРјРѕР№ РїРѕРґСЃС‚СЂРѕРєРё
+' Delims    - РЅР°Р±РѕСЂ СЂР°Р·РґРµР»РёС‚РµР»РµР№ РґР»СЏ СЂР°Р·Р±РёРµРЅРёСЏ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё
+' IncEmpty  = False - РїСЂРѕРїСѓСЃРє РїСѓСЃС‚С‹С… СЌР»РµРјРµРЅС‚РѕРІ - РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹Рµ СЂР°Р·РґРµР»РёС‚РµР»Рё Р±СѓРґСѓС‚ СЂР°СЃСЃРјР°С‚СЂРёРІР°С‚СЊСЃСЏ РєР°Рє РѕРґРёРЅ
+'           = True  - СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РёР№ РјР°СЃСЃРёРІ Р±СѓРґРµС‚ РІРєР»СЋС‡Р°С‚СЊ РїСѓСЃС‚С‹Рµ СЌР»РµРјРµРЅС‚С‹ РјРµР¶РґСѓ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹РјРё СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё
+' SubDelims = False - СЂР°Р·РґРµР»РёС‚РµР»Рё РІРѕРєСЂСѓРі СѓРґР°Р»СЏРµРјРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РѕСЃС‚Р°СЋС‚СЃСЏ РІ РёС‚РѕРіРѕРІРѕР№ СЃС‚СЂРѕРєРµ,
+'           = True  - СЂР°Р·РґРµР»РёС‚РµР»Рё РѕСЃС‚Р°РІС€РёРµСЃСЏ РїРѕСЃР»Рµ СѓРґР°Р»РµРЅРёСЏ СЌР»РµРјРµРЅС‚Р° Р±СѓРґСѓС‚ Р·Р°РјРµРЅРµРЅС‹ РЅР° EndDelims
+' NewDelim - РєРѕРЅРµС‡РЅС‹Рµ СЂР°Р·РґРµР»РёС‚РµР»Рё (РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РїСЂРё SubDelims = True) РґРѕР±Р°РІР»СЏСЋС‚СЃСЏ РїРѕСЃР»Рµ Data РїРµСЂРµРґ СЃР»РµРґСѓСЋС‰РёРј С‚РѕРєРµРЅРѕРј
+' sBeg,sEnd - РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР·РёС†РёСЋ СѓРґР°Р»РµРЅРЅРѕР№ РїРѕРґСЃС‚СЂРѕРєРё (С‚РѕРєРµРЅР°)
 '-------------------------
 Dim Result As String: Result = Source
     
@@ -2248,14 +2258,14 @@ Dim sTemp As String ':  sTemp = vbNullString
     If Pos < 0 Then Pos = aMax + Pos + 1
     If Pos < aMin Then Pos = aMin Else If Pos > aMax Then Pos = aMax
     If SubDelims Then
-    ' разделители слева и справа удаляются и, если вставка в середине строки,- заменяются на новый
+    ' СЂР°Р·РґРµР»РёС‚РµР»Рё СЃР»РµРІР° Рё СЃРїСЂР°РІР° СѓРґР°Р»СЏСЋС‚СЃСЏ Рё, РµСЃР»Рё РІСЃС‚Р°РІРєР° РІ СЃРµСЂРµРґРёРЅРµ СЃС‚СЂРѕРєРё,- Р·Р°РјРµРЅСЏСЋС‚СЃСЏ РЅР° РЅРѕРІС‹Р№
         Select Case Pos
         Case aMin: sBeg = 1: sEnd = aPos(Pos)
         Case aMax: sBeg = aPos(Pos - 2) + Len(aData(Pos - 2)): sEnd = Len(Result) + 1
         Case Else: sBeg = aPos(Pos - 2) + Len(aData(Pos - 2)): sEnd = aPos(Pos): sTemp = NewDelim
         End Select
     Else
-    ' имеющиеся разделители сохраняются
+    ' РёРјРµСЋС‰РёРµСЃСЏ СЂР°Р·РґРµР»РёС‚РµР»Рё СЃРѕС…СЂР°РЅСЏСЋС‚СЃСЏ
         sBeg = aPos(Pos - 1)
         sEnd = sBeg + Len(aData(Pos - 1))
     End If
@@ -2270,23 +2280,23 @@ Public Function TaggedStringGet(Source As String, _
     Optional Compare As VbCompareMethod = vbTextCompare, _
     Optional sBeg As Long, Optional sEnd As Long _
     ) As String
-' возвращает значение элемента строки с разделителями с указанным именем и(или) позицией
+' РІРѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° СЃС‚СЂРѕРєРё СЃ СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј Рё(РёР»Рё) РїРѕР·РёС†РёРµР№
 '-------------------------
-' лучше для этих целей использовать класс вроде TaggedValues от Гетца: https://www.sql.ru/forum/661816/vdrug-u-kogo-est-dlya-obrabotki-v-vba-strok-svoystv
-' но иногда и такой вариант бывает полезен
-' функция никак не проверяет уникальность тэга, - будет возвращено первое вхождение
-' Source    - строка элементов вида "Tag1=Val1;...TagN=ValN"
-' Tag       - имя (Tag) элемента. если Tag не задан - элемент будет получен по Pos
-' Pos -     позиция возвращаемого элемента.
-'           >0 - позиция относительно начала строки
-'           <0 - позиция относительно конца строки
-' Delim     - разделитель пар имя/значение (Tag/Val)
-' TagDelim  - разделитель имени (Tag) и значения (Val) в паре
-' sBeg,sEnd - возвращает позицию начала и окончания извлеченной подстроки (значения тэга) в исходной
-' Compare   - тип сравнения (vbBinaryCompare/vbTextCompare)
-' возвращает значение (Val) элемента с указанным именем (Tag) в указанной позиции (Pos) и его границы в исходной строке (Source)
+' Р»СѓС‡С€Рµ РґР»СЏ СЌС‚РёС… С†РµР»РµР№ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РєР»Р°СЃСЃ РІСЂРѕРґРµ TaggedValues РѕС‚ Р“РµС‚С†Р°: https://www.sql.ru/forum/661816/vdrug-u-kogo-est-dlya-obrabotki-v-vba-strok-svoystv
+' РЅРѕ РёРЅРѕРіРґР° Рё С‚Р°РєРѕР№ РІР°СЂРёР°РЅС‚ Р±С‹РІР°РµС‚ РїРѕР»РµР·РµРЅ
+' С„СѓРЅРєС†РёСЏ РЅРёРєР°Рє РЅРµ РїСЂРѕРІРµСЂСЏРµС‚ СѓРЅРёРєР°Р»СЊРЅРѕСЃС‚СЊ С‚СЌРіР°, - Р±СѓРґРµС‚ РІРѕР·РІСЂР°С‰РµРЅРѕ РїРµСЂРІРѕРµ РІС…РѕР¶РґРµРЅРёРµ
+' Source    - СЃС‚СЂРѕРєР° СЌР»РµРјРµРЅС‚РѕРІ РІРёРґР° "Tag1=Val1;...TagN=ValN"
+' Tag       - РёРјСЏ (Tag) СЌР»РµРјРµРЅС‚Р°. РµСЃР»Рё Tag РЅРµ Р·Р°РґР°РЅ - СЌР»РµРјРµРЅС‚ Р±СѓРґРµС‚ РїРѕР»СѓС‡РµРЅ РїРѕ Pos
+' Pos -     РїРѕР·РёС†РёСЏ РІРѕР·РІСЂР°С‰Р°РµРјРѕРіРѕ СЌР»РµРјРµРЅС‚Р°.
+'           >0 - РїРѕР·РёС†РёСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё
+'           <0 - РїРѕР·РёС†РёСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё
+' Delim     - СЂР°Р·РґРµР»РёС‚РµР»СЊ РїР°СЂ РёРјСЏ/Р·РЅР°С‡РµРЅРёРµ (Tag/Val)
+' TagDelim  - СЂР°Р·РґРµР»РёС‚РµР»СЊ РёРјРµРЅРё (Tag) Рё Р·РЅР°С‡РµРЅРёСЏ (Val) РІ РїР°СЂРµ
+' sBeg,sEnd - РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР·РёС†РёСЋ РЅР°С‡Р°Р»Р° Рё РѕРєРѕРЅС‡Р°РЅРёСЏ РёР·РІР»РµС‡РµРЅРЅРѕР№ РїРѕРґСЃС‚СЂРѕРєРё (Р·РЅР°С‡РµРЅРёСЏ С‚СЌРіР°) РІ РёСЃС…РѕРґРЅРѕР№
+' Compare   - С‚РёРї СЃСЂР°РІРЅРµРЅРёСЏ (vbBinaryCompare/vbTextCompare)
+' РІРѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ (Val) СЌР»РµРјРµРЅС‚Р° СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј (Tag) РІ СѓРєР°Р·Р°РЅРЅРѕР№ РїРѕР·РёС†РёРё (Pos) Рё РµРіРѕ РіСЂР°РЅРёС†С‹ РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ (Source)
 '-------------------------
-' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами (старый вариант закомментил)
+' v.1.1.0       : 16.04.2024 - РџРµСЂРµРїРёСЃР°РЅР° РґР»СЏ РїРѕРґРґРµСЂР¶РєРё С‚СЌРіРѕРІ СЃ РѕРґРёРЅР°РєРѕРІС‹РјРё РёРјРµРЅР°РјРё (СЃС‚Р°СЂС‹Р№ РІР°СЂРёР°РЅС‚ Р·Р°РєРѕРјРјРµРЅС‚РёР»)
 '-------------------------
 'RegExp: Mask = Delim & Tag & TagDelim & "(.+?)" & Delim
 '        With Regex.Execute(Delim & Source & Delim)(0)
@@ -2296,12 +2306,12 @@ Public Function TaggedStringGet(Source As String, _
 Dim Result As String: Result = vbNullString
     On Error GoTo HandleError
     If Len(Source) = 0 Then GoTo HandleExit
-' ищем границы подстроки в выражении
+' РёС‰РµРј РіСЂР°РЅРёС†С‹ РїРѕРґСЃС‚СЂРѕРєРё РІ РІС‹СЂР°Р¶РµРЅРёРё
     If p_GetSubstrBoundsByTag(Source, Tag, Result, Pos, sBeg, sEnd, Delim, TagDelim) Then
-    ' тэг найден и позиция соответствует искомой, - возвращаем
+    ' С‚СЌРі РЅР°Р№РґРµРЅ Рё РїРѕР·РёС†РёСЏ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ РёСЃРєРѕРјРѕР№, - РІРѕР·РІСЂР°С‰Р°РµРј
         sBeg = sBeg + Len(Tag): If Len(Result) > 0 Then sBeg = sBeg + Len(TagDelim)
     Else
-    ' позиция не соответствует искомой, - не найдено
+    ' РїРѕР·РёС†РёСЏ РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ РёСЃРєРѕРјРѕР№, - РЅРµ РЅР°Р№РґРµРЅРѕ
         If Pos >= 0 Then sBeg = sEnd Else sEnd = sBeg
         Err.Raise 9
     End If
@@ -2310,26 +2320,26 @@ Dim Result As String: Result = vbNullString
 ''-------------------------
 '    sBeg = 1
 '    If Len(Tag) > 0 Then
-'' ищем по Tag
+'' РёС‰РµРј РїРѕ Tag
 'Dim pLen As Long: pLen = Len(Tag & TagDelim): If Len(Source) < pLen Then GoTo HandleExit 'Pos = 0: GoTo HandleExit
 '        sBeg = sBeg + pLen
 ''        If StrComp(Mid$(Source, 1, pLen), Tag & TagDelim, Compare) = 0 ' If Mid$(tmpSrc, 1, pLen) = tmpTag & TagDelim Then
 ''            Pos = 1
 ''        Else
 '        If StrComp(Mid$(Source, 1, pLen), Tag & TagDelim, Compare) <> 0 Then ' If Mid$(tmpSrc, 1, pLen) <> tmpTag & TagDelim Then
-''        ' если тэг с заданным именем не в начале строки
-''        ' ищем подстроку с заданным именем начинающуюся с Delim и заканчивающуюся TagDelim
+''        ' РµСЃР»Рё С‚СЌРі СЃ Р·Р°РґР°РЅРЅС‹Рј РёРјРµРЅРµРј РЅРµ РІ РЅР°С‡Р°Р»Рµ СЃС‚СЂРѕРєРё
+''        ' РёС‰РµРј РїРѕРґСЃС‚СЂРѕРєСѓ СЃ Р·Р°РґР°РЅРЅС‹Рј РёРјРµРЅРµРј РЅР°С‡РёРЅР°СЋС‰СѓСЋСЃСЏ СЃ Delim Рё Р·Р°РєР°РЅС‡РёРІР°СЋС‰СѓСЋСЃСЏ TagDelim
 '            sBeg = InStr(1, Source, Delim & Tag & TagDelim, Compare)
 '            If sBeg = 0 Then GoTo HandleExit 'Pos = 0: GoTo HandleExit
 '            sBeg = sBeg + Len(Delim) + pLen
 ''            Pos = InStrCount(Left$(Source, sBeg), Delim) + 1
 '        End If
-''        ' сейчас в sBeg позиция начала значения тэга
-''        ' ищем позицию конца значения тэга с позиции начала до следующего Delim
+''        ' СЃРµР№С‡Р°СЃ РІ sBeg РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° Р·РЅР°С‡РµРЅРёСЏ С‚СЌРіР°
+''        ' РёС‰РµРј РїРѕР·РёС†РёСЋ РєРѕРЅС†Р° Р·РЅР°С‡РµРЅРёСЏ С‚СЌРіР° СЃ РїРѕР·РёС†РёРё РЅР°С‡Р°Р»Р° РґРѕ СЃР»РµРґСѓСЋС‰РµРіРѕ Delim
 '        sEnd = InStr(sBeg, Source, Delim, Compare): If sEnd = 0 Then sEnd = Len(Source) + 1
 '        Result = Mid$(Source, sBeg, sEnd - sBeg)
 ''    Else
-''' ищем по Pos
+''' РёС‰РµРј РїРѕ Pos
 ''        Call p_GetSubstrBounds(Source, Pos, sBeg, sEnd, Delim)
 ''        Result = Mid$(Source, sBeg, sEnd - sBeg)
 ''        sEnd = InStr(Result, TagDelim): sBeg = sEnd + Len(TagDelim)
@@ -2349,37 +2359,37 @@ Public Function TaggedStringSet(Source As String, _
     Optional Compare As VbCompareMethod = vbTextCompare, _
     Optional UseTagPos As Boolean = True _
     ) As String
-' устанавливает значение элемента строки с разделителями с указанным именем
+' СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ Р·РЅР°С‡РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° СЃС‚СЂРѕРєРё СЃ СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј
 '-------------------------
-' Source -  строка элементов вида "Tag1=Val1;...TagN=ValN"
-' Tag -     имя (Tag) устанавливаемого элемента, если элемент отсутствует - будет добавлен
-' Data -    значение (Val) устанавливаемого элемента
-' Pos -     позиция устанавливаемого элемента
-'           >0 - позиция относительно начала строки
-'           <0 - позиция относительно конца строки
-' Delim -   разделитель пар имя (Tag) / значение (Val)
-' TagDelim - разделитель имени (Tag) и значения (Val) в паре
-' Overwrite = True  - замена  элемента строки в указанной позиции
-'           = False - вставка со сдвигом в указанную позиию (Pos > 0 после указанной позиции,  Pos < 0 - перед)
-' sBeg,sEnd - возвращает позицию начала и окончания вставленной подстроки (значения тэга) в исходной
-' Compare - тип сравнения (vbBinaryCompare/vbTextCompare)
-' UseTagPos - определяет, что задает параметр Pos позицию подстроки, или порядковый номер тэга с именем (Tag) ???
-'           - True  - Pos определяется по имени тэга (Tag)      - n-й тэг с указанным именем
-'           - False - Pos определяется по разделителям (Delim)  - n-й тэг по порядку
-' возвращает строку элементов с учетом добавленного элемента
+' Source -  СЃС‚СЂРѕРєР° СЌР»РµРјРµРЅС‚РѕРІ РІРёРґР° "Tag1=Val1;...TagN=ValN"
+' Tag -     РёРјСЏ (Tag) СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјРѕРіРѕ СЌР»РµРјРµРЅС‚Р°, РµСЃР»Рё СЌР»РµРјРµРЅС‚ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ - Р±СѓРґРµС‚ РґРѕР±Р°РІР»РµРЅ
+' Data -    Р·РЅР°С‡РµРЅРёРµ (Val) СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
+' Pos -     РїРѕР·РёС†РёСЏ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
+'           >0 - РїРѕР·РёС†РёСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё
+'           <0 - РїРѕР·РёС†РёСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё
+' Delim -   СЂР°Р·РґРµР»РёС‚РµР»СЊ РїР°СЂ РёРјСЏ (Tag) / Р·РЅР°С‡РµРЅРёРµ (Val)
+' TagDelim - СЂР°Р·РґРµР»РёС‚РµР»СЊ РёРјРµРЅРё (Tag) Рё Р·РЅР°С‡РµРЅРёСЏ (Val) РІ РїР°СЂРµ
+' Overwrite = True  - Р·Р°РјРµРЅР°  СЌР»РµРјРµРЅС‚Р° СЃС‚СЂРѕРєРё РІ СѓРєР°Р·Р°РЅРЅРѕР№ РїРѕР·РёС†РёРё
+'           = False - РІСЃС‚Р°РІРєР° СЃРѕ СЃРґРІРёРіРѕРј РІ СѓРєР°Р·Р°РЅРЅСѓСЋ РїРѕР·РёРёСЋ (Pos > 0 РїРѕСЃР»Рµ СѓРєР°Р·Р°РЅРЅРѕР№ РїРѕР·РёС†РёРё,  Pos < 0 - РїРµСЂРµРґ)
+' sBeg,sEnd - РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР·РёС†РёСЋ РЅР°С‡Р°Р»Р° Рё РѕРєРѕРЅС‡Р°РЅРёСЏ РІСЃС‚Р°РІР»РµРЅРЅРѕР№ РїРѕРґСЃС‚СЂРѕРєРё (Р·РЅР°С‡РµРЅРёСЏ С‚СЌРіР°) РІ РёСЃС…РѕРґРЅРѕР№
+' Compare - С‚РёРї СЃСЂР°РІРЅРµРЅРёСЏ (vbBinaryCompare/vbTextCompare)
+' UseTagPos - РѕРїСЂРµРґРµР»СЏРµС‚, С‡С‚Рѕ Р·Р°РґР°РµС‚ РїР°СЂР°РјРµС‚СЂ Pos РїРѕР·РёС†РёСЋ РїРѕРґСЃС‚СЂРѕРєРё, РёР»Рё РїРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ С‚СЌРіР° СЃ РёРјРµРЅРµРј (Tag) ???
+'           - True  - Pos РѕРїСЂРµРґРµР»СЏРµС‚СЃСЏ РїРѕ РёРјРµРЅРё С‚СЌРіР° (Tag)      - n-Р№ С‚СЌРі СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј
+'           - False - Pos РѕРїСЂРµРґРµР»СЏРµС‚СЃСЏ РїРѕ СЂР°Р·РґРµР»РёС‚РµР»СЏРј (Delim)  - n-Р№ С‚СЌРі РїРѕ РїРѕСЂСЏРґРєСѓ
+' РІРѕР·РІСЂР°С‰Р°РµС‚ СЃС‚СЂРѕРєСѓ СЌР»РµРјРµРЅС‚РѕРІ СЃ СѓС‡РµС‚РѕРј РґРѕР±Р°РІР»РµРЅРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
 '-------------------------
-' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами (старый вариант закомментил)
-' v.1.0.3       : 11.02.2022 - Исправлены ошибки возникающие если TagDelim текстовое выражение, зависящее от регистра
+' v.1.1.0       : 16.04.2024 - РџРµСЂРµРїРёСЃР°РЅР° РґР»СЏ РїРѕРґРґРµСЂР¶РєРё С‚СЌРіРѕРІ СЃ РѕРґРёРЅР°РєРѕРІС‹РјРё РёРјРµРЅР°РјРё (СЃС‚Р°СЂС‹Р№ РІР°СЂРёР°РЅС‚ Р·Р°РєРѕРјРјРµРЅС‚РёР»)
+' v.1.0.3       : 11.02.2022 - РСЃРїСЂР°РІР»РµРЅС‹ РѕС€РёР±РєРё РІРѕР·РЅРёРєР°СЋС‰РёРµ РµСЃР»Рё TagDelim С‚РµРєСЃС‚РѕРІРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ, Р·Р°РІРёСЃСЏС‰РµРµ РѕС‚ СЂРµРіРёСЃС‚СЂР°
 '-------------------------
-' !!! если тэг (Tag) и позиция (Pos) заданы, а Overwrite=False - в таком виде получается неоднозначная интерпретация параметров ->
-' ??? заменять/вставлять новый "Tag=Data" в указанную позицию (Pos), или в позицию (Pos) по-порядку тэга с именем (Tag) ???
-'     пришлось вводить доп параметр UseTagPos
-' ToDo: пересмотреть и упростить весь блок процедур TaggedString
+' !!! РµСЃР»Рё С‚СЌРі (Tag) Рё РїРѕР·РёС†РёСЏ (Pos) Р·Р°РґР°РЅС‹, Р° Overwrite=False - РІ С‚Р°РєРѕРј РІРёРґРµ РїРѕР»СѓС‡Р°РµС‚СЃСЏ РЅРµРѕРґРЅРѕР·РЅР°С‡РЅР°СЏ РёРЅС‚РµСЂРїСЂРµС‚Р°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ ->
+' ??? Р·Р°РјРµРЅСЏС‚СЊ/РІСЃС‚Р°РІР»СЏС‚СЊ РЅРѕРІС‹Р№ "Tag=Data" РІ СѓРєР°Р·Р°РЅРЅСѓСЋ РїРѕР·РёС†РёСЋ (Pos), РёР»Рё РІ РїРѕР·РёС†РёСЋ (Pos) РїРѕ-РїРѕСЂСЏРґРєСѓ С‚СЌРіР° СЃ РёРјРµРЅРµРј (Tag) ???
+'     РїСЂРёС€Р»РѕСЃСЊ РІРІРѕРґРёС‚СЊ РґРѕРї РїР°СЂР°РјРµС‚СЂ UseTagPos
+' ToDo: РїРµСЂРµСЃРјРѕС‚СЂРµС‚СЊ Рё СѓРїСЂРѕСЃС‚РёС‚СЊ РІРµСЃСЊ Р±Р»РѕРє РїСЂРѕС†РµРґСѓСЂ TaggedString
 '-------------------------
 Dim Result As String: Result = Source
     On Error GoTo HandleError
 
-' если исходная строка пустая
+' РµСЃР»Рё РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР° РїСѓСЃС‚Р°СЏ
     If Len(Source) = 0 Then
         If Len(Tag) > 0 Then
             Result = Tag
@@ -2394,96 +2404,96 @@ Dim Result As String: Result = Source
     End If
     
     Result = Source
-' ищем границы подстроки в выражении
+' РёС‰РµРј РіСЂР°РЅРёС†С‹ РїРѕРґСЃС‚СЂРѕРєРё РІ РІС‹СЂР°Р¶РµРЅРёРё
 Dim bFound As Boolean: bFound = p_GetSubstrBoundsByTag(Source, Tag, , Pos, sBeg, sEnd, Delim, TagDelim, Compare, UseTagPos)
     If Not bFound Then
         If Len(Tag) > 0 Then
-    ' если не найдено, но тэг задан - добавляем в начало или в конец
+    ' РµСЃР»Рё РЅРµ РЅР°Р№РґРµРЅРѕ, РЅРѕ С‚СЌРі Р·Р°РґР°РЅ - РґРѕР±Р°РІР»СЏРµРј РІ РЅР°С‡Р°Р»Рѕ РёР»Рё РІ РєРѕРЅРµС†
             If Pos > 0 Then Pos = -1 Else Pos = 1
             Overwrite = False
         Else
-    ' если здесь нет тэга он был не задан и не найден по позиции - добавить невозможно
+    ' РµСЃР»Рё Р·РґРµСЃСЊ РЅРµС‚ С‚СЌРіР° РѕРЅ Р±С‹Р» РЅРµ Р·Р°РґР°РЅ Рё РЅРµ РЅР°Р№РґРµРЅ РїРѕ РїРѕР·РёС†РёРё - РґРѕР±Р°РІРёС‚СЊ РЅРµРІРѕР·РјРѕР¶РЅРѕ
             If Pos > 0 Then sBeg = sEnd Else sEnd = sBeg
             GoTo HandleExit
         End If
     End If
-' формируем строку для вставки
+' С„РѕСЂРјРёСЂСѓРµРј СЃС‚СЂРѕРєСѓ РґР»СЏ РІСЃС‚Р°РІРєРё
 Dim sTemp As String: sTemp = Tag: If Len(Data) > 0 Then sTemp = sTemp & TagDelim & Data
     If Not Overwrite Then
-    ' вставка со сдвигом
-        ' Pos > 0 - вставка перед указанной позицией,
-        ' Pos < 0 - после указанной позиции
+    ' РІСЃС‚Р°РІРєР° СЃРѕ СЃРґРІРёРіРѕРј
+        ' Pos > 0 - РІСЃС‚Р°РІРєР° РїРµСЂРµРґ СѓРєР°Р·Р°РЅРЅРѕР№ РїРѕР·РёС†РёРµР№,
+        ' Pos < 0 - РїРѕСЃР»Рµ СѓРєР°Р·Р°РЅРЅРѕР№ РїРѕР·РёС†РёРё
         If Pos > 0 Then sEnd = sBeg Else sBeg = sEnd
-        ' добавляем разделитель после/перед вставляемым элементом
+        ' РґРѕР±Р°РІР»СЏРµРј СЂР°Р·РґРµР»РёС‚РµР»СЊ РїРѕСЃР»Рµ/РїРµСЂРµРґ РІСЃС‚Р°РІР»СЏРµРјС‹Рј СЌР»РµРјРµРЅС‚РѕРј
         Result = Left$(Result, sBeg - 1) & Delim & Mid$(Result, sEnd)
         If Pos < 0 Then sEnd = sEnd + Len(Delim): sBeg = sEnd
     End If
-' формируем результирующую строку
+' С„РѕСЂРјРёСЂСѓРµРј СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰СѓСЋ СЃС‚СЂРѕРєСѓ
     Result = Left$(Result, sBeg - 1) & sTemp & Mid$(Result, sEnd)
     sBeg = sBeg + Len(Tag): If Len(Data) > 0 Then sBeg = sBeg + Len(TagDelim)
     sEnd = sBeg + Len(Data)
 ''-------------------------
 '' Old version (set only 1st entry)
 ''-------------------------
-'' пустое имя тэга
+'' РїСѓСЃС‚РѕРµ РёРјСЏ С‚СЌРіР°
 '    If Len(Tag) = 0 Then
 '        Result = Source
-''' ищем по Pos и получаем его Tag
-''   ' при получении по позиции - не даем выходить за пределы строки, - всегда берем имеющуюся подстроку
+''' РёС‰РµРј РїРѕ Pos Рё РїРѕР»СѓС‡Р°РµРј РµРіРѕ Tag
+''   ' РїСЂРё РїРѕР»СѓС‡РµРЅРёРё РїРѕ РїРѕР·РёС†РёРё - РЅРµ РґР°РµРј РІС‹С…РѕРґРёС‚СЊ Р·Р° РїСЂРµРґРµР»С‹ СЃС‚СЂРѕРєРё, - РІСЃРµРіРґР° Р±РµСЂРµРј РёРјРµСЋС‰СѓСЋСЃСЏ РїРѕРґСЃС‚СЂРѕРєСѓ
 ''        Call p_GetSubstrBounds(Result, Pos, sBeg, sEnd, Delim)
 ''        Tag = Split(Mid$(Result, sBeg, sEnd - sBeg), TagDelim)(0)
-''        sTemp = Tag & TagDelim & Data   ' "Tag=Val" - тэг только что получен
+''        sTemp = Tag & TagDelim & Data   ' "Tag=Val" - С‚СЌРі С‚РѕР»СЊРєРѕ С‡С‚Рѕ РїРѕР»СѓС‡РµРЅ
 '        GoTo HandleExit
 '    End If
-'' пустое значение
+'' РїСѓСЃС‚РѕРµ Р·РЅР°С‡РµРЅРёРµ
 '    If Len(Data) = 0 Then Result = TaggedStringDel(Source, Tag): GoTo HandleExit
-'' пустая строка
+'' РїСѓСЃС‚Р°СЏ СЃС‚СЂРѕРєР°
 '    If Len(Source) = 0 Then If Len(Tag) > 0 Then Result = Tag & TagDelim & Data: GoTo HandleExit ': Pos = 1
 'Dim sTemp As String
 'Dim pLen As Long
-''' ищем по Tag
-''    ' поиск наличия тэга с таким именем
+''' РёС‰РµРј РїРѕ Tag
+''    ' РїРѕРёСЃРє РЅР°Р»РёС‡РёСЏ С‚СЌРіР° СЃ С‚Р°РєРёРј РёРјРµРЅРµРј
 '    sBeg = 0: sEnd = 0 'Len(Result)
 '    pLen = 1 'Len(Tag) + Len(TagDelim)
 '    sTemp = Tag & TagDelim & Data ' "Tag=Val"
 '    If StrComp(Left$(Source, Len(Tag) + Len(TagDelim)), Tag & TagDelim, Compare) = 0 Then  ' Left$(Source, Len(Tag) + Len(TagDelim)) = Tag & TagDelim Then
-'    ' имя тэга найдено в начале строки ("Tag=...")
+'    ' РёРјСЏ С‚СЌРіР° РЅР°Р№РґРµРЅРѕ РІ РЅР°С‡Р°Р»Рµ СЃС‚СЂРѕРєРё ("Tag=...")
 '        sBeg = 1
 '    Else
-'    ' ищем в середине строки имя тэга с разделителем тэг/значение ("...;Tag=...")
+'    ' РёС‰РµРј РІ СЃРµСЂРµРґРёРЅРµ СЃС‚СЂРѕРєРё РёРјСЏ С‚СЌРіР° СЃ СЂР°Р·РґРµР»РёС‚РµР»РµРј С‚СЌРі/Р·РЅР°С‡РµРЅРёРµ ("...;Tag=...")
 '        sBeg = InStr(pLen + 1, Result, Delim & Tag & TagDelim, Compare)
 '        If sBeg > 0 Then
-'    ' имя тэга с разделителем тэг/значение найдено в середине строки ("...;Tag=...")
+'    ' РёРјСЏ С‚СЌРіР° СЃ СЂР°Р·РґРµР»РёС‚РµР»РµРј С‚СЌРі/Р·РЅР°С‡РµРЅРёРµ РЅР°Р№РґРµРЅРѕ РІ СЃРµСЂРµРґРёРЅРµ СЃС‚СЂРѕРєРё ("...;Tag=...")
 '            pLen = pLen + Len(Delim)
 '        Else
-'    ' если не найдено - проверяем тэг без значения и разделителя тэг/значение
+'    ' РµСЃР»Рё РЅРµ РЅР°Р№РґРµРЅРѕ - РїСЂРѕРІРµСЂСЏРµРј С‚СЌРі Р±РµР· Р·РЅР°С‡РµРЅРёСЏ Рё СЂР°Р·РґРµР»РёС‚РµР»СЏ С‚СЌРі/Р·РЅР°С‡РµРЅРёРµ
 '            pLen = Len(Tag) + Len(Delim)
 '            If StrComp(Left$(Source, pLen), Tag & Delim, Compare) = 0 Then 'Left$(Source, pLen) = Tag & Delim Then
-'        ' проверяем в начале строки ("Tag;...")
+'        ' РїСЂРѕРІРµСЂСЏРµРј РІ РЅР°С‡Р°Р»Рµ СЃС‚СЂРѕРєРё ("Tag;...")
 '                sBeg = 1: sEnd = Len(Tag) + 1
 '            ElseIf StrComp(Source, Tag, Compare) = 0 Then  'tmpSource = tmpTag Then
-'        ' проверяем всю строку ("Tag")
+'        ' РїСЂРѕРІРµСЂСЏРµРј РІСЃСЋ СЃС‚СЂРѕРєСѓ ("Tag")
 '                sBeg = 1: sEnd = Len(Result) + 1
 '            ElseIf StrComp(Right$(Source, pLen), Delim & Tag, Compare) = 0 Then  'Right$(tmpSource, pLen) = tmpDelim & tmpTag Then
-'        ' проверяем в конце строки ("...;Tag")
+'        ' РїСЂРѕРІРµСЂСЏРµРј РІ РєРѕРЅС†Рµ СЃС‚СЂРѕРєРё ("...;Tag")
 '                sBeg = Len(Result) - Len(Tag): sEnd = Len(Result) + 1
 '            Else
-'        ' проверяем в середине строки ("...;Tag;...")
+'        ' РїСЂРѕРІРµСЂСЏРµРј РІ СЃРµСЂРµРґРёРЅРµ СЃС‚СЂРѕРєРё ("...;Tag;...")
 '                sBeg = InStr(1, Result, Delim & Tag & Delim, Compare): sEnd = sBeg + pLen
 '            End If
 '        End If
 '    End If
-'' если начало найдено а конец не определен ищем конечный разделитель
+'' РµСЃР»Рё РЅР°С‡Р°Р»Рѕ РЅР°Р№РґРµРЅРѕ Р° РєРѕРЅРµС† РЅРµ РѕРїСЂРµРґРµР»РµРЅ РёС‰РµРј РєРѕРЅРµС‡РЅС‹Р№ СЂР°Р·РґРµР»РёС‚РµР»СЊ
 '    If sBeg > 0 And sEnd = 0 Then sEnd = InStr(sBeg + pLen + 1, Result, Delim, Compare): If sEnd = 0 Then sEnd = Len(Result) + 1
 ''        bFound = sBeg > 0
 '
 ''        If Pos = 0 Then
-''    ' вставка в позицию найденного элемента или в конец строки
-''        ' корректируем границы фрагмента
-''            ' найден не в начале вставка после разделителя
-''            ' не найден - вставка в конец, добавляем перед вставкой разделитель
+''    ' РІСЃС‚Р°РІРєР° РІ РїРѕР·РёС†РёСЋ РЅР°Р№РґРµРЅРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РёР»Рё РІ РєРѕРЅРµС† СЃС‚СЂРѕРєРё
+''        ' РєРѕСЂСЂРµРєС‚РёСЂСѓРµРј РіСЂР°РЅРёС†С‹ С„СЂР°РіРјРµРЅС‚Р°
+''            ' РЅР°Р№РґРµРЅ РЅРµ РІ РЅР°С‡Р°Р»Рµ РІСЃС‚Р°РІРєР° РїРѕСЃР»Рµ СЂР°Р·РґРµР»РёС‚РµР»СЏ
+''            ' РЅРµ РЅР°Р№РґРµРЅ - РІСЃС‚Р°РІРєР° РІ РєРѕРЅРµС†, РґРѕР±Р°РІР»СЏРµРј РїРµСЂРµРґ РІСЃС‚Р°РІРєРѕР№ СЂР°Р·РґРµР»РёС‚РµР»СЊ
 '        If sBeg = 0 Then sBeg = Len(Result) + 1: sEnd = sBeg
-''        ' получаем позицию фрагмента вставки
+''        ' РїРѕР»СѓС‡Р°РµРј РїРѕР·РёС†РёСЋ С„СЂР°РіРјРµРЅС‚Р° РІСЃС‚Р°РІРєРё
 '        If sBeg > 1 Then
 '            sTemp = Delim & sTemp
 ''                Pos = InStrCount(Left$(Result, sBeg), Delim) + 2
@@ -2491,13 +2501,13 @@ Dim sTemp As String: sTemp = Tag: If Len(Data) > 0 Then sTemp = sTemp & TagDelim
 ''                Pos = 1
 '        End If
 ''        Else
-''    ' удаление фрагмента в текущей позиции и вставка в указанную позицию
-''        ' удаление в найденной позиции
+''    ' СѓРґР°Р»РµРЅРёРµ С„СЂР°РіРјРµРЅС‚Р° РІ С‚РµРєСѓС‰РµР№ РїРѕР·РёС†РёРё Рё РІСЃС‚Р°РІРєР° РІ СѓРєР°Р·Р°РЅРЅСѓСЋ РїРѕР·РёС†РёСЋ
+''        ' СѓРґР°Р»РµРЅРёРµ РІ РЅР°Р№РґРµРЅРЅРѕР№ РїРѕР·РёС†РёРё
 ''            If sBeg > 0 Then
 ''                If sBeg = 1 Then sEnd = sEnd + Len(Delim)
 ''                Result = Left$(Source, sBeg - 1) & Mid$(Source, sEnd)
 ''            End If
-''        ' получаем позицию фрагмента вставки и формируем вставляемую строку
+''        ' РїРѕР»СѓС‡Р°РµРј РїРѕР·РёС†РёСЋ С„СЂР°РіРјРµРЅС‚Р° РІСЃС‚Р°РІРєРё Рё С„РѕСЂРјРёСЂСѓРµРј РІСЃС‚Р°РІР»СЏРµРјСѓСЋ СЃС‚СЂРѕРєСѓ
 ''            'Result = DelimStringSet(Result, Pos, sTemp, Delim, Overwrite:=False): GoTo HandleExit
 ''            Select Case Pos
 ''            Case 1:     Result = sTemp & Delim & Result: GoTo HandleExit
@@ -2510,7 +2520,7 @@ Dim sTemp As String: sTemp = Tag: If Len(Data) > 0 Then sTemp = sTemp & TagDelim
 ''            End If
 ''        End If
 '
-'' вставка в указанную позицию
+'' РІСЃС‚Р°РІРєР° РІ СѓРєР°Р·Р°РЅРЅСѓСЋ РїРѕР·РёС†РёСЋ
 '    Result = Left$(Result, sBeg - 1) & sTemp & Mid$(Result, sEnd)
 ''-------------------------
 HandleExit:  TaggedStringSet = Result: Exit Function
@@ -2524,32 +2534,32 @@ Public Function TaggedStringDel(Source As String, _
     Optional sBeg As Long, Optional sEnd As Long, _
     Optional Compare As VbCompareMethod = vbTextCompare _
     ) As String
-' удаляет элемент строки с разделителями с указанным именем
+' СѓРґР°Р»СЏРµС‚ СЌР»РµРјРµРЅС‚ СЃС‚СЂРѕРєРё СЃ СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј
 '-------------------------
-' Source - строка элементов вида "Tag1=Val1;...TagN=ValN"
-' Tag -     имя (Tag) элемента. если Tag не задан - элемент будет получен по Pos
-' Pos -     позиция удаляемого элемента
-'           >0 - позиция относительно начала строки
-'           <0 - позиция относительно конца строки
-' Delim -   разделитель пар имя (Tag) / значение (Val)
-' TagDelim - разделитель имени (Tag) и значение (Val) в паре
-' sBeg,sEnd - возвращает позицию начала и окончания вставленной подстроки в исходной
-' Compare - тип сравнения (vbBinaryCompare/vbTextCompare)
-' Возвращает строку элементов без указанного элемента
+' Source - СЃС‚СЂРѕРєР° СЌР»РµРјРµРЅС‚РѕРІ РІРёРґР° "Tag1=Val1;...TagN=ValN"
+' Tag -     РёРјСЏ (Tag) СЌР»РµРјРµРЅС‚Р°. РµСЃР»Рё Tag РЅРµ Р·Р°РґР°РЅ - СЌР»РµРјРµРЅС‚ Р±СѓРґРµС‚ РїРѕР»СѓС‡РµРЅ РїРѕ Pos
+' Pos -     РїРѕР·РёС†РёСЏ СѓРґР°Р»СЏРµРјРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
+'           >0 - РїРѕР·РёС†РёСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё
+'           <0 - РїРѕР·РёС†РёСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё
+' Delim -   СЂР°Р·РґРµР»РёС‚РµР»СЊ РїР°СЂ РёРјСЏ (Tag) / Р·РЅР°С‡РµРЅРёРµ (Val)
+' TagDelim - СЂР°Р·РґРµР»РёС‚РµР»СЊ РёРјРµРЅРё (Tag) Рё Р·РЅР°С‡РµРЅРёРµ (Val) РІ РїР°СЂРµ
+' sBeg,sEnd - РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР·РёС†РёСЋ РЅР°С‡Р°Р»Р° Рё РѕРєРѕРЅС‡Р°РЅРёСЏ РІСЃС‚Р°РІР»РµРЅРЅРѕР№ РїРѕРґСЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕР№
+' Compare - С‚РёРї СЃСЂР°РІРЅРµРЅРёСЏ (vbBinaryCompare/vbTextCompare)
+' Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃС‚СЂРѕРєСѓ СЌР»РµРјРµРЅС‚РѕРІ Р±РµР· СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
 '-------------------------
-' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами (старый вариант закомментил)
+' v.1.1.0       : 16.04.2024 - РџРµСЂРµРїРёСЃР°РЅР° РґР»СЏ РїРѕРґРґРµСЂР¶РєРё С‚СЌРіРѕРІ СЃ РѕРґРёРЅР°РєРѕРІС‹РјРё РёРјРµРЅР°РјРё (СЃС‚Р°СЂС‹Р№ РІР°СЂРёР°РЅС‚ Р·Р°РєРѕРјРјРµРЅС‚РёР»)
 '-------------------------
 Dim Result As String: Result = Source
     On Error GoTo HandleError
     If Len(Source) = 0 Then GoTo HandleExit
-' ищем границы подстроки в выражении
-    ' если здесь нет тэга он был не задан и не найден по позиции - удалить невозможно
+' РёС‰РµРј РіСЂР°РЅРёС†С‹ РїРѕРґСЃС‚СЂРѕРєРё РІ РІС‹СЂР°Р¶РµРЅРёРё
+    ' РµСЃР»Рё Р·РґРµСЃСЊ РЅРµС‚ С‚СЌРіР° РѕРЅ Р±С‹Р» РЅРµ Р·Р°РґР°РЅ Рё РЅРµ РЅР°Р№РґРµРЅ РїРѕ РїРѕР·РёС†РёРё - СѓРґР°Р»РёС‚СЊ РЅРµРІРѕР·РјРѕР¶РЅРѕ
     If Not p_GetSubstrBoundsByTag(Source, Tag, , Pos, sBeg, sEnd, Delim, TagDelim) Then GoTo HandleExit
-    ' позиция соответствует искомой, - найдено
-        ' если удаление в середине или в начале строки - удалить начальный разделитель правого фрагмента,
-        ' если в конце строки - конечный разделитель левого фрагмента
-        ' сдвинуть границы
-' возвращаем результат
+    ' РїРѕР·РёС†РёСЏ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ РёСЃРєРѕРјРѕР№, - РЅР°Р№РґРµРЅРѕ
+        ' РµСЃР»Рё СѓРґР°Р»РµРЅРёРµ РІ СЃРµСЂРµРґРёРЅРµ РёР»Рё РІ РЅР°С‡Р°Р»Рµ СЃС‚СЂРѕРєРё - СѓРґР°Р»РёС‚СЊ РЅР°С‡Р°Р»СЊРЅС‹Р№ СЂР°Р·РґРµР»РёС‚РµР»СЊ РїСЂР°РІРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°,
+        ' РµСЃР»Рё РІ РєРѕРЅС†Рµ СЃС‚СЂРѕРєРё - РєРѕРЅРµС‡РЅС‹Р№ СЂР°Р·РґРµР»РёС‚РµР»СЊ Р»РµРІРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+        ' СЃРґРІРёРЅСѓС‚СЊ РіСЂР°РЅРёС†С‹
+' РІРѕР·РІСЂР°С‰Р°РµРј СЂРµР·СѓР»СЊС‚Р°С‚
 Dim sTemp As String: sTemp = Left$(Result, sBeg - 1)
     Result = Mid$(Result, sEnd)
     If Len(Result) > 0 Then
@@ -2563,57 +2573,57 @@ Dim sTemp As String: sTemp = Left$(Result, sBeg - 1)
 '' Old version (del only 1st entry)
 ''-------------------------
 '    If Len(Tag) > 0 Then
-''' ищем по Tag
-''    ' поиск наличия тага с таким именем
+''' РёС‰РµРј РїРѕ Tag
+''    ' РїРѕРёСЃРє РЅР°Р»РёС‡РёСЏ С‚Р°РіР° СЃ С‚Р°РєРёРј РёРјРµРЅРµРј
 '        sBeg = 0: sEnd = 0 'Len(Result)
 'Dim pLen As Long
 '        pLen = 1 'Len(Tag) + Len(TagDelim)
 '        'sTemp = Tag & TagDelim & Data   ' "Tag=Val"
 '        If StrComp(Left$(Source, Len(Tag) + Len(TagDelim)), Tag & TagDelim, Compare) = 0 Then ' Left$(tmpSource, Len(Tag) + Len(TagDelim)) = tmpTag & tmpTagDelim Then
-'        ' имя тэга найдено в начале строки ("Tag=...")
+'        ' РёРјСЏ С‚СЌРіР° РЅР°Р№РґРµРЅРѕ РІ РЅР°С‡Р°Р»Рµ СЃС‚СЂРѕРєРё ("Tag=...")
 '            sBeg = 1
 '        Else
-'        ' ищем в середине строки имя тэга с разделителем тэг/значение ("...;Tag=...")
+'        ' РёС‰РµРј РІ СЃРµСЂРµРґРёРЅРµ СЃС‚СЂРѕРєРё РёРјСЏ С‚СЌРіР° СЃ СЂР°Р·РґРµР»РёС‚РµР»РµРј С‚СЌРі/Р·РЅР°С‡РµРЅРёРµ ("...;Tag=...")
 '            sBeg = InStr(pLen + 1, Result, Delim & Tag & TagDelim, Compare)
 '            If sBeg > 0 Then
-'        ' имя тэга с разделителем тэг/значение найдено в середине строки ("...;Tag=...")
+'        ' РёРјСЏ С‚СЌРіР° СЃ СЂР°Р·РґРµР»РёС‚РµР»РµРј С‚СЌРі/Р·РЅР°С‡РµРЅРёРµ РЅР°Р№РґРµРЅРѕ РІ СЃРµСЂРµРґРёРЅРµ СЃС‚СЂРѕРєРё ("...;Tag=...")
 '                pLen = pLen + Len(Delim)
 '            Else
-'        ' если не найдено - проверяем тэг без значения и разделителя тэг/значение
+'        ' РµСЃР»Рё РЅРµ РЅР°Р№РґРµРЅРѕ - РїСЂРѕРІРµСЂСЏРµРј С‚СЌРі Р±РµР· Р·РЅР°С‡РµРЅРёСЏ Рё СЂР°Р·РґРµР»РёС‚РµР»СЏ С‚СЌРі/Р·РЅР°С‡РµРЅРёРµ
 '                pLen = Len(Tag) + Len(Delim)
 '                If StrComp(Left$(Source, pLen), Tag & Delim, Compare) = 0 Then  ' Left$(tmpSource, pLen) = tmpTag & tmpDelim Then
-'            ' проверяем в начале строки ("Tag;...")
+'            ' РїСЂРѕРІРµСЂСЏРµРј РІ РЅР°С‡Р°Р»Рµ СЃС‚СЂРѕРєРё ("Tag;...")
 '                    sBeg = 1: sEnd = Len(Tag) + 1
 '                ElseIf StrComp(Source, Tag, Compare) = 0 Then   ' tmpSource = tmpTag Then
-'            ' проверяем всю строку ("Tag")
+'            ' РїСЂРѕРІРµСЂСЏРµРј РІСЃСЋ СЃС‚СЂРѕРєСѓ ("Tag")
 '                    sBeg = 1: sEnd = Len(Result) + 1
 '                ElseIf StrComp(Right$(Source, pLen) = Delim & Tag, Compare) = 0 Then   'Right$(tmpSource, pLen) = tmpDelim & tmpTag Then
-'            ' проверяем в конце строки ("...;Tag")
+'            ' РїСЂРѕРІРµСЂСЏРµРј РІ РєРѕРЅС†Рµ СЃС‚СЂРѕРєРё ("...;Tag")
 '                    sBeg = Len(Result) - Len(Tag): sEnd = Len(Result) + 1
 '                Else
-'            ' проверяем в середине строки ("...;Tag;...")
+'            ' РїСЂРѕРІРµСЂСЏРµРј РІ СЃРµСЂРµРґРёРЅРµ СЃС‚СЂРѕРєРё ("...;Tag;...")
 '                    sBeg = InStr(1, Result, Delim & Tag & Delim, Compare): sEnd = sBeg + pLen
 '                End If
 '            End If
 '        End If
-'        If sBeg = 0 Then GoTo HandleExit ' тэг не найден
-''        ' если начало фрагмента найдено ищем его конец
+'        If sBeg = 0 Then GoTo HandleExit ' С‚СЌРі РЅРµ РЅР°Р№РґРµРЅ
+''        ' РµСЃР»Рё РЅР°С‡Р°Р»Рѕ С„СЂР°РіРјРµРЅС‚Р° РЅР°Р№РґРµРЅРѕ РёС‰РµРј РµРіРѕ РєРѕРЅРµС†
 '        If sEnd = 0 Then sEnd = InStr(sBeg + pLen + 1, Result, Delim, Compare): If sEnd = 0 Then sEnd = Len(Result) + 1
-''        ' получаем позицию фрагмента удаления
+''        ' РїРѕР»СѓС‡Р°РµРј РїРѕР·РёС†РёСЋ С„СЂР°РіРјРµРЅС‚Р° СѓРґР°Р»РµРЅРёСЏ
 '        If sBeg <= 1 Then
 '            sEnd = sEnd + Len(Delim) ': Pos = 1
 '        Else
 '            Pos = InStrCount(Left$(Result, sBeg), Delim) + 1
 '        End If
 '    Else
-'' ищем по Pos
-'    ' при получении по позиции - не даем выходить за пределы строки, - всегда берем имеющуюся подстроку
+'' РёС‰РµРј РїРѕ Pos
+'    ' РїСЂРё РїРѕР»СѓС‡РµРЅРёРё РїРѕ РїРѕР·РёС†РёРё - РЅРµ РґР°РµРј РІС‹С…РѕРґРёС‚СЊ Р·Р° РїСЂРµРґРµР»С‹ СЃС‚СЂРѕРєРё, - РІСЃРµРіРґР° Р±РµСЂРµРј РёРјРµСЋС‰СѓСЋСЃСЏ РїРѕРґСЃС‚СЂРѕРєСѓ
 '        Call p_GetSubstrBounds(Result, Pos, sBeg, sEnd, Delim)
 '        'Tag = Split(Mid$(Result, sBeg, sEnd - sBeg), TagDelim)(0)
 '        If sBeg > 1 Then sBeg = sBeg - Len(Delim) Else sEnd = sEnd + Len(Delim)
 '        If Pos > 1 Then Pos = Pos - 1
 '    End If
-'' удаление указанной позиции
+'' СѓРґР°Р»РµРЅРёРµ СѓРєР°Р·Р°РЅРЅРѕР№ РїРѕР·РёС†РёРё
 '    Result = Left$(Result, sBeg - 1) & Mid$(Result, sEnd)
 ''-------------------------
 HandleExit:  sEnd = sBeg: TaggedStringDel = Result: Exit Function
@@ -2625,22 +2635,22 @@ Public Function TaggedString2Collection(Source As String, _
         Optional ReplaceExisting As Integer = True, _
         Optional MultiSfx As String = c_strMultiSfx _
         ) As Boolean
-' преобразует строку именованных параметров в коллекцию значений с ключами соотв имени тэга
+' РїСЂРµРѕР±СЂР°Р·СѓРµС‚ СЃС‚СЂРѕРєСѓ РёРјРµРЅРѕРІР°РЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РІ РєРѕР»Р»РµРєС†РёСЋ Р·РЅР°С‡РµРЅРёР№ СЃ РєР»СЋС‡Р°РјРё СЃРѕРѕС‚РІ РёРјРµРЅРё С‚СЌРіР°
 '-------------------------
-' Source - строка элементов вида "Tag1=Val1;...TagN=ValN"
-' Tags - возвращаемая коллекция значений тэгов. если на входе передана непустая коллекция новые значения будут добавлены к ней
-' Keys - (если задано) возвращает массив ключей коллекции (Tag)
-' Delim -   разделитель пар имя (Tag) / значение (Val)
-' TagDelim - разделитель имени (Tag) и значение (Val) в паре
-' ReplaceExisting - определяет поведение при обнаружении переменных с одинаковым именем
-'   0 - будет сохранено первое значение
-'  -1 - будет сохранено последнее значение
-'   1 - будут сохранены все значения в переменных с добавлением суффикса
-' MultiSfx - признак суффикса для повторяющихся имен (при ReplaceExisting=1) д.б. что-то заведомо отсутствующее в именах переменных
+' Source - СЃС‚СЂРѕРєР° СЌР»РµРјРµРЅС‚РѕРІ РІРёРґР° "Tag1=Val1;...TagN=ValN"
+' Tags - РІРѕР·РІСЂР°С‰Р°РµРјР°СЏ РєРѕР»Р»РµРєС†РёСЏ Р·РЅР°С‡РµРЅРёР№ С‚СЌРіРѕРІ. РµСЃР»Рё РЅР° РІС…РѕРґРµ РїРµСЂРµРґР°РЅР° РЅРµРїСѓСЃС‚Р°СЏ РєРѕР»Р»РµРєС†РёСЏ РЅРѕРІС‹Рµ Р·РЅР°С‡РµРЅРёСЏ Р±СѓРґСѓС‚ РґРѕР±Р°РІР»РµРЅС‹ Рє РЅРµР№
+' Keys - (РµСЃР»Рё Р·Р°РґР°РЅРѕ) РІРѕР·РІСЂР°С‰Р°РµС‚ РјР°СЃСЃРёРІ РєР»СЋС‡РµР№ РєРѕР»Р»РµРєС†РёРё (Tag)
+' Delim -   СЂР°Р·РґРµР»РёС‚РµР»СЊ РїР°СЂ РёРјСЏ (Tag) / Р·РЅР°С‡РµРЅРёРµ (Val)
+' TagDelim - СЂР°Р·РґРµР»РёС‚РµР»СЊ РёРјРµРЅРё (Tag) Рё Р·РЅР°С‡РµРЅРёРµ (Val) РІ РїР°СЂРµ
+' ReplaceExisting - РѕРїСЂРµРґРµР»СЏРµС‚ РїРѕРІРµРґРµРЅРёРµ РїСЂРё РѕР±РЅР°СЂСѓР¶РµРЅРёРё РїРµСЂРµРјРµРЅРЅС‹С… СЃ РѕРґРёРЅР°РєРѕРІС‹Рј РёРјРµРЅРµРј
+'   0 - Р±СѓРґРµС‚ СЃРѕС…СЂР°РЅРµРЅРѕ РїРµСЂРІРѕРµ Р·РЅР°С‡РµРЅРёРµ
+'  -1 - Р±СѓРґРµС‚ СЃРѕС…СЂР°РЅРµРЅРѕ РїРѕСЃР»РµРґРЅРµРµ Р·РЅР°С‡РµРЅРёРµ
+'   1 - Р±СѓРґСѓС‚ СЃРѕС…СЂР°РЅРµРЅС‹ РІСЃРµ Р·РЅР°С‡РµРЅРёСЏ РІ РїРµСЂРµРјРµРЅРЅС‹С… СЃ РґРѕР±Р°РІР»РµРЅРёРµРј СЃСѓС„С„РёРєСЃР°
+' MultiSfx - РїСЂРёР·РЅР°Рє СЃСѓС„С„РёРєСЃР° РґР»СЏ РїРѕРІС‚РѕСЂСЏСЋС‰РёС…СЃСЏ РёРјРµРЅ (РїСЂРё ReplaceExisting=1) Рґ.Р±. С‡С‚Рѕ-С‚Рѕ Р·Р°РІРµРґРѕРјРѕ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РµРµ РІ РёРјРµРЅР°С… РїРµСЂРµРјРµРЅРЅС‹С…
 '-------------------------
-' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами (очень тупо и в лоб, но хороших идей нет)
+' v.1.1.0       : 16.04.2024 - РџРµСЂРµРїРёСЃР°РЅР° РґР»СЏ РїРѕРґРґРµСЂР¶РєРё С‚СЌРіРѕРІ СЃ РѕРґРёРЅР°РєРѕРІС‹РјРё РёРјРµРЅР°РјРё (РѕС‡РµРЅСЊ С‚СѓРїРѕ Рё РІ Р»РѕР±, РЅРѕ С…РѕСЂРѕС€РёС… РёРґРµР№ РЅРµС‚)
 '-------------------------
-' ToDo: !!! необходимо оптимизировать код, а лучше - полностью переписать.
+' ToDo: !!! РЅРµРѕР±С…РѕРґРёРјРѕ РѕРїС‚РёРјРёР·РёСЂРѕРІР°С‚СЊ РєРѕРґ, Р° Р»СѓС‡С€Рµ - РїРѕР»РЅРѕСЃС‚СЊСЋ РїРµСЂРµРїРёСЃР°С‚СЊ.
 Dim Result As Boolean: Result = False
     On Error GoTo HandleError
     'If Len(Source) = 0 Then GoTo HandleExit
@@ -2648,23 +2658,23 @@ Dim Result As Boolean: Result = False
     If Len(Source) = 0 Then GoTo HandleExit
 Dim sKey As String, sTag As String, vVal As String, iKey As Long
 Dim Arr() As String, Term 'As String
-' проверяем переданную коллекцию тэгов
+' РїСЂРѕРІРµСЂСЏРµРј РїРµСЂРµРґР°РЅРЅСѓСЋ РєРѕР»Р»РµРєС†РёСЋ С‚СЌРіРѕРІ
     Select Case ReplaceExisting
     Case 0, -1: If Tags Is Nothing Then Set Tags = New Collection
     Case Else
-    ' если допустимы множественные вхождения
-        ' создаем коллекцию имен тэгов, где будем хранить количество вхождений каждого имени тэга
+    ' РµСЃР»Рё РґРѕРїСѓСЃС‚РёРјС‹ РјРЅРѕР¶РµСЃС‚РІРµРЅРЅС‹Рµ РІС…РѕР¶РґРµРЅРёСЏ
+        ' СЃРѕР·РґР°РµРј РєРѕР»Р»РµРєС†РёСЋ РёРјРµРЅ С‚СЌРіРѕРІ, РіРґРµ Р±СѓРґРµРј С…СЂР°РЅРёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ РІС…РѕР¶РґРµРЅРёР№ РєР°Р¶РґРѕРіРѕ РёРјРµРЅРё С‚СЌРіР°
 Dim cCount As Collection: Set cCount = New Collection
         If Tags Is Nothing Then
                 If Tags Is Nothing Then Set Tags = New Collection
         Else
             If Tags.Count > 0 Then
-    ' если передана готовая коллекция тэгов (добавление новых значений к готовой коллекции) - надо сначала проверить её и посчитать количество вхождений для повторяющихся тэгов
-    ' это очень плохо - при каждом вызове надо пробегать все имена из существующей коллекции - проще её пересоздать
-        ' получаем массив ключей имеющихся элементов
+    ' РµСЃР»Рё РїРµСЂРµРґР°РЅР° РіРѕС‚РѕРІР°СЏ РєРѕР»Р»РµРєС†РёСЏ С‚СЌРіРѕРІ (РґРѕР±Р°РІР»РµРЅРёРµ РЅРѕРІС‹С… Р·РЅР°С‡РµРЅРёР№ Рє РіРѕС‚РѕРІРѕР№ РєРѕР»Р»РµРєС†РёРё) - РЅР°РґРѕ СЃРЅР°С‡Р°Р»Р° РїСЂРѕРІРµСЂРёС‚СЊ РµС‘ Рё РїРѕСЃС‡РёС‚Р°С‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ РІС…РѕР¶РґРµРЅРёР№ РґР»СЏ РїРѕРІС‚РѕСЂСЏСЋС‰РёС…СЃСЏ С‚СЌРіРѕРІ
+    ' СЌС‚Рѕ РѕС‡РµРЅСЊ РїР»РѕС…Рѕ - РїСЂРё РєР°Р¶РґРѕРј РІС‹Р·РѕРІРµ РЅР°РґРѕ РїСЂРѕР±РµРіР°С‚СЊ РІСЃРµ РёРјРµРЅР° РёР· СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµР№ РєРѕР»Р»РµРєС†РёРё - РїСЂРѕС‰Рµ РµС‘ РїРµСЂРµСЃРѕР·РґР°С‚СЊ
+        ' РїРѕР»СѓС‡Р°РµРј РјР°СЃСЃРёРІ РєР»СЋС‡РµР№ РёРјРµСЋС‰РёС…СЃСЏ СЌР»РµРјРµРЅС‚РѕРІ
                 Arr() = p_GetCollKeys(Tags)
                 For Each Term In Arr
-        ' проверяем ключ, извлекаем из него тэг и заносим в коллекцию количество имеющихся вхождений + 1
+        ' РїСЂРѕРІРµСЂСЏРµРј РєР»СЋС‡, РёР·РІР»РµРєР°РµРј РёР· РЅРµРіРѕ С‚СЌРі Рё Р·Р°РЅРѕСЃРёРј РІ РєРѕР»Р»РµРєС†РёСЋ РєРѕР»РёС‡РµСЃС‚РІРѕ РёРјРµСЋС‰РёС…СЃСЏ РІС…РѕР¶РґРµРЅРёР№ + 1
                     sTag = Split(Term, MultiSfx)(0)
                     If p_IsExist(sTag, cCount, iKey) Then cCount.Remove sTag 'Else iKey = 0
                     cCount.Add iKey + 1, sTag
@@ -2672,23 +2682,23 @@ Dim cCount As Collection: Set cCount = New Collection
             End If
         End If
     End Select
-' разбираем строку тэгов
+' СЂР°Р·Р±РёСЂР°РµРј СЃС‚СЂРѕРєСѓ С‚СЌРіРѕРІ
     If Tags Is Nothing Then Set Tags = New Collection
     Arr() = Split(Source, Delim)
     For Each Term In Arr
-        sKey = Split(Term, TagDelim)(0)     ' получаем тэг
+        sKey = Split(Term, TagDelim)(0)     ' РїРѕР»СѓС‡Р°РµРј С‚СЌРі
         Select Case ReplaceExisting
-        Case 0:     If p_IsExist(sKey, Tags) Then GoTo HandleNext   ' пропускаем если в коллекции уже есть тэг с таким именем иначе добавляем
-        Case -1:    If p_IsExist(sKey, Tags) Then Tags.Remove sKey  ' заменяем если в коллекции уже есть тэг с таким именем иначе добавляем
-        Case Else:  sTag = sKey: iKey = 0                           ' добавляем, если в коллекции уже есть тэг с таким именем - добавляем к имени суффикс
-                If p_IsExist(sKey, cCount, iKey) Then sKey = sTag & MultiSfx & iKey: cCount.Remove sTag ' получаем имя ключа для нового элемента коллекции тэгов из имени тэга и количества вхождений
-                cCount.Add iKey + 1, sTag                           ' обновляем значение количества вхождений для тэга
+        Case 0:     If p_IsExist(sKey, Tags) Then GoTo HandleNext   ' РїСЂРѕРїСѓСЃРєР°РµРј РµСЃР»Рё РІ РєРѕР»Р»РµРєС†РёРё СѓР¶Рµ РµСЃС‚СЊ С‚СЌРі СЃ С‚Р°РєРёРј РёРјРµРЅРµРј РёРЅР°С‡Рµ РґРѕР±Р°РІР»СЏРµРј
+        Case -1:    If p_IsExist(sKey, Tags) Then Tags.Remove sKey  ' Р·Р°РјРµРЅСЏРµРј РµСЃР»Рё РІ РєРѕР»Р»РµРєС†РёРё СѓР¶Рµ РµСЃС‚СЊ С‚СЌРі СЃ С‚Р°РєРёРј РёРјРµРЅРµРј РёРЅР°С‡Рµ РґРѕР±Р°РІР»СЏРµРј
+        Case Else:  sTag = sKey: iKey = 0                           ' РґРѕР±Р°РІР»СЏРµРј, РµСЃР»Рё РІ РєРѕР»Р»РµРєС†РёРё СѓР¶Рµ РµСЃС‚СЊ С‚СЌРі СЃ С‚Р°РєРёРј РёРјРµРЅРµРј - РґРѕР±Р°РІР»СЏРµРј Рє РёРјРµРЅРё СЃСѓС„С„РёРєСЃ
+                If p_IsExist(sKey, cCount, iKey) Then sKey = sTag & MultiSfx & iKey: cCount.Remove sTag ' РїРѕР»СѓС‡Р°РµРј РёРјСЏ РєР»СЋС‡Р° РґР»СЏ РЅРѕРІРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РєРѕР»Р»РµРєС†РёРё С‚СЌРіРѕРІ РёР· РёРјРµРЅРё С‚СЌРіР° Рё РєРѕР»РёС‡РµСЃС‚РІР° РІС…РѕР¶РґРµРЅРёР№
+                cCount.Add iKey + 1, sTag                           ' РѕР±РЅРѕРІР»СЏРµРј Р·РЅР°С‡РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РІС…РѕР¶РґРµРЅРёР№ РґР»СЏ С‚СЌРіР°
         End Select
-        If Len(Term) > Len(sTag) Then vVal = Split(Term, TagDelim)(1) Else vVal = vbNullString ' получаем значение
-        Tags.Add vVal, sKey                                         ' добавляем тэг в коллекцию
+        If Len(Term) > Len(sTag) Then vVal = Split(Term, TagDelim)(1) Else vVal = vbNullString ' РїРѕР»СѓС‡Р°РµРј Р·РЅР°С‡РµРЅРёРµ
+        Tags.Add vVal, sKey                                         ' РґРѕР±Р°РІР»СЏРµРј С‚СЌРі РІ РєРѕР»Р»РµРєС†РёСЋ
 HandleNext:
     Next
-    ' если надо - возвращаем массив имен ключей
+    ' РµСЃР»Рё РЅР°РґРѕ - РІРѕР·РІСЂР°С‰Р°РµРј РјР°СЃСЃРёРІ РёРјРµРЅ РєР»СЋС‡РµР№
     If Not IsMissing(Keys) Then Keys = p_GetCollKeys(Tags)
     Erase Arr
     'Select Case ReplaceExisting
@@ -2703,15 +2713,15 @@ Public Function TaggedCollection2String(Tags As Collection, _
     Optional Delim As String = ";", Optional TagDelim As String = "=", _
     Optional MultiSfx As String = c_strMultiSfx _
     ) As String
-' преобразует коллекцию значений с ключами соотв имени тэга в строку именованных параметров
+' РїСЂРµРѕР±СЂР°Р·СѓРµС‚ РєРѕР»Р»РµРєС†РёСЋ Р·РЅР°С‡РµРЅРёР№ СЃ РєР»СЋС‡Р°РјРё СЃРѕРѕС‚РІ РёРјРµРЅРё С‚СЌРіР° РІ СЃС‚СЂРѕРєСѓ РёРјРµРЅРѕРІР°РЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 '-------------------------
-' Tags - коллекция значений тэгов.
-' Keys - (если задано) возвращает массив ключей коллекции (Tag)
-' Delim -   разделитель пар имя (Tag) / значение (Val)
-' TagDelim - разделитель имени (Tag) и значение (Val) в паре
-' MultiSfx - признак суффикса для повторяющихся имен (при ReplaceExisting=1) д.б. что-то заведомо отсутствующее в именах переменных
+' Tags - РєРѕР»Р»РµРєС†РёСЏ Р·РЅР°С‡РµРЅРёР№ С‚СЌРіРѕРІ.
+' Keys - (РµСЃР»Рё Р·Р°РґР°РЅРѕ) РІРѕР·РІСЂР°С‰Р°РµС‚ РјР°СЃСЃРёРІ РєР»СЋС‡РµР№ РєРѕР»Р»РµРєС†РёРё (Tag)
+' Delim -   СЂР°Р·РґРµР»РёС‚РµР»СЊ РїР°СЂ РёРјСЏ (Tag) / Р·РЅР°С‡РµРЅРёРµ (Val)
+' TagDelim - СЂР°Р·РґРµР»РёС‚РµР»СЊ РёРјРµРЅРё (Tag) Рё Р·РЅР°С‡РµРЅРёРµ (Val) РІ РїР°СЂРµ
+' MultiSfx - РїСЂРёР·РЅР°Рє СЃСѓС„С„РёРєСЃР° РґР»СЏ РїРѕРІС‚РѕСЂСЏСЋС‰РёС…СЃСЏ РёРјРµРЅ (РїСЂРё ReplaceExisting=1) Рґ.Р±. С‡С‚Рѕ-С‚Рѕ Р·Р°РІРµРґРѕРјРѕ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РµРµ РІ РёРјРµРЅР°С… РїРµСЂРµРјРµРЅРЅС‹С…
 '-------------------------
-' v.1.1.0       : 16.04.2024 - Переписана для поддержки тэгов с одинаковыми именами
+' v.1.1.0       : 16.04.2024 - РџРµСЂРµРїРёСЃР°РЅР° РґР»СЏ РїРѕРґРґРµСЂР¶РєРё С‚СЌРіРѕРІ СЃ РѕРґРёРЅР°РєРѕРІС‹РјРё РёРјРµРЅР°РјРё
 '-------------------------
 Dim Result As String: Result = vbNullString
     On Error GoTo HandleError
@@ -2735,25 +2745,25 @@ Private Function p_GetSubstrBoundsByTag(Source As String, _
     Optional Compare As VbCompareMethod = vbTextCompare, _
     Optional UseTagPos As Boolean = True _
     ) As Boolean
-' возвращает номер и позицию начала и конца подстроки тэга (Tag=Val или Tag) в строке
+' РІРѕР·РІСЂР°С‰Р°РµС‚ РЅРѕРјРµСЂ Рё РїРѕР·РёС†РёСЋ РЅР°С‡Р°Р»Р° Рё РєРѕРЅС†Р° РїРѕРґСЃС‚СЂРѕРєРё С‚СЌРіР° (Tag=Val РёР»Рё Tag) РІ СЃС‚СЂРѕРєРµ
 '-------------------------
-' Source    - исходная строка
-' Tag       - имя (Tag) элемента. если Tag не задан - элемент будет получен по Pos
-' Data      - значение тэга (Val)
-' Pos       - позиция возвращаемого элемента.
-'        >0 - позиция относительно начала строки
-'        <0 - позиция относительно конца строки
-' sBeg,sEnd - возвращает позицию начала и окончания извлеченной подстроки (имя (Tag), разделитель (TagDelim) и значение (Val)) в исходной
-' Delim     - разделитель пар имя/значение (Tag/Val)
-' TagDelim  - разделитель имени (Tag) и значения (Val) в паре
-' Compare   - тип сравнения (vbBinaryCompare/vbTextCompare)
-' UseTagPos - определяет что извлекать элемент в указанной позиции (Pos), или n-го (Pos) тэга с именем (Tag) ???
-'           - True  - Pos определяется по имени тэга (Tag)      - n-й тэг с указанным именем
-'           - False - Pos определяется по разделителям (Delim)  - n-й тэг по порядку
-' возвращает True если заданная позиция в границах строки, иначе False
+' Source    - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
+' Tag       - РёРјСЏ (Tag) СЌР»РµРјРµРЅС‚Р°. РµСЃР»Рё Tag РЅРµ Р·Р°РґР°РЅ - СЌР»РµРјРµРЅС‚ Р±СѓРґРµС‚ РїРѕР»СѓС‡РµРЅ РїРѕ Pos
+' Data      - Р·РЅР°С‡РµРЅРёРµ С‚СЌРіР° (Val)
+' Pos       - РїРѕР·РёС†РёСЏ РІРѕР·РІСЂР°С‰Р°РµРјРѕРіРѕ СЌР»РµРјРµРЅС‚Р°.
+'        >0 - РїРѕР·РёС†РёСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё
+'        <0 - РїРѕР·РёС†РёСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё
+' sBeg,sEnd - РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР·РёС†РёСЋ РЅР°С‡Р°Р»Р° Рё РѕРєРѕРЅС‡Р°РЅРёСЏ РёР·РІР»РµС‡РµРЅРЅРѕР№ РїРѕРґСЃС‚СЂРѕРєРё (РёРјСЏ (Tag), СЂР°Р·РґРµР»РёС‚РµР»СЊ (TagDelim) Рё Р·РЅР°С‡РµРЅРёРµ (Val)) РІ РёСЃС…РѕРґРЅРѕР№
+' Delim     - СЂР°Р·РґРµР»РёС‚РµР»СЊ РїР°СЂ РёРјСЏ/Р·РЅР°С‡РµРЅРёРµ (Tag/Val)
+' TagDelim  - СЂР°Р·РґРµР»РёС‚РµР»СЊ РёРјРµРЅРё (Tag) Рё Р·РЅР°С‡РµРЅРёСЏ (Val) РІ РїР°СЂРµ
+' Compare   - С‚РёРї СЃСЂР°РІРЅРµРЅРёСЏ (vbBinaryCompare/vbTextCompare)
+' UseTagPos - РѕРїСЂРµРґРµР»СЏРµС‚ С‡С‚Рѕ РёР·РІР»РµРєР°С‚СЊ СЌР»РµРјРµРЅС‚ РІ СѓРєР°Р·Р°РЅРЅРѕР№ РїРѕР·РёС†РёРё (Pos), РёР»Рё n-РіРѕ (Pos) С‚СЌРіР° СЃ РёРјРµРЅРµРј (Tag) ???
+'           - True  - Pos РѕРїСЂРµРґРµР»СЏРµС‚СЃСЏ РїРѕ РёРјРµРЅРё С‚СЌРіР° (Tag)      - n-Р№ С‚СЌРі СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј
+'           - False - Pos РѕРїСЂРµРґРµР»СЏРµС‚СЃСЏ РїРѕ СЂР°Р·РґРµР»РёС‚РµР»СЏРј (Delim)  - n-Р№ С‚СЌРі РїРѕ РїРѕСЂСЏРґРєСѓ
+' РІРѕР·РІСЂР°С‰Р°РµС‚ True РµСЃР»Рё Р·Р°РґР°РЅРЅР°СЏ РїРѕР·РёС†РёСЏ РІ РіСЂР°РЅРёС†Р°С… СЃС‚СЂРѕРєРё, РёРЅР°С‡Рµ False
 '-------------------------
-' !!! если тэг (Tag) и позиция (Pos) заданы, получается неоднозначная интерпретация параметров ->
-' ??? извлекать элемент в указанной позиции (Pos), или в позиции (Pos) по-порядку тэга с именем (Tag) ???, поэтому:
+' !!! РµСЃР»Рё С‚СЌРі (Tag) Рё РїРѕР·РёС†РёСЏ (Pos) Р·Р°РґР°РЅС‹, РїРѕР»СѓС‡Р°РµС‚СЃСЏ РЅРµРѕРґРЅРѕР·РЅР°С‡РЅР°СЏ РёРЅС‚РµСЂРїСЂРµС‚Р°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ ->
+' ??? РёР·РІР»РµРєР°С‚СЊ СЌР»РµРјРµРЅС‚ РІ СѓРєР°Р·Р°РЅРЅРѕР№ РїРѕР·РёС†РёРё (Pos), РёР»Рё РІ РїРѕР·РёС†РёРё (Pos) РїРѕ-РїРѕСЂСЏРґРєСѓ С‚СЌРіР° СЃ РёРјРµРЅРµРј (Tag) ???, РїРѕСЌС‚РѕРјСѓ:
 '-------------------------
 Dim Result As Boolean
     On Error GoTo HandleError
@@ -2763,10 +2773,10 @@ Dim sPos As Long
 Dim bFound As Boolean
 Dim sSubst As String, sTag As String, sVal As String
 
-' если тэг не задан - без вариантов считаем позицию по разделителям
+' РµСЃР»Рё С‚СЌРі РЅРµ Р·Р°РґР°РЅ - Р±РµР· РІР°СЂРёР°РЅС‚РѕРІ СЃС‡РёС‚Р°РµРј РїРѕР·РёС†РёСЋ РїРѕ СЂР°Р·РґРµР»РёС‚РµР»СЏРј
     UseTagPos = UseTagPos And Len(Tag)
     If Pos >= 0 Then
-' позиция от начала - пробегаем всю строку с начала по разделителям, проверяя номер подстроки
+' РїРѕР·РёС†РёСЏ РѕС‚ РЅР°С‡Р°Р»Р° - РїСЂРѕР±РµРіР°РµРј РІСЃСЋ СЃС‚СЂРѕРєСѓ СЃ РЅР°С‡Р°Р»Р° РїРѕ СЂР°Р·РґРµР»РёС‚РµР»СЏРј, РїСЂРѕРІРµСЂСЏСЏ РЅРѕРјРµСЂ РїРѕРґСЃС‚СЂРѕРєРё
         If Pos = 0 Then Pos = 1
         sPos = 1
         Do
@@ -2785,7 +2795,7 @@ Dim sSubst As String, sTag As String, sVal As String
             sPos = sPos + Len(Delim)
         Loop
     Else
-' позиция от конца - пробегаем всю строку с конца по разделителям, проверяя номер подстроки
+' РїРѕР·РёС†РёСЏ РѕС‚ РєРѕРЅС†Р° - РїСЂРѕР±РµРіР°РµРј РІСЃСЋ СЃС‚СЂРѕРєСѓ СЃ РєРѕРЅС†Р° РїРѕ СЂР°Р·РґРµР»РёС‚РµР»СЏРј, РїСЂРѕРІРµСЂСЏСЏ РЅРѕРјРµСЂ РїРѕРґСЃС‚СЂРѕРєРё
         sPos = Len(Source): sEnd = sPos + 1
         Do
             sPos = InStrRev(Source, Delim, sPos, Compare)
@@ -2802,9 +2812,9 @@ Dim sSubst As String, sTag As String, sVal As String
             sEnd = sPos: sPos = sPos - 1
         Loop
     End If
-' проверяем соответствие позиции границам
-    Result = (i >= Abs(Pos)) ' позиция ниже нижней границы
-' получаем значение тэга
+' РїСЂРѕРІРµСЂСЏРµРј СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РїРѕР·РёС†РёРё РіСЂР°РЅРёС†Р°Рј
+    Result = (i >= Abs(Pos)) ' РїРѕР·РёС†РёСЏ РЅРёР¶Рµ РЅРёР¶РЅРµР№ РіСЂР°РЅРёС†С‹
+' РїРѕР»СѓС‡Р°РµРј Р·РЅР°С‡РµРЅРёРµ С‚СЌРіР°
     If Result Then
         If Len(Tag) = 0 Then Tag = sTag
         If Len(sSubst) > Len(Tag) Then Data = Split(sSubst, TagDelim)(1)
@@ -2816,24 +2826,24 @@ End Function
 Private Function p_GetSubstrBounds(ByRef Source As String, _
     ByRef Pos As Long, ByRef sBeg As Long, ByRef sEnd As Long, _
     Optional Delim As String = " ") As Boolean
-' возвращает номер и позицию начала и конца подстроки в строке с разделителями
+' РІРѕР·РІСЂР°С‰Р°РµС‚ РЅРѕРјРµСЂ Рё РїРѕР·РёС†РёСЋ РЅР°С‡Р°Р»Р° Рё РєРѕРЅС†Р° РїРѕРґСЃС‚СЂРѕРєРё РІ СЃС‚СЂРѕРєРµ СЃ СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё
 '-------------------------
-' Source -  исходная строка
-' Pos -     на входе позиция искомого элемента.
-'           >0 - позиция относительно начала строки
-'           <0 - позиция относительно конца строки
-'           на выходе позиция элемента относительно начала строки
-' sBeg, sEnd - возвращает границы подстроки в строке
-' Delim -   разделитель
-' возвращает True если заданная позиция в границах строки, иначе False
+' Source -  РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
+' Pos -     РЅР° РІС…РѕРґРµ РїРѕР·РёС†РёСЏ РёСЃРєРѕРјРѕРіРѕ СЌР»РµРјРµРЅС‚Р°.
+'           >0 - РїРѕР·РёС†РёСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё
+'           <0 - РїРѕР·РёС†РёСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё
+'           РЅР° РІС‹С…РѕРґРµ РїРѕР·РёС†РёСЏ СЌР»РµРјРµРЅС‚Р° РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё
+' sBeg, sEnd - РІРѕР·РІСЂР°С‰Р°РµС‚ РіСЂР°РЅРёС†С‹ РїРѕРґСЃС‚СЂРѕРєРё РІ СЃС‚СЂРѕРєРµ
+' Delim -   СЂР°Р·РґРµР»РёС‚РµР»СЊ
+' РІРѕР·РІСЂР°С‰Р°РµС‚ True РµСЃР»Рё Р·Р°РґР°РЅРЅР°СЏ РїРѕР·РёС†РёСЏ РІ РіСЂР°РЅРёС†Р°С… СЃС‚СЂРѕРєРё, РёРЅР°С‡Рµ False
 '-------------------------
 Dim Result As Boolean
     On Error GoTo HandleError
 Dim i As Long
     i = 1: sBeg = 1
     If Pos >= 0 Then
-' позиция от начала
-    ' пробегаем всю строку с начала по разделителям, проверяя номер подстроки
+' РїРѕР·РёС†РёСЏ РѕС‚ РЅР°С‡Р°Р»Р°
+    ' РїСЂРѕР±РµРіР°РµРј РІСЃСЋ СЃС‚СЂРѕРєСѓ СЃ РЅР°С‡Р°Р»Р° РїРѕ СЂР°Р·РґРµР»РёС‚РµР»СЏРј, РїСЂРѕРІРµСЂСЏСЏ РЅРѕРјРµСЂ РїРѕРґСЃС‚СЂРѕРєРё
         If Pos = 0 Then Pos = 1
         Do
             sEnd = InStr(sBeg, Source, Delim)
@@ -2842,8 +2852,8 @@ Dim i As Long
             sBeg = sEnd + Len(Delim)
         Loop
     Else
-' позиция от конца
-    ' Пробегаем всю строку с конца по разделителям, проверяя номер подстроки (Вариант 1)
+' РїРѕР·РёС†РёСЏ РѕС‚ РєРѕРЅС†Р°
+    ' РџСЂРѕР±РµРіР°РµРј РІСЃСЋ СЃС‚СЂРѕРєСѓ СЃ РєРѕРЅС†Р° РїРѕ СЂР°Р·РґРµР»РёС‚РµР»СЏРј, РїСЂРѕРІРµСЂСЏСЏ РЅРѕРјРµСЂ РїРѕРґСЃС‚СЂРѕРєРё (Р’Р°СЂРёР°РЅС‚ 1)
 Dim sPos As Long: sPos = Len(Source): sEnd = sPos + 1
         Do
             sPos = InStrRev(Source, Delim, sPos)
@@ -2851,42 +2861,42 @@ Dim sPos As Long: sPos = Len(Source): sEnd = sPos + 1
             i = i + 1: If i > Abs(Pos) Then Exit Do
             sEnd = sPos
         Loop
-'    ' Пробегаем всю строку с начала подсчитывая количество подстрок и формируя массив позиций разделителей (Вариант 2)
+'    ' РџСЂРѕР±РµРіР°РµРј РІСЃСЋ СЃС‚СЂРѕРєСѓ СЃ РЅР°С‡Р°Р»Р° РїРѕРґСЃС‡РёС‚С‹РІР°СЏ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРґСЃС‚СЂРѕРє Рё С„РѕСЂРјРёСЂСѓСЏ РјР°СЃСЃРёРІ РїРѕР·РёС†РёР№ СЂР°Р·РґРµР»РёС‚РµР»РµР№ (Р’Р°СЂРёР°РЅС‚ 2)
 '    Dim aPos() As Long
-'    ' подсчитываем количество фрагментов в строке, формируя массив позиций разделителей
+'    ' РїРѕРґСЃС‡РёС‚С‹РІР°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ С„СЂР°РіРјРµРЅС‚РѕРІ РІ СЃС‚СЂРѕРєРµ, С„РѕСЂРјРёСЂСѓСЏ РјР°СЃСЃРёРІ РїРѕР·РёС†РёР№ СЂР°Р·РґРµР»РёС‚РµР»РµР№
 '        Do
 '            ReDim Preserve aPos(1 To i): aPos(i) = sBeg
 '            sBeg = InStr(sBeg, Source, Delim): i = i + 1
 '            If sBeg > 0 Then sBeg = sBeg + Len(Delim) Else Exit Do
 '        Loop
-'    ' переводим позицию относительно конца строки в позицию от начала
+'    ' РїРµСЂРµРІРѕРґРёРј РїРѕР·РёС†РёСЋ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё РІ РїРѕР·РёС†РёСЋ РѕС‚ РЅР°С‡Р°Р»Р°
 '        Pos = i + Pos
 '        Select Case Pos
-'        Case 1 To i: Result = True  ' позиция в пределах строки
-'        Case Is < 1: Pos = 1        ' позиция ниже нижней границы
-'        'Case Is > i: Pos = i        ' позиция выше верхней границы
+'        Case 1 To i: Result = True  ' РїРѕР·РёС†РёСЏ РІ РїСЂРµРґРµР»Р°С… СЃС‚СЂРѕРєРё
+'        Case Is < 1: Pos = 1        ' РїРѕР·РёС†РёСЏ РЅРёР¶Рµ РЅРёР¶РЅРµР№ РіСЂР°РЅРёС†С‹
+'        'Case Is > i: Pos = i        ' РїРѕР·РёС†РёСЏ РІС‹С€Рµ РІРµСЂС…РЅРµР№ РіСЂР°РЅРёС†С‹
 '        End Select
-'    ' берем границы фрагмента с указанной позицией из массива
+'    ' Р±РµСЂРµРј РіСЂР°РЅРёС†С‹ С„СЂР°РіРјРµРЅС‚Р° СЃ СѓРєР°Р·Р°РЅРЅРѕР№ РїРѕР·РёС†РёРµР№ РёР· РјР°СЃСЃРёРІР°
 '        sBeg = aPos(Pos): If Pos < (i - 1) Then sEnd = aPos(Pos + 1) - Len(Delim) Else sEnd = Len(Source) + 1
 '        Erase aPos()
     End If
-' проверяем соответствие позиции границам
-    Result = (i >= Abs(Pos)): If Not Result Then Pos = Sgn(Pos) * i ' позиция ниже нижней границы
+' РїСЂРѕРІРµСЂСЏРµРј СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РїРѕР·РёС†РёРё РіСЂР°РЅРёС†Р°Рј
+    Result = (i >= Abs(Pos)): If Not Result Then Pos = Sgn(Pos) * i ' РїРѕР·РёС†РёСЏ РЅРёР¶Рµ РЅРёР¶РЅРµР№ РіСЂР°РЅРёС†С‹
 HandleExit:  p_GetSubstrBounds = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
 ' ==================
-' Функции для разбиения/распределения элементов строки с разделителями
+' Р¤СѓРЅРєС†РёРё РґР»СЏ СЂР°Р·Р±РёРµРЅРёСЏ/СЂР°СЃРїСЂРµРґРµР»РµРЅРёСЏ СЌР»РµРјРµРЅС‚РѕРІ СЃС‚СЂРѕРєРё СЃ СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё
 ' ==================
-#If APPTYPE = 0 Then ' только для Access
+#If APPTYPE = 0 Then ' С‚РѕР»СЊРєРѕ РґР»СЏ Access
 Public Sub TextToArrayByControl(TextString As String, _
     vControls As Variant, _
-    Optional Separators As String = " ­.,;:!?()[]{}…+-*/\|" & vbTab & vbCrLf)
-' разбивает текст с учётом допустимых разделителей на строки, соответствующие ширине полей, и распределяет её по полям
+    Optional Separators As String = " В­.,;:!?()[]{}вЂ¦+-*/\|" & vbTab & vbCrLf)
+' СЂР°Р·Р±РёРІР°РµС‚ С‚РµРєСЃС‚ СЃ СѓС‡С‘С‚РѕРј РґРѕРїСѓСЃС‚РёРјС‹С… СЂР°Р·РґРµР»РёС‚РµР»РµР№ РЅР° СЃС‚СЂРѕРєРё, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРµ С€РёСЂРёРЅРµ РїРѕР»РµР№, Рё СЂР°СЃРїСЂРµРґРµР»СЏРµС‚ РµС‘ РїРѕ РїРѕР»СЏРј
 '-------------------------
-' TextString - строка текста которую необходимо разбить
-' vControls  - коллекция или массив полей в которых надо распределить текст
-' Separators - список разделителей по которым можно бить текст если включен символ мягкого переноса - в выходной строке будет опущен
+' TextString - СЃС‚СЂРѕРєР° С‚РµРєСЃС‚Р° РєРѕС‚РѕСЂСѓСЋ РЅРµРѕР±С…РѕРґРёРјРѕ СЂР°Р·Р±РёС‚СЊ
+' vControls  - РєРѕР»Р»РµРєС†РёСЏ РёР»Рё РјР°СЃСЃРёРІ РїРѕР»РµР№ РІ РєРѕС‚РѕСЂС‹С… РЅР°РґРѕ СЂР°СЃРїСЂРµРґРµР»РёС‚СЊ С‚РµРєСЃС‚
+' Separators - СЃРїРёСЃРѕРє СЂР°Р·РґРµР»РёС‚РµР»РµР№ РїРѕ РєРѕС‚РѕСЂС‹Рј РјРѕР¶РЅРѕ Р±РёС‚СЊ С‚РµРєСЃС‚ РµСЃР»Рё РІРєР»СЋС‡РµРЅ СЃРёРјРІРѕР» РјСЏРіРєРѕРіРѕ РїРµСЂРµРЅРѕСЃР° - РІ РІС‹С…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ Р±СѓРґРµС‚ РѕРїСѓС‰РµРЅ
 '-------------------------
 Dim hFont As LongPtr, hOldFont As LongPtr
 Dim WidthInPix As Long
@@ -2915,18 +2925,18 @@ Dim Result As Boolean
     End If
 Dim tDC As LongPtr:           tDC = GetDC(0)
 Dim PIXEL_PER_INCH_X As Long: PIXEL_PER_INCH_X = GetDeviceCaps(tDC, LOGPIXELSX)
-' разбиваем строку
+' СЂР°Р·Р±РёРІР°РµРј СЃС‚СЂРѕРєСѓ
     Call Tokenize(TextString, aWords, Separators)
     i = LBound(aWords): iMax = UBound(aWords)
     spLen = 1
     'strRest = Text
-    ' костыль: vbCrLf меняем на vbCr иначе делает двойной разрыв строки
+    ' РєРѕСЃС‚С‹Р»СЊ: vbCrLf РјРµРЅСЏРµРј РЅР° vbCr РёРЅР°С‡Рµ РґРµР»Р°РµС‚ РґРІРѕР№РЅРѕР№ СЂР°Р·СЂС‹РІ СЃС‚СЂРѕРєРё
     strRest = Replace(TextString, vbCrLf, vbCr)
     For Each ctl In aCtl
         w = 0
         strText = vbNullString
         Do
-        ' перебираем куски текста
+        ' РїРµСЂРµР±РёСЂР°РµРј РєСѓСЃРєРё С‚РµРєСЃС‚Р°
             If i < iMax Then
                 strTemp = aWords(i)
                 spPos = Len(strTemp) + 1
@@ -2938,61 +2948,61 @@ Dim PIXEL_PER_INCH_X As Long: PIXEL_PER_INCH_X = GetDeviceCaps(tDC, LOGPIXELSX)
                 spPosNext = spPos
                 spLen = 0
             End If
-            ' убираем мягкие переносы Chr(&HAD)
+            ' СѓР±РёСЂР°РµРј РјСЏРіРєРёРµ РїРµСЂРµРЅРѕСЃС‹ Chr(&HAD)
             strTemp = Replace(strText & strTemp, Chr(&HAD), vbNullString)
-            ' строка равна предыдущей строке + текущий фрагмент + текущий разделитель
+            ' СЃС‚СЂРѕРєР° СЂР°РІРЅР° РїСЂРµРґС‹РґСѓС‰РµР№ СЃС‚СЂРѕРєРµ + С‚РµРєСѓС‰РёР№ С„СЂР°РіРјРµРЅС‚ + С‚РµРєСѓС‰РёР№ СЂР°Р·РґРµР»РёС‚РµР»СЊ
             strTemp = strTemp & Mid$(strRest, spPos, spLen)
             spLen = Len(Trim$(strTemp)): If spLen = 0 Then spLen = 1
-        ' получаем размер текста
+        ' РїРѕР»СѓС‡Р°РµРј СЂР°Р·РјРµСЂ С‚РµРєСЃС‚Р°
             hFont = p_HFontByControl(ctl)
             hOldFont = SelectObject(tDC, hFont)
             GetTextExtentPoint32 tDC, strTemp, spLen, sz
             SelectObject tDC, hOldFont
             DeleteObject hFont
-        ' условие: w=0, - ещё один костыль
+        ' СѓСЃР»РѕРІРёРµ: w=0, - РµС‰С‘ РѕРґРёРЅ РєРѕСЃС‚С‹Р»СЊ
             WidthInPix = ctl.Width * (PIXEL_PER_INCH_X / TwipsPerInch)
             If sz.cX <= WidthInPix Or w = 0 Then
-            ' если первое слово в строке меньше области печати - всё равно берём,
-            ' иначе зависает в мертвом цикле
+            ' РµСЃР»Рё РїРµСЂРІРѕРµ СЃР»РѕРІРѕ РІ СЃС‚СЂРѕРєРµ РјРµРЅСЊС€Рµ РѕР±Р»Р°СЃС‚Рё РїРµС‡Р°С‚Рё - РІСЃС‘ СЂР°РІРЅРѕ Р±РµСЂС‘Рј,
+            ' РёРЅР°С‡Рµ Р·Р°РІРёСЃР°РµС‚ РІ РјРµСЂС‚РІРѕРј С†РёРєР»Рµ
                 If sz.cX > tWidth Then tWidth = sz.cX
                 strRest = Mid$(strRest, spPosNext)
                 strText = strTemp
                 i = i + 1
                 w = w + 1
             End If
-        ' сравниваем размер текста с размером контрола
+        ' СЃСЂР°РІРЅРёРІР°РµРј СЂР°Р·РјРµСЂ С‚РµРєСЃС‚Р° СЃ СЂР°Р·РјРµСЂРѕРј РєРѕРЅС‚СЂРѕР»Р°
         Loop Until (i > iMax) Or (WidthInPix < sz.cX) '(WidthInPix < (sz.cx * (1 + spLen) / spLen))
         ctl.Value = strText
         'tHeight = tHeight + sz.cy
     Next ctl
-' получаем разбитую строку и ее высоту в пикселях
+' РїРѕР»СѓС‡Р°РµРј СЂР°Р·Р±РёС‚СѓСЋ СЃС‚СЂРѕРєСѓ Рё РµРµ РІС‹СЃРѕС‚Сѓ РІ РїРёРєСЃРµР»СЏС…
 '    WidthInPix = tWidth: HeightInPix = tHeight
 '    GetTextMetrics tDC, tm
-'    Overhang = tm.tmOverhang ' добавка для наклонных и толстых шрифтов
+'    Overhang = tm.tmOverhang ' РґРѕР±Р°РІРєР° РґР»СЏ РЅР°РєР»РѕРЅРЅС‹С… Рё С‚РѕР»СЃС‚С‹С… С€СЂРёС„С‚РѕРІ
 HandleExit:  SelectObject tDC, hOldFont
              DeleteObject hFont: ReleaseDC 0, tDC
              Exit Sub
 HandleError: Err.Clear: Resume HandleExit
 End Sub
 Public Function TextToArrayByWidth(TextString As String, WidthInPix As Long, Optional HeightInPix, _
-    Optional Separators As String = " ­.,;:!?()[]{}…+-*/\|" & vbTab & vbCrLf, _
+    Optional Separators As String = " В­.,;:!?()[]{}вЂ¦+-*/\|" & vbTab & vbCrLf, _
     Optional OutLines, Optional Overhang As Long, Optional OutDelimiter = vbCrLf, _
     Optional hFont As LongPtr, Optional hdc As LongPtr = 0) As String
 ' , Optional OutLineWidth, Optional OutLineHeight
-' разбивает текст с учётом допустимых разделителей на строки, соответствующие размерам заданонй области и параметрам шрифта
+' СЂР°Р·Р±РёРІР°РµС‚ С‚РµРєСЃС‚ СЃ СѓС‡С‘С‚РѕРј РґРѕРїСѓСЃС‚РёРјС‹С… СЂР°Р·РґРµР»РёС‚РµР»РµР№ РЅР° СЃС‚СЂРѕРєРё, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРµ СЂР°Р·РјРµСЂР°Рј Р·Р°РґР°РЅРѕРЅР№ РѕР±Р»Р°СЃС‚Рё Рё РїР°СЂР°РјРµС‚СЂР°Рј С€СЂРёС„С‚Р°
 '-------------------------
-' TextString - строка текста которую необходимо разбить
-' WidthInPix - на входе - максимальная ширина разбитого текста,
-'              на выходе - реальная высота разбитого текста
-' HeightInPix - на выходе - реальная высота разбитого текста
-' Separators - список разделителей по которым можно бить текст.
-'       если включен символ мягкого переноса - в выходной строке будет опущен
-' OutLines - массив строк разбитого текста
-' Overhang - смещение для корректировки размера для наклонных, жирных и пр. шрифтов
-' OutDelimiter - разделитель строк в выходной строке
-' hFont - hFont шрифта для которого рассчитываем разбиение
-' hDC - hDC -области куда будет выводиться текст
-'' OutLineWidth, OutLineHeight - массивы размеров строк разбитого текста
+' TextString - СЃС‚СЂРѕРєР° С‚РµРєСЃС‚Р° РєРѕС‚РѕСЂСѓСЋ РЅРµРѕР±С…РѕРґРёРјРѕ СЂР°Р·Р±РёС‚СЊ
+' WidthInPix - РЅР° РІС…РѕРґРµ - РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ С€РёСЂРёРЅР° СЂР°Р·Р±РёС‚РѕРіРѕ С‚РµРєСЃС‚Р°,
+'              РЅР° РІС‹С…РѕРґРµ - СЂРµР°Р»СЊРЅР°СЏ РІС‹СЃРѕС‚Р° СЂР°Р·Р±РёС‚РѕРіРѕ С‚РµРєСЃС‚Р°
+' HeightInPix - РЅР° РІС‹С…РѕРґРµ - СЂРµР°Р»СЊРЅР°СЏ РІС‹СЃРѕС‚Р° СЂР°Р·Р±РёС‚РѕРіРѕ С‚РµРєСЃС‚Р°
+' Separators - СЃРїРёСЃРѕРє СЂР°Р·РґРµР»РёС‚РµР»РµР№ РїРѕ РєРѕС‚РѕСЂС‹Рј РјРѕР¶РЅРѕ Р±РёС‚СЊ С‚РµРєСЃС‚.
+'       РµСЃР»Рё РІРєР»СЋС‡РµРЅ СЃРёРјРІРѕР» РјСЏРіРєРѕРіРѕ РїРµСЂРµРЅРѕСЃР° - РІ РІС‹С…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ Р±СѓРґРµС‚ РѕРїСѓС‰РµРЅ
+' OutLines - РјР°СЃСЃРёРІ СЃС‚СЂРѕРє СЂР°Р·Р±РёС‚РѕРіРѕ С‚РµРєСЃС‚Р°
+' Overhang - СЃРјРµС‰РµРЅРёРµ РґР»СЏ РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєРё СЂР°Р·РјРµСЂР° РґР»СЏ РЅР°РєР»РѕРЅРЅС‹С…, Р¶РёСЂРЅС‹С… Рё РїСЂ. С€СЂРёС„С‚РѕРІ
+' OutDelimiter - СЂР°Р·РґРµР»РёС‚РµР»СЊ СЃС‚СЂРѕРє РІ РІС‹С…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ
+' hFont - hFont С€СЂРёС„С‚Р° РґР»СЏ РєРѕС‚РѕСЂРѕРіРѕ СЂР°СЃСЃС‡РёС‚С‹РІР°РµРј СЂР°Р·Р±РёРµРЅРёРµ
+' hDC - hDC -РѕР±Р»Р°СЃС‚Рё РєСѓРґР° Р±СѓРґРµС‚ РІС‹РІРѕРґРёС‚СЊСЃСЏ С‚РµРєСЃС‚
+'' OutLineWidth, OutLineHeight - РјР°СЃСЃРёРІС‹ СЂР°Р·РјРµСЂРѕРІ СЃС‚СЂРѕРє СЂР°Р·Р±РёС‚РѕРіРѕ С‚РµРєСЃС‚Р°
 '-------------------------
 Dim Result As String
 Dim sz As Size, tm As TEXTMETRIC
@@ -3017,13 +3027,13 @@ Dim PIXEL_PER_INCH_X As Long: PIXEL_PER_INCH_X = GetDeviceCaps(tDC, LOGPIXELSX)
     i = LBound(aWords): iMax = UBound(aWords)
     ii = 0: spLen = 1
     'strRest = Text
-    ' костыль: vbCrLf меняем на vbCr иначе делает двойной разрыв строки
+    ' РєРѕСЃС‚С‹Р»СЊ: vbCrLf РјРµРЅСЏРµРј РЅР° vbCr РёРЅР°С‡Рµ РґРµР»Р°РµС‚ РґРІРѕР№РЅРѕР№ СЂР°Р·СЂС‹РІ СЃС‚СЂРѕРєРё
     strRest = Replace$(TextString, vbCrLf, vbCr)
     Do
         w = 0
         strText = vbNullString
         Do
-        ' перебираем куски текста
+        ' РїРµСЂРµР±РёСЂР°РµРј РєСѓСЃРєРё С‚РµРєСЃС‚Р°
             If i < iMax Then
                 strTemp = aWords(i)
                 spPos = Len(strTemp) + 1
@@ -3035,17 +3045,17 @@ Dim PIXEL_PER_INCH_X As Long: PIXEL_PER_INCH_X = GetDeviceCaps(tDC, LOGPIXELSX)
                 spPosNext = spPos
                 spLen = 0
             End If
-            ' убираем мягкие переносы Chr(&HAD)
+            ' СѓР±РёСЂР°РµРј РјСЏРіРєРёРµ РїРµСЂРµРЅРѕСЃС‹ Chr(&HAD)
             strTemp = Replace$(strText & strTemp, Chr(&HAD), vbNullString)
-            ' строка равна предыдущей строке + текущий фрагмент + текущий разделитель
+            ' СЃС‚СЂРѕРєР° СЂР°РІРЅР° РїСЂРµРґС‹РґСѓС‰РµР№ СЃС‚СЂРѕРєРµ + С‚РµРєСѓС‰РёР№ С„СЂР°РіРјРµРЅС‚ + С‚РµРєСѓС‰РёР№ СЂР°Р·РґРµР»РёС‚РµР»СЊ
             strTemp = strTemp & Mid$(strRest, spPos, spLen)
             spLen = Len(Trim$(strTemp)): If spLen = 0 Then spLen = 1
-        ' получаем размер текста
+        ' РїРѕР»СѓС‡Р°РµРј СЂР°Р·РјРµСЂ С‚РµРєСЃС‚Р°
             GetTextExtentPoint32 tDC, strTemp, spLen, sz
-        ' условие: w=0, - ещё один костыль
+        ' СѓСЃР»РѕРІРёРµ: w=0, - РµС‰С‘ РѕРґРёРЅ РєРѕСЃС‚С‹Р»СЊ
             If sz.cX <= WidthInPix Or w = 0 Then
-            ' если первое слово в строке меньше области печати - всё равно берём,
-            ' иначе зависает в мертвом цикле
+            ' РµСЃР»Рё РїРµСЂРІРѕРµ СЃР»РѕРІРѕ РІ СЃС‚СЂРѕРєРµ РјРµРЅСЊС€Рµ РѕР±Р»Р°СЃС‚Рё РїРµС‡Р°С‚Рё - РІСЃС‘ СЂР°РІРЅРѕ Р±РµСЂС‘Рј,
+            ' РёРЅР°С‡Рµ Р·Р°РІРёСЃР°РµС‚ РІ РјРµСЂС‚РІРѕРј С†РёРєР»Рµ
                 If sz.cX > tWidth Then tWidth = sz.cX
                 strRest = Mid$(strRest, spPosNext)
                 strText = strTemp
@@ -3058,18 +3068,18 @@ Dim PIXEL_PER_INCH_X As Long: PIXEL_PER_INCH_X = GetDeviceCaps(tDC, LOGPIXELSX)
 '        ReDim Preserve aHeight(ii): aHeight(ii) = sz.CY
         tHeight = tHeight + sz.cY
 '        Result = Result & OutDelimiter & strText
-    ' если достигли конца - выходим
+    ' РµСЃР»Рё РґРѕСЃС‚РёРіР»Рё РєРѕРЅС†Р° - РІС‹С…РѕРґРёРј
         If Len(strRest) = 0 Then Exit Do
         ii = ii + 1
     Loop
-' получаем разбитую строку и ее высоту в пикселях
+' РїРѕР»СѓС‡Р°РµРј СЂР°Р·Р±РёС‚СѓСЋ СЃС‚СЂРѕРєСѓ Рё РµРµ РІС‹СЃРѕС‚Сѓ РІ РїРёРєСЃРµР»СЏС…
     WidthInPix = tWidth: HeightInPix = tHeight
     Result = Join(aText, OutDelimiter)
     OutLines = aText:           Erase aText
 '    OutLineWidth = aWidth:      Erase aWidth
 '    OutLineHeight = aHeight:    Erase aHeight
     GetTextMetrics tDC, tm
-    Overhang = tm.tmOverhang ' добавка для наклонных и толстых шрифтов
+    Overhang = tm.tmOverhang ' РґРѕР±Р°РІРєР° РґР»СЏ РЅР°РєР»РѕРЅРЅС‹С… Рё С‚РѕР»СЃС‚С‹С… С€СЂРёС„С‚РѕРІ
     
 HandleExit:  SelectObject tDC, hOldFont: If hdc = 0 Then ReleaseDC 0, tDC
              TextToArrayByWidth = Result: Exit Function
@@ -3077,42 +3087,42 @@ HandleError: Result = vbNullString: Err.Clear: Resume HandleExit
 End Function
 #End If
 ' ==================
-' Функции проверки/преобразования строк/символов
+' Р¤СѓРЅРєС†РёРё РїСЂРѕРІРµСЂРєРё/РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ СЃС‚СЂРѕРє/СЃРёРјРІРѕР»РѕРІ
 ' ==================
 Public Function TextTranslit(ByVal Source As String, Optional Direction As Byte = 0) As String
-' транслитерация кириллицы для русского алфавита по ГОСТ Р 52535.1-2006
+' С‚СЂР°РЅСЃР»РёС‚РµСЂР°С†РёСЏ РєРёСЂРёР»Р»РёС†С‹ РґР»СЏ СЂСѓСЃСЃРєРѕРіРѕ Р°Р»С„Р°РІРёС‚Р° РїРѕ Р“РћРЎРў Р  52535.1-2006
 '-------------------------
-' Direction = 0 - транслитерация (рус > лат)
-'             1 - обратная транслитерация (лат > рус)
+' Direction = 0 - С‚СЂР°РЅСЃР»РёС‚РµСЂР°С†РёСЏ (СЂСѓСЃ > Р»Р°С‚)
+'             1 - РѕР±СЂР°С‚РЅР°СЏ С‚СЂР°РЅСЃР»РёС‚РµСЂР°С†РёСЏ (Р»Р°С‚ > СЂСѓСЃ)
 '-------------------------
 Dim Result As String: Result = vbNullString
     On Error GoTo HandleError
 Dim i As Integer, j As Integer, c As String: i = 1
-Const cSymbRus = "щжхцчшюяаеёиоуыэйбвгдзклмнпрстфьъ"
+Const cSymbRus = "С‰Р¶С…С†С‡С€СЋСЏР°РµС‘РёРѕСѓС‹СЌР№Р±РІРіРґР·РєР»РјРЅРїСЂСЃС‚С„СЊСЉ"
 Dim TransLat(): TransLat = Array("shch", "zh", "kh", "tc", "ch", "sh", "iu", "ia", "a", "e", "e", "i", "o", "u", "y", "e", "i", "b", "v", "g", "d", "z", "k", "l", "m", "n", "p", "r", "s", "t", "f", "", "")
 Dim cLen As Integer: cLen = 1
-    If Direction = 0 Then   ' рус >> лат
+    If Direction = 0 Then   ' СЂСѓСЃ >> Р»Р°С‚
         Do Until i > Len(Source)
-            c = Mid$(Source, i, cLen)           ' текущий рус символ
-            j = InStr(1, cSymbRus, LCase$(c))    ' номер элемента массива
+            c = Mid$(Source, i, cLen)           ' С‚РµРєСѓС‰РёР№ СЂСѓСЃ СЃРёРјРІРѕР»
+            j = InStr(1, cSymbRus, LCase$(c))    ' РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° РјР°СЃСЃРёРІР°
             If j > 0 Then j = j - 1: If c = LCase$(c) Then c = TransLat(j) Else c = StrConv(TransLat(j), vbProperCase)
             Result = Result & c
             i = i + cLen
         Loop
-    Else                    ' лат >> рус
+    Else                    ' Р»Р°С‚ >> СЂСѓСЃ
 Const cSymbLat = "chjqwx" ''"
-Dim TransRus(): TransRus = Array("ц", "х", "дж", "к", "в", "кс") ', "ь")
+Dim TransRus(): TransRus = Array("С†", "С…", "РґР¶", "Рє", "РІ", "РєСЃ") ', "СЊ")
         Do Until i > Len(Source)
-        ' проверяем по массиву транслитерации по ГОСТ
-            For j = 0 To UBound(TransLat)       ' номер элемента массива
+        ' РїСЂРѕРІРµСЂСЏРµРј РїРѕ РјР°СЃСЃРёРІСѓ С‚СЂР°РЅСЃР»РёС‚РµСЂР°С†РёРё РїРѕ Р“РћРЎРў
+            For j = 0 To UBound(TransLat)       ' РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° РјР°СЃСЃРёРІР°
                 c = TransLat(j): cLen = Len(c): If cLen = 0 Then Exit For
                 If LCase(Mid$(Source, i, cLen)) = c Then c = Mid$(cSymbRus, j + 1, 1): Exit For
             Next j
             If Len(c) = 0 Then
-        ' если не найдены соотв лат символы ГОСТ проверяем не вошедшие символы
-                cLen = 1: c = Mid$(Source, i, cLen) ' текущий рус символ
-                j = InStr(1, cSymbLat, LCase$(c))    ' номер элемента массива
-                If j > 0 Then c = TransRus(j - 1)   ' если найден - берём
+        ' РµСЃР»Рё РЅРµ РЅР°Р№РґРµРЅС‹ СЃРѕРѕС‚РІ Р»Р°С‚ СЃРёРјРІРѕР»С‹ Р“РћРЎРў РїСЂРѕРІРµСЂСЏРµРј РЅРµ РІРѕС€РµРґС€РёРµ СЃРёРјРІРѕР»С‹
+                cLen = 1: c = Mid$(Source, i, cLen) ' С‚РµРєСѓС‰РёР№ СЂСѓСЃ СЃРёРјРІРѕР»
+                j = InStr(1, cSymbLat, LCase$(c))    ' РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° РјР°СЃСЃРёРІР°
+                If j > 0 Then c = TransRus(j - 1)   ' РµСЃР»Рё РЅР°Р№РґРµРЅ - Р±РµСЂС‘Рј
             End If
             If UCase$(Mid$(Source, i, 1)) = Mid$(Source, i, 1) Then c = StrConv(c, vbProperCase)
             Result = Result & c
@@ -3123,16 +3133,16 @@ HandleExit:  TextTranslit = Result: Exit Function
 HandleError: Result = vbNullString: Err.Clear: Resume HandleExit
 End Function
 Public Function TextCorrectLatRus(Source As String, Optional Direction As Byte = 0) As String
-' Исправляет опечатку Lat<=>Rus
+' РСЃРїСЂР°РІР»СЏРµС‚ РѕРїРµС‡Р°С‚РєСѓ Lat<=>Rus
 '-------------------------
-' Direction = 0 - заменяет латинский символ соответствующим русским
-' Direction = 1 - заменяет русский символ соответствующим латинским
+' Direction = 0 - Р·Р°РјРµРЅСЏРµС‚ Р»Р°С‚РёРЅСЃРєРёР№ СЃРёРјРІРѕР» СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРј СЂСѓСЃСЃРєРёРј
+' Direction = 1 - Р·Р°РјРµРЅСЏРµС‚ СЂСѓСЃСЃРєРёР№ СЃРёРјРІРѕР» СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРј Р»Р°С‚РёРЅСЃРєРёРј
 '-------------------------
 Dim Result As String
     Result = Source
     If Len(Source) = 0 Then GoTo HandleExit
 Const cSymbLat As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-Const cSymbRus As String = "АВСДЕФГНИЖКЛМНОРОРСТУВВХУЗ"
+Const cSymbRus As String = "РђР’РЎР”Р•Р¤Р“РќРР–РљР›РњРќРћР РћР РЎРўРЈР’Р’РҐРЈР—"
 Dim strSearch As String, strReplace As String
     If Direction = 0 Then   'Lat=>Rus
         strSearch = cSymbLat: strReplace = cSymbRus
@@ -3152,16 +3162,16 @@ HandleExit:  TextCorrectLatRus = Result
 HandleError: Result = Source: Err.Clear: Resume HandleExit
 End Function
 Public Function TextContainsAlpha(Source As String) As Boolean
-' проверяет наличие в строке символов невходящих в список допустимых
+' РїСЂРѕРІРµСЂСЏРµС‚ РЅР°Р»РёС‡РёРµ РІ СЃС‚СЂРѕРєРµ СЃРёРјРІРѕР»РѕРІ РЅРµРІС…РѕРґСЏС‰РёС… РІ СЃРїРёСЃРѕРє РґРѕРїСѓСЃС‚РёРјС‹С…
 '-------------------------
 Dim c As Long, cMax As Long
 Dim Char As String * 1
 Dim Result As Boolean
     Result = False
     On Error GoTo HandleError
-' задаем разрешенные символы
+' Р·Р°РґР°РµРј СЂР°Р·СЂРµС€РµРЅРЅС‹Рµ СЃРёРјРІРѕР»С‹
 Dim PermissedSymb As String: PermissedSymb = VBA.UCase$(c_strSymbRusAll & c_strOthers)  '(c_strOthers)
-' пробегаем все символы пока не найдем первый не из списка
+' РїСЂРѕР±РµРіР°РµРј РІСЃРµ СЃРёРјРІРѕР»С‹ РїРѕРєР° РЅРµ РЅР°Р№РґРµРј РїРµСЂРІС‹Р№ РЅРµ РёР· СЃРїРёСЃРєР°
     c = 1: cMax = Len(Source)
     Do Until c > cMax
         Char = VBA.UCase$(VBA.Mid$(Source, c, 1))
@@ -3177,26 +3187,26 @@ End Function
 Public Function TextAlpha2Code(Source As String, _
     Optional Encoding As Byte = 0, _
     Optional Prefix As String = "%") As String
-' Заменяет символы не входящие в список допустимых их шестнадцатиричным кодом вида %XX
+' Р—Р°РјРµРЅСЏРµС‚ СЃРёРјРІРѕР»С‹ РЅРµ РІС…РѕРґСЏС‰РёРµ РІ СЃРїРёСЃРѕРє РґРѕРїСѓСЃС‚РёРјС‹С… РёС… С€РµСЃС‚РЅР°РґС†Р°С‚РёСЂРёС‡РЅС‹Рј РєРѕРґРѕРј РІРёРґР° %XX
 '-------------------------
-' Source   - кодируемая строка
-' Encoding - тип кодировки 0-cp1251, 1-UTF-8, 2-URL код (как в поисковых запросах)
-' Prefix   - префикс кода символа: "%","\u","=" или др
+' Source   - РєРѕРґРёСЂСѓРµРјР°СЏ СЃС‚СЂРѕРєР°
+' Encoding - С‚РёРї РєРѕРґРёСЂРѕРІРєРё 0-cp1251, 1-UTF-8, 2-URL РєРѕРґ (РєР°Рє РІ РїРѕРёСЃРєРѕРІС‹С… Р·Р°РїСЂРѕСЃР°С…)
+' Prefix   - РїСЂРµС„РёРєСЃ РєРѕРґР° СЃРёРјРІРѕР»Р°: "%","\u","=" РёР»Рё РґСЂ
 '-------------------------
 Dim Result As String
     Result = vbNullString
     On Error GoTo HandleError
 Dim c As Long, cMax As Long, cLen As Byte: c = 1: cMax = Len(Source): If cMax = 0 Then GoTo HandleExit
-' определяем параметры кодирования
+' РѕРїСЂРµРґРµР»СЏРµРј РїР°СЂР°РјРµС‚СЂС‹ РєРѕРґРёСЂРѕРІР°РЅРёСЏ
     Select Case Encoding
     Case 0: cLen = 2  ' cp1251   Prefix = "%"
     Case 1: cLen = 4  ' UTF-8    Prefix = "\u"
-    Case 2: cLen = 2  ' URL код  Prefix = "%" или "="
+    Case 2: cLen = 2  ' URL РєРѕРґ  Prefix = "%" РёР»Рё "="
     Case Else: Err.Raise vbObjectError + 512
     End Select
-' задаем дополнительные разрешенные символы помимо a-z,A-Z и 0-9. можно вынести в параметр функции
+' Р·Р°РґР°РµРј РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ СЂР°Р·СЂРµС€РµРЅРЅС‹Рµ СЃРёРјРІРѕР»С‹ РїРѕРјРёРјРѕ a-z,A-Z Рё 0-9. РјРѕР¶РЅРѕ РІС‹РЅРµСЃС‚Рё РІ РїР°СЂР°РјРµС‚СЂ С„СѓРЅРєС†РёРё
 Dim PermissedSymb As String: PermissedSymb = Replace(VBA.UCase$(c_strOthers), " ", "") '(c_strSymbRusAll & c_strOthers)  '(c_strOthers)
-' пробегаем все символы строки
+' РїСЂРѕР±РµРіР°РµРј РІСЃРµ СЃРёРјРІРѕР»С‹ СЃС‚СЂРѕРєРё
 Dim Char As String, Code As String
     Do Until c > cMax
         Char = VBA.Mid$(Source, c, 1)
@@ -3222,39 +3232,39 @@ End Function
 Public Function TextCode2Alpha(Source As String, _
     Optional Encoding As Byte = 0, _
     Optional Prefix As String = "%") As String
-' Заменяет код вида %XX, символов не входящих в список допустимых, их значением
+' Р—Р°РјРµРЅСЏРµС‚ РєРѕРґ РІРёРґР° %XX, СЃРёРјРІРѕР»РѕРІ РЅРµ РІС…РѕРґСЏС‰РёС… РІ СЃРїРёСЃРѕРє РґРѕРїСѓСЃС‚РёРјС‹С…, РёС… Р·РЅР°С‡РµРЅРёРµРј
 '-------------------------
-' Source   - декодируемая строка
-' Encoding - тип кодировки 0-cp1251, 1-UTF-8, 2-URL код (как в поисковых запросах)
-' Prefix   - префикс кода символа: "%","\u","=" или др
+' Source   - РґРµРєРѕРґРёСЂСѓРµРјР°СЏ СЃС‚СЂРѕРєР°
+' Encoding - С‚РёРї РєРѕРґРёСЂРѕРІРєРё 0-cp1251, 1-UTF-8, 2-URL РєРѕРґ (РєР°Рє РІ РїРѕРёСЃРєРѕРІС‹С… Р·Р°РїСЂРѕСЃР°С…)
+' Prefix   - РїСЂРµС„РёРєСЃ РєРѕРґР° СЃРёРјРІРѕР»Р°: "%","\u","=" РёР»Рё РґСЂ
 '-------------------------
 Dim Result As String
     On Error GoTo HandleError
     Result = vbNullString
     On Error GoTo HandleError
 Dim c As Long, cMax As Long, cLen As Byte: c = 1: cMax = Len(Source): If cMax = 0 Then GoTo HandleExit
-' определяем параметры кодирования
+' РѕРїСЂРµРґРµР»СЏРµРј РїР°СЂР°РјРµС‚СЂС‹ РєРѕРґРёСЂРѕРІР°РЅРёСЏ
     Select Case Encoding
     Case 0: cLen = 2  ' cp1251   Prefix = "%"
     Case 1: cLen = 4  ' UTF-8    Prefix = "\u"
-    Case 2: cLen = 2  ' URL код  Prefix = "%" или "="
+    Case 2: cLen = 2  ' URL РєРѕРґ  Prefix = "%" РёР»Рё "="
     Case Else: Err.Raise vbObjectError + 512
     End Select
-' пробегаем все символы строки
+' РїСЂРѕР±РµРіР°РµРј РІСЃРµ СЃРёРјРІРѕР»С‹ СЃС‚СЂРѕРєРё
 Dim Char As String, Code As String, Cod2 As String
     Do Until c > cMax
         If VBA.Mid$(Source, c, Len(Prefix)) <> Prefix Then
-' разрешенный (незакодированный) символ
+' СЂР°Р·СЂРµС€РµРЅРЅС‹Р№ (РЅРµР·Р°РєРѕРґРёСЂРѕРІР°РЅРЅС‹Р№) СЃРёРјРІРѕР»
             Char = VBA.Mid$(Source, c, 1)
         Else
-' если находим управляющий символ - расшифровываем код
+' РµСЃР»Рё РЅР°С…РѕРґРёРј СѓРїСЂР°РІР»СЏСЋС‰РёР№ СЃРёРјРІРѕР» - СЂР°СЃС€РёС„СЂРѕРІС‹РІР°РµРј РєРѕРґ
             Code = VBA.UCase$(VBA.Mid$(Source, c + Len(Prefix), cLen))
             Select Case Encoding
             Case 0: Code = c_strHexPref & Code: If IsNumeric(Code) Then Char = VBA.Chr$(Val(Code)):  c = c + cLen + Len(Prefix) - 1
             Case 1: Code = c_strHexPref & Code: If IsNumeric(Code) Then Char = VBA.ChrW$(Val(Code)): c = c + cLen + Len(Prefix) - 1
             Case 2: Code = c_strHexPref & Code: c = c + cLen + Len(Prefix) - 1
-            ' символы U+0000..U+00FF >> %00..%FF
-            ' символы U+0400..U+04FF >> %D0%80..%D0%BF;%D1%80..%D1%BF;%D2%80..%D2%BF;%D3%80..%D3%BF
+            ' СЃРёРјРІРѕР»С‹ U+0000..U+00FF >> %00..%FF
+            ' СЃРёРјРІРѕР»С‹ U+0400..U+04FF >> %D0%80..%D0%BF;%D1%80..%D1%BF;%D2%80..%D2%BF;%D3%80..%D3%BF
                     If IsNumeric(Code) Then
                         Select Case CLng(Code)
                         Case &HD0 To &HD3:
@@ -3270,7 +3280,7 @@ Dim Char As String, Code As String, Cod2 As String
                         Case Else:
                         End Select
                     End If
-                    Char = VBA.ChrW$(Val(Code))  ' прочие символы
+                    Char = VBA.ChrW$(Val(Code))  ' РїСЂРѕС‡РёРµ СЃРёРјРІРѕР»С‹
             End Select
         End If
 HandleNext:  Result = Result & Char: c = c + 1
@@ -3282,9 +3292,9 @@ Public Function TextClearAlpha( _
     Source, _
     Optional ReplaceWith As String = "_", _
     Optional AllowedSymbols As String)
-' Сжимает строку, заменяя символы не входящие в список допустимых указанным символом
+' РЎР¶РёРјР°РµС‚ СЃС‚СЂРѕРєСѓ, Р·Р°РјРµРЅСЏСЏ СЃРёРјРІРѕР»С‹ РЅРµ РІС…РѕРґСЏС‰РёРµ РІ СЃРїРёСЃРѕРє РґРѕРїСѓСЃС‚РёРјС‹С… СѓРєР°Р·Р°РЅРЅС‹Рј СЃРёРјРІРѕР»РѕРј
 '-------------------------
-' работает также с массивами строк.
+' СЂР°Р±РѕС‚Р°РµС‚ С‚Р°РєР¶Рµ СЃ РјР°СЃСЃРёРІР°РјРё СЃС‚СЂРѕРє.
 '-------------------------
 Dim c As Long, cMax As Long
 Dim i As Long, iMax As Long
@@ -3335,10 +3345,10 @@ HandleExit:  TextClearAlpha = Result: Exit Function
 HandleError: Err.Clear: Resume HandleExit
 End Function
 Public Function GetCharType(Letter As String, Optional AlphaType As Byte = 0) As Byte
-' проверяет букву и возвращает результат
+' РїСЂРѕРІРµСЂСЏРµС‚ Р±СѓРєРІСѓ Рё РІРѕР·РІСЂР°С‰Р°РµС‚ СЂРµР·СѓР»СЊС‚Р°С‚
 '-------------------------
-' на выходе: 1-гласная,2-согласная,3-знак(ьъ),и т.д.,0-не определено
-' AlphaType = 1-буква латинского алфавита, 2-буква русского алфавита, 3-цифра, 0-иной символ
+' РЅР° РІС‹С…РѕРґРµ: 1-РіР»Р°СЃРЅР°СЏ,2-СЃРѕРіР»Р°СЃРЅР°СЏ,3-Р·РЅР°Рє(СЊСЉ),Рё С‚.Рґ.,0-РЅРµ РѕРїСЂРµРґРµР»РµРЅРѕ
+' AlphaType = 1-Р±СѓРєРІР° Р»Р°С‚РёРЅСЃРєРѕРіРѕ Р°Р»С„Р°РІРёС‚Р°, 2-Р±СѓРєРІР° СЂСѓСЃСЃРєРѕРіРѕ Р°Р»С„Р°РІРёС‚Р°, 3-С†РёС„СЂР°, 0-РёРЅРѕР№ СЃРёРјРІРѕР»
 '-------------------------
 Dim Result As Byte: Result = 0 ': SymbType = 0
 Dim sChar As String * 1: sChar = LCase$(Left$(Trim$(Letter), 1))
@@ -3358,13 +3368,13 @@ Dim sChar As String * 1: sChar = LCase$(Left$(Trim$(Letter), 1))
 HandleExit: GetCharType = Result
 End Function
 ' ==================
-' Функции для сравнения слов
+' Р¤СѓРЅРєС†РёРё РґР»СЏ СЃСЂР°РІРЅРµРЅРёСЏ СЃР»РѕРІ
 ' ==================
 Public Function PolyPhone(ByVal Word As String, Optional FuzzyIdx As Boolean = False) 'As String
 'Polyphon: An Algorithm for Phonetic String Matching in Russian Language (Paramonov V.V., Shigarov A O., Ruzhnikov G.M. )
 '-------------------------
-' FuzzyIdx - если True  - возвращает числовой код для нечеткого сравнения
-'            если False - возвращает фонетический код
+' FuzzyIdx - РµСЃР»Рё True  - РІРѕР·РІСЂР°С‰Р°РµС‚ С‡РёСЃР»РѕРІРѕР№ РєРѕРґ РґР»СЏ РЅРµС‡РµС‚РєРѕРіРѕ СЃСЂР°РІРЅРµРЅРёСЏ
+'            РµСЃР»Рё False - РІРѕР·РІСЂР°С‰Р°РµС‚ С„РѕРЅРµС‚РёС‡РµСЃРєРёР№ РєРѕРґ
 '-------------------------
 'http://td.icc.ru/files/papers/Paramonov_ICIST2016.pdf
 'https://cyberleninka.ru/article/n/obzor-algoritmov-foneticheskogo-kodirovaniya
@@ -3375,104 +3385,104 @@ Dim i As Long, sChar As String
     For i = 1 To Len(Word)
         sChar = Mid$(Word, i, 1)
         Select Case sChar
-        Case "B":                     sChar = "В" ' Подстановка вместо латинских букв схожих букв русского алфавита:
-        Case "M":                     sChar = "М"
-        Case "H":                     sChar = "Н"
-        Case "A", "a":                sChar = "А"
-        Case "E", "e":                sChar = "Е"
-        Case "O", "o":                sChar = "О"
-        Case "C", "c":                sChar = "С"
-        Case "X", "x":                sChar = "Х"
-        Case "Ъ", "ъ", "Ь", "ь":      sChar = vbNullString  ' Удаление букв Ь, Ъ.
-        Case "А" To "Я", "а" To "я":  sChar = UCase$(sChar)
-        Case Else:                    sChar = vbNullString  ' Удаление всех букв, не принадлежащих алфавиту русского языка.
+        Case "B":                     sChar = "Р’" ' РџРѕРґСЃС‚Р°РЅРѕРІРєР° РІРјРµСЃС‚Рѕ Р»Р°С‚РёРЅСЃРєРёС… Р±СѓРєРІ СЃС…РѕР¶РёС… Р±СѓРєРІ СЂСѓСЃСЃРєРѕРіРѕ Р°Р»С„Р°РІРёС‚Р°:
+        Case "M":                     sChar = "Рњ"
+        Case "H":                     sChar = "Рќ"
+        Case "A", "a":                sChar = "Рђ"
+        Case "E", "e":                sChar = "Р•"
+        Case "O", "o":                sChar = "Рћ"
+        Case "C", "c":                sChar = "РЎ"
+        Case "X", "x":                sChar = "РҐ"
+        Case "РЄ", "СЉ", "Р¬", "СЊ":      sChar = vbNullString  ' РЈРґР°Р»РµРЅРёРµ Р±СѓРєРІ Р¬, РЄ.
+        Case "Рђ" To "РЇ", "Р°" To "СЏ":  sChar = UCase$(sChar)
+        Case Else:                    sChar = vbNullString  ' РЈРґР°Р»РµРЅРёРµ РІСЃРµС… Р±СѓРєРІ, РЅРµ РїСЂРёРЅР°РґР»РµР¶Р°С‰РёС… Р°Р»С„Р°РІРёС‚Сѓ СЂСѓСЃСЃРєРѕРіРѕ СЏР·С‹РєР°.
         End Select
-        ' Замена двух одинаковых букв одной.
+        ' Р—Р°РјРµРЅР° РґРІСѓС… РѕРґРёРЅР°РєРѕРІС‹С… Р±СѓРєРІ РѕРґРЅРѕР№.
         If sChar = UCase$(Mid$(Word, i + 1, 1)) Then i = i + 1: GoTo HandleNext
-        ' Замена одиночных букв
+        ' Р—Р°РјРµРЅР° РѕРґРёРЅРѕС‡РЅС‹С… Р±СѓРєРІ
         Select Case sChar
-        Case "А", "Е", "Ё", _
-             "И", "О", "Ы", "Э", "Я": sChar = "А"
-        Case "Б":                     sChar = "П"
-        Case "В":                     sChar = "Ф"
-        Case "Г":                     sChar = "К"
-        Case "Д":                     sChar = "Т"
-        Case "З":                     sChar = "С"
-        Case "Щ":                     sChar = "Ш"
-        Case "Ж":                     sChar = "Ш"
-        Case "М":                     sChar = "Н"
-        Case "Ю":                     sChar = "У"
+        Case "Рђ", "Р•", "РЃ", _
+             "Р", "Рћ", "Р«", "Р­", "РЇ": sChar = "Рђ"
+        Case "Р‘":                     sChar = "Рџ"
+        Case "Р’":                     sChar = "Р¤"
+        Case "Р“":                     sChar = "Рљ"
+        Case "Р”":                     sChar = "Рў"
+        Case "Р—":                     sChar = "РЎ"
+        Case "Р©":                     sChar = "РЁ"
+        Case "Р–":                     sChar = "РЁ"
+        Case "Рњ":                     sChar = "Рќ"
+        Case "Р®":                     sChar = "РЈ"
         End Select
-        ' Выполнение подстановок:
+        ' Р’С‹РїРѕР»РЅРµРЅРёРµ РїРѕРґСЃС‚Р°РЅРѕРІРѕРє:
         If Len(Result) > 3 Then
             Select Case Right$(Result, 4) & sChar
-            Case "ЛФСТФ": Mid$(Result, Len(Result) - 3, 4) = "ЛСТФ": sChar = vbNullString: GoTo HandleNext
+            Case "Р›Р¤РЎРўР¤": Mid$(Result, Len(Result) - 3, 4) = "Р›РЎРўР¤": sChar = vbNullString: GoTo HandleNext
             End Select
         End If
         If Len(Result) > 2 Then
             Select Case Right$(Result, 3) & sChar
-            Case "НТСК": Mid$(Result, Len(Result) - 2, 3) = "НCК": sChar = vbNullString: GoTo HandleNext
-            Case "ФСТФ": Mid$(Result, Len(Result) - 2, 3) = "CТФ": sChar = vbNullString: GoTo HandleNext
+            Case "РќРўРЎРљ": Mid$(Result, Len(Result) - 2, 3) = "РќCРљ": sChar = vbNullString: GoTo HandleNext
+            Case "Р¤РЎРўР¤": Mid$(Result, Len(Result) - 2, 3) = "CРўР¤": sChar = vbNullString: GoTo HandleNext
             End Select
         End If
         If Len(Result) > 1 Then
             Select Case Right$(Result, 2) & sChar
-            Case "ТАТ": Mid$(Result, Len(Result) - 1, 2) = "Т ": Result = Trim$(Result): sChar = vbNullString: GoTo HandleNext
-            Case "ТСА": Mid$(Result, Len(Result) - 1, 2) = "Ц ": Result = Trim$(Result): sChar = vbNullString: GoTo HandleNext
-            Case "ТСЯ": Mid$(Result, Len(Result) - 1, 2) = "Ц ": Result = Trim$(Result): sChar = vbNullString: GoTo HandleNext
-            Case "НАТ": Mid$(Result, Len(Result) - 1, 2) = "Н ": Result = Trim$(Result): sChar = vbNullString: GoTo HandleNext
-            Case "ТАФ": Mid$(Result, Len(Result) - 1, 2) = "ТФ": sChar = vbNullString: GoTo HandleNext
-            Case "ФАК": Mid$(Result, Len(Result) - 1, 2) = "ФК": sChar = vbNullString: GoTo HandleNext
-            Case "СТЛ": Mid$(Result, Len(Result) - 1, 2) = "CЛ": sChar = vbNullString: GoTo HandleNext
-            Case "СТН": Mid$(Result, Len(Result) - 1, 2) = "CН": sChar = vbNullString: GoTo HandleNext
-            Case "НТА": Mid$(Result, Len(Result) - 1, 2) = "НA": sChar = vbNullString: GoTo HandleNext
-            Case "НТК": Mid$(Result, Len(Result) - 1, 2) = "НК": sChar = vbNullString: GoTo HandleNext
-            Case "НТС": Mid$(Result, Len(Result) - 1, 2) = "НC": sChar = vbNullString: GoTo HandleNext
-            Case "ЛНЦ": Mid$(Result, Len(Result) - 1, 2) = "НЦ": sChar = vbNullString: GoTo HandleNext
-            Case "НТЦ": Mid$(Result, Len(Result) - 1, 2) = "НЦ": sChar = vbNullString: GoTo HandleNext
-            Case "НТШ": Mid$(Result, Len(Result) - 1, 2) = "НШ": sChar = vbNullString: GoTo HandleNext
-            Case "ПАЛ": Mid$(Result, Len(Result) - 1, 2) = "ПЛ": sChar = vbNullString: GoTo HandleNext
-            Case "РТЧ": Mid$(Result, Len(Result) - 1, 2) = "PЧ": sChar = vbNullString: GoTo HandleNext
-            Case "РТЦ": Mid$(Result, Len(Result) - 1, 2) = "PЦ": sChar = vbNullString: GoTo HandleNext
-            Case "АКA": Mid$(Result, Len(Result) - 1, 2) = "AФ": sChar = "A": GoTo HandleNext
-            Case "ОКО": Mid$(Result, Len(Result) - 1, 2) = "ОФ": sChar = "О": GoTo HandleNext
+            Case "РўРђРў": Mid$(Result, Len(Result) - 1, 2) = "Рў ": Result = Trim$(Result): sChar = vbNullString: GoTo HandleNext
+            Case "РўРЎРђ": Mid$(Result, Len(Result) - 1, 2) = "Р¦ ": Result = Trim$(Result): sChar = vbNullString: GoTo HandleNext
+            Case "РўРЎРЇ": Mid$(Result, Len(Result) - 1, 2) = "Р¦ ": Result = Trim$(Result): sChar = vbNullString: GoTo HandleNext
+            Case "РќРђРў": Mid$(Result, Len(Result) - 1, 2) = "Рќ ": Result = Trim$(Result): sChar = vbNullString: GoTo HandleNext
+            Case "РўРђР¤": Mid$(Result, Len(Result) - 1, 2) = "РўР¤": sChar = vbNullString: GoTo HandleNext
+            Case "Р¤РђРљ": Mid$(Result, Len(Result) - 1, 2) = "Р¤Рљ": sChar = vbNullString: GoTo HandleNext
+            Case "РЎРўР›": Mid$(Result, Len(Result) - 1, 2) = "CР›": sChar = vbNullString: GoTo HandleNext
+            Case "РЎРўРќ": Mid$(Result, Len(Result) - 1, 2) = "CРќ": sChar = vbNullString: GoTo HandleNext
+            Case "РќРўРђ": Mid$(Result, Len(Result) - 1, 2) = "РќA": sChar = vbNullString: GoTo HandleNext
+            Case "РќРўРљ": Mid$(Result, Len(Result) - 1, 2) = "РќРљ": sChar = vbNullString: GoTo HandleNext
+            Case "РќРўРЎ": Mid$(Result, Len(Result) - 1, 2) = "РќC": sChar = vbNullString: GoTo HandleNext
+            Case "Р›РќР¦": Mid$(Result, Len(Result) - 1, 2) = "РќР¦": sChar = vbNullString: GoTo HandleNext
+            Case "РќРўР¦": Mid$(Result, Len(Result) - 1, 2) = "РќР¦": sChar = vbNullString: GoTo HandleNext
+            Case "РќРўРЁ": Mid$(Result, Len(Result) - 1, 2) = "РќРЁ": sChar = vbNullString: GoTo HandleNext
+            Case "РџРђР›": Mid$(Result, Len(Result) - 1, 2) = "РџР›": sChar = vbNullString: GoTo HandleNext
+            Case "Р РўР§": Mid$(Result, Len(Result) - 1, 2) = "PР§": sChar = vbNullString: GoTo HandleNext
+            Case "Р РўР¦": Mid$(Result, Len(Result) - 1, 2) = "PР¦": sChar = vbNullString: GoTo HandleNext
+            Case "РђРљA": Mid$(Result, Len(Result) - 1, 2) = "AР¤": sChar = "A": GoTo HandleNext
+            Case "РћРљРћ": Mid$(Result, Len(Result) - 1, 2) = "РћР¤": sChar = "Рћ": GoTo HandleNext
             End Select
         End If
         If Len(Result) > 0 Then
             Select Case Right$(Result, 1) & sChar
-            Case "АН": Mid$(Result, Len(Result), 1) = "Н": sChar = vbNullString: GoTo HandleNext
-            Case "ЗЧ": Mid$(Result, Len(Result), 1) = "Ш": sChar = vbNullString: GoTo HandleNext
-            Case "НТ": Mid$(Result, Len(Result), 1) = "Н": sChar = vbNullString: GoTo HandleNext
-            Case "СЧ": Mid$(Result, Len(Result), 1) = "Ш": sChar = vbNullString: GoTo HandleNext
-            Case "СШ": Mid$(Result, Len(Result), 1) = "Ш": sChar = vbNullString: GoTo HandleNext
-            Case "ТЦ": Mid$(Result, Len(Result), 1) = "Ц": sChar = vbNullString: GoTo HandleNext
-            Case "ТЧ": Mid$(Result, Len(Result), 1) = "Ч": sChar = vbNullString: GoTo HandleNext
-            Case "ШЧ": Mid$(Result, Len(Result), 1) = "Ш": sChar = vbNullString: GoTo HandleNext
-            Case "СП": Mid$(Result, Len(Result), 1) = "C": sChar = "Ф": GoTo HandleNext
-            Case "ТС": Mid$(Result, Len(Result), 1) = "Т": sChar = "Ц": GoTo HandleNext
+            Case "РђРќ": Mid$(Result, Len(Result), 1) = "Рќ": sChar = vbNullString: GoTo HandleNext
+            Case "Р—Р§": Mid$(Result, Len(Result), 1) = "РЁ": sChar = vbNullString: GoTo HandleNext
+            Case "РќРў": Mid$(Result, Len(Result), 1) = "Рќ": sChar = vbNullString: GoTo HandleNext
+            Case "РЎР§": Mid$(Result, Len(Result), 1) = "РЁ": sChar = vbNullString: GoTo HandleNext
+            Case "РЎРЁ": Mid$(Result, Len(Result), 1) = "РЁ": sChar = vbNullString: GoTo HandleNext
+            Case "РўР¦": Mid$(Result, Len(Result), 1) = "Р¦": sChar = vbNullString: GoTo HandleNext
+            Case "РўР§": Mid$(Result, Len(Result), 1) = "Р§": sChar = vbNullString: GoTo HandleNext
+            Case "РЁР§": Mid$(Result, Len(Result), 1) = "РЁ": sChar = vbNullString: GoTo HandleNext
+            Case "РЎРџ": Mid$(Result, Len(Result), 1) = "C": sChar = "Р¤": GoTo HandleNext
+            Case "РўРЎ": Mid$(Result, Len(Result), 1) = "Рў": sChar = "Р¦": GoTo HandleNext
             End Select
         End If
 HandleNext:
         If FuzzyIdx Then
-        ' добавляем числовые значения выходных символов
+        ' РґРѕР±Р°РІР»СЏРµРј С‡РёСЃР»РѕРІС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РІС‹С…РѕРґРЅС‹С… СЃРёРјРІРѕР»РѕРІ
             Select Case sChar
-            Case "А": x = x + 2
-            Case "П": x = x + 3
-            Case "К": x = x + 5
-            Case "Л": x = x + 7
-            Case "М": x = x + 11
-            Case "Н": x = x + 13
-            Case "Р": x = x + 17
-            Case "С": x = x + 19
-            Case "Т": x = x + 23
-            Case "У": x = x + 29
-            Case "Ф": x = x + 31
-            Case "Х": x = x + 37
-            Case "Ц": x = x + 41
-            Case "Ч": x = x + 43
-            Case "Щ": x = x + 47
-            Case "Э": x = x + 53
-            Case "Я": x = x + 59
+            Case "Рђ": x = x + 2
+            Case "Рџ": x = x + 3
+            Case "Рљ": x = x + 5
+            Case "Р›": x = x + 7
+            Case "Рњ": x = x + 11
+            Case "Рќ": x = x + 13
+            Case "Р ": x = x + 17
+            Case "РЎ": x = x + 19
+            Case "Рў": x = x + 23
+            Case "РЈ": x = x + 29
+            Case "Р¤": x = x + 31
+            Case "РҐ": x = x + 37
+            Case "Р¦": x = x + 41
+            Case "Р§": x = x + 43
+            Case "Р©": x = x + 47
+            Case "Р­": x = x + 53
+            Case "РЇ": x = x + 59
             End Select
         End If
         Result = Result & sChar
@@ -3481,67 +3491,67 @@ HandleExit:  PolyPhone = IIf(FuzzyIdx, x, Result): Exit Function
 HandleError: Result = vbNullString: x = 0: Err.Clear: Resume HandleExit
 End Function
 Public Function MetaPhoneRu1(ByVal Word As String) As String
-'Первоначальный вариант — простой, но не оптимальный.
+'РџРµСЂРІРѕРЅР°С‡Р°Р»СЊРЅС‹Р№ РІР°СЂРёР°РЅС‚В вЂ” РїСЂРѕСЃС‚РѕР№, РЅРѕ РЅРµ РѕРїС‚РёРјР°Р»СЊРЅС‹Р№.
 '-------------------------
-'Источник: http://forum.aeroion.ru/topic461.html
-Const alf$ = "ОЕАИУЭЮЯПСТРКЛМНБВГДЖЗЙФХЦЧШЩЫЁ", _
-      cns1$ = "БЗДВГ", _
-      cns2$ = "ПСТФК", _
-      cns3$ = "ПСТКБВГДЖЗФХЦЧШЩ", _
-      cH$ = "ОЮЕЭЯЁЫ", _
-      ct$ = "АУИИАИА"
-'alf - алфавит кроме исключаемых букв, cns1 и cns2 - звонкие и глухие
-'согласные, cns3 - согласные, перед которыми звонкие оглушаются,
-'ch, ct - образец и замена гласных
+'РСЃС‚РѕС‡РЅРёРє: http://forum.aeroion.ru/topic461.html
+Const alf$ = "РћР•РђРРЈР­Р®РЇРџРЎРўР РљР›РњРќР‘Р’Р“Р”Р–Р—Р™Р¤РҐР¦Р§РЁР©Р«РЃ", _
+      cns1$ = "Р‘Р—Р”Р’Р“", _
+      cns2$ = "РџРЎРўР¤Рљ", _
+      cns3$ = "РџРЎРўРљР‘Р’Р“Р”Р–Р—Р¤РҐР¦Р§РЁР©", _
+      cH$ = "РћР®Р•Р­РЇРЃР«", _
+      ct$ = "РђРЈРРРђРРђ"
+'alf - Р°Р»С„Р°РІРёС‚ РєСЂРѕРјРµ РёСЃРєР»СЋС‡Р°РµРјС‹С… Р±СѓРєРІ, cns1 Рё cns2 - Р·РІРѕРЅРєРёРµ Рё РіР»СѓС…РёРµ
+'СЃРѕРіР»Р°СЃРЅС‹Рµ, cns3 - СЃРѕРіР»Р°СЃРЅС‹Рµ, РїРµСЂРµРґ РєРѕС‚РѕСЂС‹РјРё Р·РІРѕРЅРєРёРµ РѕРіР»СѓС€Р°СЋС‚СЃСЏ,
+'ch, ct - РѕР±СЂР°Р·РµС† Рё Р·Р°РјРµРЅР° РіР»Р°СЃРЅС‹С…
 Dim s$, v$, i&, b&, c$
-'S, V - промежуточные строки, i - счётчик цикла, B - позиция
-'найденного элемента, c$ - текущий символ
+'S, V - РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅС‹Рµ СЃС‚СЂРѕРєРё, i - СЃС‡С‘С‚С‡РёРє С†РёРєР»Р°, B - РїРѕР·РёС†РёСЏ
+'РЅР°Р№РґРµРЅРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°, c$ - С‚РµРєСѓС‰РёР№ СЃРёРјРІРѕР»
 
-'Переводим в верхний регистр, оставляем только символы из alf
-'приписываем пробел с начала, копируем в S:
+'РџРµСЂРµРІРѕРґРёРј РІ РІРµСЂС…РЅРёР№ СЂРµРіРёСЃС‚СЂ, РѕСЃС‚Р°РІР»СЏРµРј С‚РѕР»СЊРєРѕ СЃРёРјРІРѕР»С‹ РёР· alf
+'РїСЂРёРїРёСЃС‹РІР°РµРј РїСЂРѕР±РµР» СЃ РЅР°С‡Р°Р»Р°, РєРѕРїРёСЂСѓРµРј РІ S:
     Word = UCase$(Word): s = " "
     For i = 1 To Len(Word)
         c = Mid$(Word, i, 1)
         If InStr(alf, c) Then s = s & c
     Next i
     If Len(s) = 1 Then Exit Function
-    'Заменяем окончания:
+    'Р—Р°РјРµРЅСЏРµРј РѕРєРѕРЅС‡Р°РЅРёСЏ:
     Select Case Right$(s, 6)
-    Case "ОВСКИЙ":      s = Left$(s, Len(s) - 6) & "@"
-    Case "ЕВСКИЙ":      s = Left$(s, Len(s) - 6) & "#"
-    Case "ОВСКАЯ":      s = Left$(s, Len(s) - 6) & "$"
-    Case "ЕВСКАЯ":      s = Left$(s, Len(s) - 6) & "%"
+    Case "РћР’РЎРљРР™":      s = Left$(s, Len(s) - 6) & "@"
+    Case "Р•Р’РЎРљРР™":      s = Left$(s, Len(s) - 6) & "#"
+    Case "РћР’РЎРљРђРЇ":      s = Left$(s, Len(s) - 6) & "$"
+    Case "Р•Р’РЎРљРђРЇ":      s = Left$(s, Len(s) - 6) & "%"
     End Select
     
     Select Case Right$(s, 3)
-    Case "ОВА", "ЕВА":  s = Left$(s, Len(s) - 3) & "9"
-    Case "ИНА":         s = Left$(s, Len(s) - 3) & "1"
-    Case "НКО":         s = Left$(s, Len(s) - 3) & "3"
+    Case "РћР’Рђ", "Р•Р’Рђ":  s = Left$(s, Len(s) - 3) & "9"
+    Case "РРќРђ":         s = Left$(s, Len(s) - 3) & "1"
+    Case "РќРљРћ":         s = Left$(s, Len(s) - 3) & "3"
     End Select
     
     Select Case Right$(s, 2)
-    Case "ОВ", "ЕВ":    s = Left$(s, Len(s) - 2) & "4"
-    Case "АЯ":          s = Left$(s, Len(s) - 2) & "6"
-    Case "ИЙ", "ЫЙ":    s = Left$(s, Len(s) - 2) & "7"
-    Case "ЫХ", "ИХ":    s = Left$(s, Len(s) - 2) & "5"
-    Case "ИН":          s = Left$(s, Len(s) - 2) & "8"
-    Case "ИК", "ЕК":    s = Left$(s, Len(s) - 2) & "2"
-    Case "УК", "ЮК":    s = Left$(s, Len(s) - 2) & "0"
+    Case "РћР’", "Р•Р’":    s = Left$(s, Len(s) - 2) & "4"
+    Case "РђРЇ":          s = Left$(s, Len(s) - 2) & "6"
+    Case "РР™", "Р«Р™":    s = Left$(s, Len(s) - 2) & "7"
+    Case "Р«РҐ", "РРҐ":    s = Left$(s, Len(s) - 2) & "5"
+    Case "РРќ":          s = Left$(s, Len(s) - 2) & "8"
+    Case "РРљ", "Р•Рљ":    s = Left$(s, Len(s) - 2) & "2"
+    Case "РЈРљ", "Р®Рљ":    s = Left$(s, Len(s) - 2) & "0"
     End Select
-    'Оглушаем последний символ, если он - звонкий согласный:
+    'РћРіР»СѓС€Р°РµРј РїРѕСЃР»РµРґРЅРёР№ СЃРёРјРІРѕР», РµСЃР»Рё РѕРЅ - Р·РІРѕРЅРєРёР№ СЃРѕРіР»Р°СЃРЅС‹Р№:
     b = InStr(cns1, Right$(s, 1))
     If b Then Mid$(s, Len(s), 1) = Mid$(cns2, b, 1)
-    'Основной цикл:
+    'РћСЃРЅРѕРІРЅРѕР№ С†РёРєР»:
     For i = 2 To Len(s)
         c = Mid$(s, i, 1)
         b = InStr(cH, c)
-        If b Then Mid$(s, i, 1) = Mid$(ct, b, 1) 'Замена гласных
-        If InStr(cns3, c) Then 'Оглушение согласных
+        If b Then Mid$(s, i, 1) = Mid$(ct, b, 1) 'Р—Р°РјРµРЅР° РіР»Р°СЃРЅС‹С…
+        If InStr(cns3, c) Then 'РћРіР»СѓС€РµРЅРёРµ СЃРѕРіР»Р°СЃРЅС‹С…
             b = InStr(cns1, Mid$(s, i - 1, 1))
             If b Then Mid$(s, i - 1, 1) = Mid$(cns2, b, 1)
         End If
     Next i
-    'Устраняем повторы, убираем первый пробел:
+    'РЈСЃС‚СЂР°РЅСЏРµРј РїРѕРІС‚РѕСЂС‹, СѓР±РёСЂР°РµРј РїРµСЂРІС‹Р№ РїСЂРѕР±РµР»:
     For i = 2 To Len(s)
         c = Mid$(s, i, 1)
         If c <> Mid$(s, i - 1, 1) Then v = v & c
@@ -3549,85 +3559,85 @@ Dim s$, v$, i&, b&, c$
     MetaPhoneRu1 = v
 End Function
 Public Function MetaPhoneRu2(ByVal Word As String) As String
-'Второй вариант — пожалуй, лучший.
+'Р’С‚РѕСЂРѕР№ РІР°СЂРёР°РЅС‚В вЂ” РїРѕР¶Р°Р»СѓР№, Р»СѓС‡С€РёР№.
 '-------------------------
-'Источник: http://forum.aeroion.ru/topic461.html
-'Заменяет ЙО, ЙЕ и др.; неплохо оптимизирован.
-Const alf$ = "ОЕАИУЭЮЯПСТРКЛМНБВГДЖЗЙФХЦЧШЩЁЫ", _
-      cns1$ = "БЗДВГ", _
-      cns2$ = "ПСТФК", _
-      cns3$ = "ПСТКБВГДЖЗФХЦЧШЩ", _
-      cH$ = "ОЮЕЭЯЁЫ", _
-      ct$ = "АУИИАИА"
-'alf - алфавит кроме исключаемых букв, cns1 и cns2 - звонкие и глухие
-'согласные, cns3 - согласные, перед которыми звонкие оглушаются,
-'ch, ct - образец и замена гласных
+'РСЃС‚РѕС‡РЅРёРє: http://forum.aeroion.ru/topic461.html
+'Р—Р°РјРµРЅСЏРµС‚ Р™Рћ, Р™Р• РёВ РґСЂ.; РЅРµРїР»РѕС…Рѕ РѕРїС‚РёРјРёР·РёСЂРѕРІР°РЅ.
+Const alf$ = "РћР•РђРРЈР­Р®РЇРџРЎРўР РљР›РњРќР‘Р’Р“Р”Р–Р—Р™Р¤РҐР¦Р§РЁР©РЃР«", _
+      cns1$ = "Р‘Р—Р”Р’Р“", _
+      cns2$ = "РџРЎРўР¤Рљ", _
+      cns3$ = "РџРЎРўРљР‘Р’Р“Р”Р–Р—Р¤РҐР¦Р§РЁР©", _
+      cH$ = "РћР®Р•Р­РЇРЃР«", _
+      ct$ = "РђРЈРРРђРРђ"
+'alf - Р°Р»С„Р°РІРёС‚ РєСЂРѕРјРµ РёСЃРєР»СЋС‡Р°РµРјС‹С… Р±СѓРєРІ, cns1 Рё cns2 - Р·РІРѕРЅРєРёРµ Рё РіР»СѓС…РёРµ
+'СЃРѕРіР»Р°СЃРЅС‹Рµ, cns3 - СЃРѕРіР»Р°СЃРЅС‹Рµ, РїРµСЂРµРґ РєРѕС‚РѕСЂС‹РјРё Р·РІРѕРЅРєРёРµ РѕРіР»СѓС€Р°СЋС‚СЃСЏ,
+'ch, ct - РѕР±СЂР°Р·РµС† Рё Р·Р°РјРµРЅР° РіР»Р°СЃРЅС‹С…
 Dim s$, v$, i&, b&, c$, old_c$
-'S, V - промежуточные строки, i - счётчик цикла, B - позиция
-'найденного элемента, c$ - текущий символ, c_old$ - предыдущий
-'символ
+'S, V - РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅС‹Рµ СЃС‚СЂРѕРєРё, i - СЃС‡С‘С‚С‡РёРє С†РёРєР»Р°, B - РїРѕР·РёС†РёСЏ
+'РЅР°Р№РґРµРЅРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°, c$ - С‚РµРєСѓС‰РёР№ СЃРёРјРІРѕР», c_old$ - РїСЂРµРґС‹РґСѓС‰РёР№
+'СЃРёРјРІРѕР»
 
-'Переводим в верхний регистр, оставляем только
-'символы из alf и копируем в S:
+'РџРµСЂРµРІРѕРґРёРј РІ РІРµСЂС…РЅРёР№ СЂРµРіРёСЃС‚СЂ, РѕСЃС‚Р°РІР»СЏРµРј С‚РѕР»СЊРєРѕ
+'СЃРёРјРІРѕР»С‹ РёР· alf Рё РєРѕРїРёСЂСѓРµРј РІ S:
     Word = UCase$(Word)
     For i = 1 To Len(Word)
         c = Mid$(Word, i, 1)
         If InStr(alf, c) Then s = s & c
     Next i
     If Len(s) = 0 Then Exit Function
-    'Сжимаем окончания:
+    'РЎР¶РёРјР°РµРј РѕРєРѕРЅС‡Р°РЅРёСЏ:
     Select Case Right$(s, 6)
-    Case "ОВСКИЙ":                  s = Left$(s, Len(s) - 6) & "@"
-    Case "ЕВСКИЙ":                  s = Left$(s, Len(s) - 6) & "#"
-    Case "ОВСКАЯ":                  s = Left$(s, Len(s) - 6) & "$"
-    Case "ЕВСКАЯ":                  s = Left$(s, Len(s) - 6) & "%"
+    Case "РћР’РЎРљРР™":                  s = Left$(s, Len(s) - 6) & "@"
+    Case "Р•Р’РЎРљРР™":                  s = Left$(s, Len(s) - 6) & "#"
+    Case "РћР’РЎРљРђРЇ":                  s = Left$(s, Len(s) - 6) & "$"
+    Case "Р•Р’РЎРљРђРЇ":                  s = Left$(s, Len(s) - 6) & "%"
     Case Else
-        If Right$(s, 4) = "ИЕВА" Or Right$(s, 4) = "ЕЕВА" Then
+        If Right$(s, 4) = "РР•Р’Рђ" Or Right$(s, 4) = "Р•Р•Р’Рђ" Then
             s = Left$(s, Len(s) - 4) & "9"
         Else
             Select Case Right$(s, 3)
-            Case "ОВА", "ЕВА":      s = Left$(s, Len(s) - 3) & "9"
-            Case "ИНА":             s = Left$(s, Len(s) - 3) & "1"
-            Case "ИЕВ", "ЕЕВ":      s = Left$(s, Len(s) - 3) & "4"
-            Case "НКО":             s = Left$(s, Len(s) - 3) & "3"
+            Case "РћР’Рђ", "Р•Р’Рђ":      s = Left$(s, Len(s) - 3) & "9"
+            Case "РРќРђ":             s = Left$(s, Len(s) - 3) & "1"
+            Case "РР•Р’", "Р•Р•Р’":      s = Left$(s, Len(s) - 3) & "4"
+            Case "РќРљРћ":             s = Left$(s, Len(s) - 3) & "3"
             Case Else
                 Select Case Right$(s, 2)
-                Case "ОВ", "ЕВ":    s = Left$(s, Len(s) - 2) & "4"
-                Case "АЯ":          s = Left$(s, Len(s) - 2) & "6"
-                Case "ИЙ", "ЫЙ":    s = Left$(s, Len(s) - 2) & "7"
-                Case "ЫХ", "ИХ":    s = Left$(s, Len(s) - 2) & "5"
-                Case "ИН":          s = Left$(s, Len(s) - 2) & "8"
-                Case "ИК", "ЕК":    s = Left$(s, Len(s) - 2) & "2"
-                Case "УК", "ЮК":    s = Left$(s, Len(s) - 2) & "0"
+                Case "РћР’", "Р•Р’":    s = Left$(s, Len(s) - 2) & "4"
+                Case "РђРЇ":          s = Left$(s, Len(s) - 2) & "6"
+                Case "РР™", "Р«Р™":    s = Left$(s, Len(s) - 2) & "7"
+                Case "Р«РҐ", "РРҐ":    s = Left$(s, Len(s) - 2) & "5"
+                Case "РРќ":          s = Left$(s, Len(s) - 2) & "8"
+                Case "РРљ", "Р•Рљ":    s = Left$(s, Len(s) - 2) & "2"
+                Case "РЈРљ", "Р®Рљ":    s = Left$(s, Len(s) - 2) & "0"
                 End Select
             End Select
         End If
     End Select
-    'Оглушаем последний символ, если он - звонкий согласный:
+    'РћРіР»СѓС€Р°РµРј РїРѕСЃР»РµРґРЅРёР№ СЃРёРјРІРѕР», РµСЃР»Рё РѕРЅ - Р·РІРѕРЅРєРёР№ СЃРѕРіР»Р°СЃРЅС‹Р№:
     b = InStr(cns1, Right$(s, 1))
     If b Then Mid$(s, Len(s), 1) = Mid$(cns2, b, 1)
     old_c = " "
-    'Основной цикл:
+    'РћСЃРЅРѕРІРЅРѕР№ С†РёРєР»:
     For i = 1 To Len(s)
         c = Mid$(s, i, 1)
         b = InStr(cH, c)
-        If b Then   'Если гласная
-            If old_c = "Й" Or old_c = "И" Then
-                If c = "О" Or c = "Е" Then 'Буквосочетания с гласной
-                    old_c = "И": Mid$(v, Len(v), 1) = old_c
-                Else 'Если не буквосочетания с гласной, а просто гласная
+        If b Then   'Р•СЃР»Рё РіР»Р°СЃРЅР°СЏ
+            If old_c = "Р™" Or old_c = "Р" Then
+                If c = "Рћ" Or c = "Р•" Then 'Р‘СѓРєРІРѕСЃРѕС‡РµС‚Р°РЅРёСЏ СЃ РіР»Р°СЃРЅРѕР№
+                    old_c = "Р": Mid$(v, Len(v), 1) = old_c
+                Else 'Р•СЃР»Рё РЅРµ Р±СѓРєРІРѕСЃРѕС‡РµС‚Р°РЅРёСЏ СЃ РіР»Р°СЃРЅРѕР№, Р° РїСЂРѕСЃС‚Рѕ РіР»Р°СЃРЅР°СЏ
                     If c <> old_c Then v = v & Mid$(ct, b, 1)
                 End If
-            Else    'Если не буквосочетания с гласной, а просто гласная
+            Else    'Р•СЃР»Рё РЅРµ Р±СѓРєРІРѕСЃРѕС‡РµС‚Р°РЅРёСЏ СЃ РіР»Р°СЃРЅРѕР№, Р° РїСЂРѕСЃС‚Рѕ РіР»Р°СЃРЅР°СЏ
                 If c <> old_c Then v = v & Mid$(ct, b, 1)
             End If
-        Else        'Если согласная
-            If c <> old_c Then 'для «Аввакумов»
-                If InStr(cns3, c) Then 'Оглушение согласных
+        Else        'Р•СЃР»Рё СЃРѕРіР»Р°СЃРЅР°СЏ
+            If c <> old_c Then 'РґР»СЏ В«РђРІРІР°РєСѓРјРѕРІВ»
+                If InStr(cns3, c) Then 'РћРіР»СѓС€РµРЅРёРµ СЃРѕРіР»Р°СЃРЅС‹С…
                     b = InStr(cns1, old_c)
                     If b Then old_c = Mid$(cns2, b, 1): Mid$(v, Len(v), 1) = old_c
                 End If
-                If c <> old_c Then v = v & c 'для «Шмидт»
+                If c <> old_c Then v = v & c 'РґР»СЏ В«РЁРјРёРґС‚В»
             End If
         End If
         old_c = c
@@ -3636,268 +3646,268 @@ Dim s$, v$, i&, b&, c$, old_c$
 End Function
 
 Public Function MetaPhoneRu3(ByVal Word As String) As Long
-'Третий вариант — с переводом ключа в 24-ричное число.
+'РўСЂРµС‚РёР№ РІР°СЂРёР°РЅС‚В вЂ” СЃВ РїРµСЂРµРІРѕРґРѕРј РєР»СЋС‡Р° РІВ 24-СЂРёС‡РЅРѕРµ С‡РёСЃР»Рѕ.
 '-------------------------
-'Источник: http://forum.aeroion.ru/topic461.html
-'Единственный недостаток первых двух процедур — значительное место, необходимое для хранения
-'строки-ключа. В некоторых реализациях SoundEx эту проблему решают, переводя ключ в число.
+'РСЃС‚РѕС‡РЅРёРє: http://forum.aeroion.ru/topic461.html
+'Р•РґРёРЅСЃС‚РІРµРЅРЅС‹Р№ РЅРµРґРѕСЃС‚Р°С‚РѕРє РїРµСЂРІС‹С… РґРІСѓС… РїСЂРѕС†РµРґСѓСЂВ вЂ” Р·РЅР°С‡РёС‚РµР»СЊРЅРѕРµ РјРµСЃС‚Рѕ, РЅРµРѕР±С…РѕРґРёРјРѕРµ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ
+'СЃС‚СЂРѕРєРё-РєР»СЋС‡Р°. Р’В РЅРµРєРѕС‚РѕСЂС‹С… СЂРµР°Р»РёР·Р°С†РёСЏС… SoundEx СЌС‚Сѓ РїСЂРѕР±Р»РµРјСѓ СЂРµС€Р°СЋС‚, РїРµСЂРµРІРѕРґСЏ РєР»СЋС‡ РІВ С‡РёСЃР»Рѕ.
 
-'Строка с ключом MetaPhoneRu из шести символов занимает в файле базы данных минимум 7 байт
-'с завершающим нулём (без сжатия Unicode — 14 байт). Её можно перевести в число Long,
-'занимающее только 4 байта.
+'РЎС‚СЂРѕРєР° СЃВ РєР»СЋС‡РѕРј MetaPhoneRu РёР· С€РµСЃС‚Рё СЃРёРјРІРѕР»РѕРІ Р·Р°РЅРёРјР°РµС‚ РІВ С„Р°Р№Р»Рµ Р±Р°Р·С‹ РґР°РЅРЅС‹С… РјРёРЅРёРјСѓРј 7В Р±Р°Р№С‚
+'СЃВ Р·Р°РІРµСЂС€Р°СЋС‰РёРј РЅСѓР»С‘Рј (Р±РµР· СЃР¶Р°С‚РёСЏ UnicodeВ вЂ” 14 Р±Р°Р№С‚). Р•С‘ РјРѕР¶РЅРѕ РїРµСЂРµРІРµСЃС‚Рё РІВ С‡РёСЃР»Рѕ Long,
+'Р·Р°РЅРёРјР°СЋС‰РµРµ С‚РѕР»СЊРєРѕ 4В Р±Р°Р№С‚Р°.
 
-'Например, имеем 24 возможных буквы в каждой позиции ключа. Переведём их в 24-ричную
-'систему счисления так, например, что:
-'«А» даст «1», «К» — «8», «Н» — «11». тогда
-'«КА» превратится в 24 * 8 + 1 = 193;
-'«КАН» — в 24 * (24 * 8 + 1) +  11 = 4643.
+'РќР°РїСЂРёРјРµСЂ, РёРјРµРµРј 24 РІРѕР·РјРѕР¶РЅС‹С… Р±СѓРєРІС‹ РІВ РєР°Р¶РґРѕР№ РїРѕР·РёС†РёРё РєР»СЋС‡Р°. РџРµСЂРµРІРµРґС‘Рј РёС… РІВ 24-СЂРёС‡РЅСѓСЋ
+'СЃРёСЃС‚РµРјСѓ СЃС‡РёСЃР»РµРЅРёСЏ С‚Р°Рє, РЅР°РїСЂРёРјРµСЂ, С‡С‚Рѕ:
+'В«РђВ» РґР°СЃС‚ В«1В», В«РљВ»В вЂ” В«8В», В«РќВ»В вЂ” В«11В». С‚РѕРіРґР°
+'В«РљРђВ» РїСЂРµРІСЂР°С‚РёС‚СЃСЏ РІВ 24 * 8 + 1 = 193;
+'В«РљРђРќВ»В вЂ” РІВ 24 * (24 * 8 + 1) +  11 = 4643.
 
-'Недостаток здесь — в MetaPhoneRu слишком велико число возможных значений буквы — 24.
-'В числе типа Long удастся сохранить только 6 букв, и фамилии придётся усекать: «Колоколова»
-'и «Колокольникова» различаться не будут оба усекаются до «КОЛОКО».
+'РќРµРґРѕСЃС‚Р°С‚РѕРє Р·РґРµСЃСЊВ вЂ” РІВ MetaPhoneRu СЃР»РёС€РєРѕРј РІРµР»РёРєРѕ С‡РёСЃР»Рѕ РІРѕР·РјРѕР¶РЅС‹С… Р·РЅР°С‡РµРЅРёР№ Р±СѓРєРІС‹В вЂ” 24.
+'Р’В С‡РёСЃР»Рµ С‚РёРїР° Long СѓРґР°СЃС‚СЃСЏ СЃРѕС…СЂР°РЅРёС‚СЊ С‚РѕР»СЊРєРѕ 6В Р±СѓРєРІ, Рё С„Р°РјРёР»РёРё РїСЂРёРґС‘С‚СЃСЏ СѓСЃРµРєР°С‚СЊ: В«РљРѕР»РѕРєРѕР»РѕРІР°В»
+'Рё В«РљРѕР»РѕРєРѕР»СЊРЅРёРєРѕРІР°В» СЂР°Р·Р»РёС‡Р°С‚СЊСЃСЏ РЅРµ Р±СѓРґСѓС‚ РѕР±Р° СѓСЃРµРєР°СЋС‚СЃСЏ РґРѕ В«РљРћР›РћРљРћВ».
 
-'Частично этот недостаток устаняется сжатием окончаний: «Кузьмина» и «Кузьминова» будут иметь
-'разные ключи, хотя первые шесть букв у этих фамилий те же. Код сжатого окончание хранится
-'в знаке ключа и в последней «половинной» цифре, появляющейся из-за того, что 24 не является
-'степенью двойки. Между 24^6 (число комбинаций из 24-х символов на шести позициях) и 2^32
-'(число возможных состояний 4-байтной переменной Long) остаётся небольшая разница, как бы
-'«половинка» 24-ричной цифры. Эта «половинка» и используется для хранения окончания —
-'она может принимать 2^32 / 24^6 = 22 различных состояния, из которых в процедуре используется
-'четырнадцать.
+'Р§Р°СЃС‚РёС‡РЅРѕ СЌС‚РѕС‚ РЅРµРґРѕСЃС‚Р°С‚РѕРє СѓСЃС‚Р°РЅСЏРµС‚СЃСЏ СЃР¶Р°С‚РёРµРј РѕРєРѕРЅС‡Р°РЅРёР№: В«РљСѓР·СЊРјРёРЅР°В» Рё В«РљСѓР·СЊРјРёРЅРѕРІР°В» Р±СѓРґСѓС‚ РёРјРµС‚СЊ
+'СЂР°Р·РЅС‹Рµ РєР»СЋС‡Рё, С…РѕС‚СЏ РїРµСЂРІС‹Рµ С€РµСЃС‚СЊ Р±СѓРєРІ СѓВ СЌС‚РёС… С„Р°РјРёР»РёР№ С‚Рµ Р¶Рµ. РљРѕРґ СЃР¶Р°С‚РѕРіРѕВ РѕРєРѕРЅС‡Р°РЅРёРµ С…СЂР°РЅРёС‚СЃСЏ
+'РІВ Р·РЅР°РєРµ РєР»СЋС‡Р° Рё РІВ РїРѕСЃР»РµРґРЅРµР№ В«РїРѕР»РѕРІРёРЅРЅРѕР№В» С†РёС„СЂРµ, РїРѕСЏРІР»СЏСЋС‰РµР№СЃСЏ РёР·-Р·Р° С‚РѕРіРѕ, С‡С‚Рѕ 24 РЅРµ СЏРІР»СЏРµС‚СЃСЏ
+'СЃС‚РµРїРµРЅСЊСЋ РґРІРѕР№РєРё. РњРµР¶РґСѓ 24^6 (С‡РёСЃР»Рѕ РєРѕРјР±РёРЅР°С†РёР№ РёР· 24-С… СЃРёРјРІРѕР»РѕРІ РЅР° С€РµСЃС‚Рё РїРѕР·РёС†РёСЏС…) Рё 2^32
+'(С‡РёСЃР»Рѕ РІРѕР·РјРѕР¶РЅС‹С… СЃРѕСЃС‚РѕСЏРЅРёР№ 4-Р±Р°Р№С‚РЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ Long) РѕСЃС‚Р°С‘С‚СЃСЏ РЅРµР±РѕР»СЊС€Р°СЏ СЂР°Р·РЅРёС†Р°, РєР°Рє Р±С‹
+'В«РїРѕР»РѕРІРёРЅРєР°В» 24-СЂРёС‡РЅРѕР№ С†РёС„СЂС‹. Р­С‚Р° В«РїРѕР»РѕРІРёРЅРєР°В» Рё РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РѕРєРѕРЅС‡Р°РЅРёСЏВ вЂ”
+'РѕРЅР° РјРѕР¶РµС‚ РїСЂРёРЅРёРјР°С‚СЊ 2^32 / 24^6 = 22 СЂР°Р·Р»РёС‡РЅС‹С… СЃРѕСЃС‚РѕСЏРЅРёСЏ, РёР· РєРѕС‚РѕСЂС‹С… РІВ РїСЂРѕС†РµРґСѓСЂРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ
+'С‡РµС‚С‹СЂРЅР°РґС†Р°С‚СЊ.
 
-'Реально применять на практике этот вариант MetaPhoneRu вряд ли стоит — выигрыш в размере поля
-'с ключом всего в log2(256) / log2(24) = в 1,7 раз, но все фамилии длиннее шести символов в основе
-'усекаются. Кроме того, программу сложнее понять и поддерживать: строковой ключ можно вывести
-'на экран во время отладки и легко прочитать, а числовой код требует дополнительной расшифровки.
+'Р РµР°Р»СЊРЅРѕ РїСЂРёРјРµРЅСЏС‚СЊ РЅР° РїСЂР°РєС‚РёРєРµ СЌС‚РѕС‚ РІР°СЂРёР°РЅС‚ MetaPhoneRu РІСЂСЏРґ Р»Рё СЃС‚РѕРёС‚В вЂ” РІС‹РёРіСЂС‹С€ РІВ СЂР°Р·РјРµСЂРµ РїРѕР»СЏ
+'СЃВ РєР»СЋС‡РѕРј РІСЃРµРіРѕ РІВ log2(256) / log2(24) = РІВ 1,7 СЂР°Р·, РЅРѕ РІСЃРµ С„Р°РјРёР»РёРё РґР»РёРЅРЅРµРµ С€РµСЃС‚Рё СЃРёРјРІРѕР»РѕРІ РІВ РѕСЃРЅРѕРІРµ
+'СѓСЃРµРєР°СЋС‚СЃСЏ. РљСЂРѕРјРµ С‚РѕРіРѕ, РїСЂРѕРіСЂР°РјРјСѓ СЃР»РѕР¶РЅРµРµ РїРѕРЅСЏС‚СЊ Рё РїРѕРґРґРµСЂР¶РёРІР°С‚СЊ: СЃС‚СЂРѕРєРѕРІРѕР№ РєР»СЋС‡ РјРѕР¶РЅРѕ РІС‹РІРµСЃС‚Рё
+'РЅР° СЌРєСЂР°РЅ РІРѕ РІСЂРµРјСЏ РѕС‚Р»Р°РґРєРё Рё Р»РµРіРєРѕ РїСЂРѕС‡РёС‚Р°С‚СЊ, Р° С‡РёСЃР»РѕРІРѕР№ РєРѕРґ С‚СЂРµР±СѓРµС‚ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕР№ СЂР°СЃС€РёС„СЂРѕРІРєРё.
 '-------------------------
-Const alf$ = "АИУПСТРКЛМНБВГДЖЗЙФХЦЧШЩЕОЁЫЭЮЯ", _
-      cns1$ = "БЗДВГ", _
-      cns2$ = "ПСТФК", _
-      cns3$ = "ПСТКБВГДЖЗФХЦЧШЩ", _
-      cH$ = "ОЮЕЭЯЁЫ", _
-      ct$ = "АУИИАИА"
-'alf - алфавит кроме исключаемых букв, cns1 и cns2 - звонкие и глухие
-'согласные, cns3 - согласные, перед которыми звонкие оглушаются,
-'ch, ct - образец и замена гласных
+Const alf$ = "РђРРЈРџРЎРўР РљР›РњРќР‘Р’Р“Р”Р–Р—Р™Р¤РҐР¦Р§РЁР©Р•РћРЃР«Р­Р®РЇ", _
+      cns1$ = "Р‘Р—Р”Р’Р“", _
+      cns2$ = "РџРЎРўР¤Рљ", _
+      cns3$ = "РџРЎРўРљР‘Р’Р“Р”Р–Р—Р¤РҐР¦Р§РЁР©", _
+      cH$ = "РћР®Р•Р­РЇРЃР«", _
+      ct$ = "РђРЈРРРђРРђ"
+'alf - Р°Р»С„Р°РІРёС‚ РєСЂРѕРјРµ РёСЃРєР»СЋС‡Р°РµРјС‹С… Р±СѓРєРІ, cns1 Рё cns2 - Р·РІРѕРЅРєРёРµ Рё РіР»СѓС…РёРµ
+'СЃРѕРіР»Р°СЃРЅС‹Рµ, cns3 - СЃРѕРіР»Р°СЃРЅС‹Рµ, РїРµСЂРµРґ РєРѕС‚РѕСЂС‹РјРё Р·РІРѕРЅРєРёРµ РѕРіР»СѓС€Р°СЋС‚СЃСЏ,
+'ch, ct - РѕР±СЂР°Р·РµС† Рё Р·Р°РјРµРЅР° РіР»Р°СЃРЅС‹С…
 Dim s$, v&, i&, b&, c$, old_c$, new_c$
-'S - промежуточная строка, V — ключ, который создаётся в ходе
-'работы процедуры, i - счётчик цикла, B - позиция найденного
-'элемента, c$ - текущий символ, c_old$ - предыдущий символ,
-'new_c$ — преобразованный текущий символ.
+'S - РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅР°СЏ СЃС‚СЂРѕРєР°, VВ вЂ” РєР»СЋС‡, РєРѕС‚РѕСЂС‹Р№ СЃРѕР·РґР°С‘С‚СЃСЏ РІВ С…РѕРґРµ
+'СЂР°Р±РѕС‚С‹ РїСЂРѕС†РµРґСѓСЂС‹, i - СЃС‡С‘С‚С‡РёРє С†РёРєР»Р°, B - РїРѕР·РёС†РёСЏ РЅР°Р№РґРµРЅРЅРѕРіРѕ
+'СЌР»РµРјРµРЅС‚Р°, c$ - С‚РµРєСѓС‰РёР№ СЃРёРјРІРѕР», c_old$ - РїСЂРµРґС‹РґСѓС‰РёР№ СЃРёРјРІРѕР»,
+'new_c$В вЂ” РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРЅС‹Р№ С‚РµРєСѓС‰РёР№ СЃРёРјРІРѕР».
 
-'Переводим в верхний регистр, оставляем только
-'символы из alf и копируем в S:
+'РџРµСЂРµРІРѕРґРёРј РІ РІРµСЂС…РЅРёР№ СЂРµРіРёСЃС‚СЂ, РѕСЃС‚Р°РІР»СЏРµРј С‚РѕР»СЊРєРѕ
+'СЃРёРјРІРѕР»С‹ РёР· alf Рё РєРѕРїРёСЂСѓРµРј РІ S:
     Word = UCase$(Word)
     For i = 1 To Len(Word)
         c = Mid$(Word, i, 1)
         If InStr(alf, c) Then s = s + c
     Next i
     If Len(s) = 0 Then Exit Function
-    'Сжимаем окончания:
+    'РЎР¶РёРјР°РµРј РѕРєРѕРЅС‡Р°РЅРёСЏ:
     Select Case Right$(s, 6)
-    Case "ОВСКИЙ": s = Left$(s, Len(s) - 6): v = -1
-    Case "ЕВСКИЙ": s = Left$(s, Len(s) - 6): v = -2
-    Case "ОВСКАЯ": s = Left$(s, Len(s) - 6): v = -3
-    Case "ЕВСКАЯ": s = Left$(s, Len(s) - 6): v = -4
+    Case "РћР’РЎРљРР™": s = Left$(s, Len(s) - 6): v = -1
+    Case "Р•Р’РЎРљРР™": s = Left$(s, Len(s) - 6): v = -2
+    Case "РћР’РЎРљРђРЇ": s = Left$(s, Len(s) - 6): v = -3
+    Case "Р•Р’РЎРљРђРЇ": s = Left$(s, Len(s) - 6): v = -4
     Case Else
         Select Case Right$(s, 4)
-        Case "ИЕВА", "ЕЕВА": s = Left$(s, Len(s) - 4): v = 9
+        Case "РР•Р’Рђ", "Р•Р•Р’Рђ": s = Left$(s, Len(s) - 4): v = 9
         Case Else
             Select Case Right$(s, 3)
-            Case "ОВА", "ЕВА": s = Left$(s, Len(s) - 3): v = 9
-            Case "ИНА": s = Left$(s, Len(s) - 3): v = 1
-            Case "ИЕВ", "ЕЕВ": s = Left$(s, Len(s) - 3): v = 4
-            Case "НКО": s = Left$(s, Len(s) - 3): v = 3
+            Case "РћР’Рђ", "Р•Р’Рђ": s = Left$(s, Len(s) - 3): v = 9
+            Case "РРќРђ": s = Left$(s, Len(s) - 3): v = 1
+            Case "РР•Р’", "Р•Р•Р’": s = Left$(s, Len(s) - 3): v = 4
+            Case "РќРљРћ": s = Left$(s, Len(s) - 3): v = 3
             Case Else
                 Select Case Right$(s, 2)
-                Case "ОВ", "ЕВ": s = Left$(s, Len(s) - 2): v = 4
-                Case "АЯ": s = Left$(s, Len(s) - 2): v = 6
-                Case "ИЙ", "ЫЙ": s = Left$(s, Len(s) - 2): v = 7
-                Case "ЫХ", "ИХ": s = Left$(s, Len(s) - 2): v = 5
-                Case "ИН": s = Left$(s, Len(s) - 2): v = 8
-                Case "ИК", "ЕК": s = Left$(s, Len(s) - 2): v = 2
-                Case "УК", "ЮК": s = Left$(s, Len(s) - 2): v = -5
+                Case "РћР’", "Р•Р’": s = Left$(s, Len(s) - 2): v = 4
+                Case "РђРЇ": s = Left$(s, Len(s) - 2): v = 6
+                Case "РР™", "Р«Р™": s = Left$(s, Len(s) - 2): v = 7
+                Case "Р«РҐ", "РРҐ": s = Left$(s, Len(s) - 2): v = 5
+                Case "РРќ": s = Left$(s, Len(s) - 2): v = 8
+                Case "РРљ", "Р•Рљ": s = Left$(s, Len(s) - 2): v = 2
+                Case "РЈРљ", "Р®Рљ": s = Left$(s, Len(s) - 2): v = -5
                 End Select
             End Select
         End Select
     End Select
-    'Оглушаем последний символ, если он - звонкий согласный:
+    'РћРіР»СѓС€Р°РµРј РїРѕСЃР»РµРґРЅРёР№ СЃРёРјРІРѕР», РµСЃР»Рё РѕРЅ - Р·РІРѕРЅРєРёР№ СЃРѕРіР»Р°СЃРЅС‹Р№:
     b = InStr(cns1, Right$(s, 1))
     If b Then Mid$(s, Len(s), 1) = Mid$(cns2, b, 1)
     old_c = " "
     s = Left$(s, 6)
-    'Основной цикл:
+    'РћСЃРЅРѕРІРЅРѕР№ С†РёРєР»:
     For i = 1 To Len(s)
         c = Mid$(s, i, 1)
         b = InStr(cH, c)
-        If b Then 'Если гласная
-            If old_c = "Й" Or old_c = "И" Then
-                If c = "О" Or c = "Е" Then 'Буквосочетания с гласной
-                    old_c = "И"
-                Else 'Если не буквосочетания с гласной, а просто гласная
+        If b Then 'Р•СЃР»Рё РіР»Р°СЃРЅР°СЏ
+            If old_c = "Р™" Or old_c = "Р" Then
+                If c = "Рћ" Or c = "Р•" Then 'Р‘СѓРєРІРѕСЃРѕС‡РµС‚Р°РЅРёСЏ СЃ РіР»Р°СЃРЅРѕР№
+                    old_c = "Р"
+                Else 'Р•СЃР»Рё РЅРµ Р±СѓРєРІРѕСЃРѕС‡РµС‚Р°РЅРёСЏ СЃ РіР»Р°СЃРЅРѕР№, Р° РїСЂРѕСЃС‚Рѕ РіР»Р°СЃРЅР°СЏ
                     If c <> old_c Then new_c = Mid$(ct, b, 1)
                 End If
-            Else 'Если не буквосочетания с гласной, а просто гласная
+            Else 'Р•СЃР»Рё РЅРµ Р±СѓРєРІРѕСЃРѕС‡РµС‚Р°РЅРёСЏ СЃ РіР»Р°СЃРЅРѕР№, Р° РїСЂРѕСЃС‚Рѕ РіР»Р°СЃРЅР°СЏ
                 If c <> old_c Then new_c = Mid$(ct, b, 1)
             End If
-        Else 'Если согласная
-            If c <> old_c Then 'для «Аввакумов»
-                If InStr(cns3, c) Then 'Оглушение согласных
+        Else 'Р•СЃР»Рё СЃРѕРіР»Р°СЃРЅР°СЏ
+            If c <> old_c Then 'РґР»СЏ В«РђРІРІР°РєСѓРјРѕРІВ»
+                If InStr(cns3, c) Then 'РћРіР»СѓС€РµРЅРёРµ СЃРѕРіР»Р°СЃРЅС‹С…
                     b = InStr(cns1, old_c)
                     If b Then old_c = Mid$(cns2, b, 1)
                 End If
-                If c <> old_c Then new_c = c 'для «Шмидт»
+                If c <> old_c Then new_c = c 'РґР»СЏ В«РЁРјРёРґС‚В»
             End If
         End If
         old_c = c
-        v = v * 24                'Новая цифра в 24-ричном числе V —
-        v = v + InStr(alf, new_c) 'порядковый номер буквы new_c в alf$.
+        v = v * 24                'РќРѕРІР°СЏ С†РёС„СЂР° РІ 24-СЂРёС‡РЅРѕРј С‡РёСЃР»Рµ VВ вЂ”
+        v = v + InStr(alf, new_c) 'РїРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ Р±СѓРєРІС‹ new_c РІВ alf$.
         
-        'Первые 24 символа в alf — это возможные значения каждой
-        'буквы ключа. После них в alf приведены те гласные, которые
-        'заменяются всегда и в конечном ключе не присутствуют.
+        'РџРµСЂРІС‹Рµ 24 СЃРёРјРІРѕР»Р° РІВ alfВ вЂ” СЌС‚Рѕ РІРѕР·РјРѕР¶РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РєР°Р¶РґРѕР№
+        'Р±СѓРєРІС‹ РєР»СЋС‡Р°. РџРѕСЃР»Рµ РЅРёС… РІВ alf РїСЂРёРІРµРґРµРЅС‹ С‚Рµ РіР»Р°СЃРЅС‹Рµ, РєРѕС‚РѕСЂС‹Рµ
+        'Р·Р°РјРµРЅСЏСЋС‚СЃСЏ РІСЃРµРіРґР° Рё РІВ РєРѕРЅРµС‡РЅРѕРј РєР»СЋС‡Рµ РЅРµ РїСЂРёСЃСѓС‚СЃС‚РІСѓСЋС‚.
     Next i
     MetaPhoneRu3 = v
 End Function
 Public Function SoundEx(ByVal Word As String) As String
-' русский Russell (NARA) Soundex, алгоритм с учетом cмежных W и H
+' СЂСѓСЃСЃРєРёР№ Russell (NARA) Soundex, Р°Р»РіРѕСЂРёС‚Рј СЃ СѓС‡РµС‚РѕРј cРјРµР¶РЅС‹С… W Рё H
 '-------------------------
-' Источник: http://forum.aeroion.ru/topic443.html
-' также:    http://www.source-code.biz/snippets/vbasic/4.htm
+' РСЃС‚РѕС‡РЅРёРє: http://forum.aeroion.ru/topic443.html
+' С‚Р°РєР¶Рµ:    http://www.source-code.biz/snippets/vbasic/4.htm
 '-------------------------
 Dim s As String, l As Long
 Dim Result As String
     s = Trim$(UCase$(Word)): l = Len(s)
     If l = 0 Then Result = String$(4, 0): GoTo HandleExit
-Const RusTab = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЭЮЯЬЪ"  ' для упрощённой транслитерации
-Const LatTab = "ABVGDEEGZIIKLMNOPRSTUFHCHHHIAWAXY"  '(для транслитерации по ГОСТ см.TextTranslit)
-Const CodeTab = "01230120022455012623010202"        ' для кодирования по правилам Soundex
-'               "ABCDEFGHIJKLNMOPQRSTUVWXYZ"        ' соответствующие кодам символы
-'' альтернативная для кириллицы без транслитерации из: https://cyberleninka.ru/article/n/obzor-algoritmov-foneticheskogo-kodirovaniya
+Const RusTab = "РђР‘Р’Р“Р”Р•РЃР–Р—РР™РљР›РњРќРћРџР РЎРўРЈР¤РҐР¦Р§РЁР©Р«Р­Р®РЇР¬РЄ"  ' РґР»СЏ СѓРїСЂРѕС‰С‘РЅРЅРѕР№ С‚СЂР°РЅСЃР»РёС‚РµСЂР°С†РёРё
+Const LatTab = "ABVGDEEGZIIKLMNOPRSTUFHCHHHIAWAXY"  '(РґР»СЏ С‚СЂР°РЅСЃР»РёС‚РµСЂР°С†РёРё РїРѕ Р“РћРЎРў СЃРј.TextTranslit)
+Const CodeTab = "01230120022455012623010202"        ' РґР»СЏ РєРѕРґРёСЂРѕРІР°РЅРёСЏ РїРѕ РїСЂР°РІРёР»Р°Рј Soundex
+'               "ABCDEFGHIJKLNMOPQRSTUVWXYZ"        ' СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРµ РєРѕРґР°Рј СЃРёРјРІРѕР»С‹
+'' Р°Р»СЊС‚РµСЂРЅР°С‚РёРІРЅР°СЏ РґР»СЏ РєРёСЂРёР»Р»РёС†С‹ Р±РµР· С‚СЂР°РЅСЃР»РёС‚РµСЂР°С†РёРё РёР·: https://cyberleninka.ru/article/n/obzor-algoritmov-foneticheskogo-kodirovaniya
 'Const CodeTab = "012460033074788019360235555000000"
-''               "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЭЮЯЬЪ"
-Dim h As Long:  h = 0   ' код текущего символа
-Dim lH As Long: lH = -1 ' код предыдущего символа. -1 - первый символ (нет предыдущего)
-Dim i As Long:  i = 1   ' текущая позиция во входной строке
-Dim c As String         ' текущий символ
-Dim p As Integer        ' позиция текущего символа в строке транслитерации
+''               "РђР‘Р’Р“Р”Р•РЃР–Р—РР™РљР›РњРќРћРџР РЎРўРЈР¤РҐР¦Р§РЁР©Р«Р­Р®РЇР¬РЄ"
+Dim h As Long:  h = 0   ' РєРѕРґ С‚РµРєСѓС‰РµРіРѕ СЃРёРјРІРѕР»Р°
+Dim lH As Long: lH = -1 ' РєРѕРґ РїСЂРµРґС‹РґСѓС‰РµРіРѕ СЃРёРјРІРѕР»Р°. -1 - РїРµСЂРІС‹Р№ СЃРёРјРІРѕР» (РЅРµС‚ РїСЂРµРґС‹РґСѓС‰РµРіРѕ)
+Dim i As Long:  i = 1   ' С‚РµРєСѓС‰Р°СЏ РїРѕР·РёС†РёСЏ РІРѕ РІС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ
+Dim c As String         ' С‚РµРєСѓС‰РёР№ СЃРёРјРІРѕР»
+Dim p As Integer        ' РїРѕР·РёС†РёСЏ С‚РµРєСѓС‰РµРіРѕ СЃРёРјРІРѕР»Р° РІ СЃС‚СЂРѕРєРµ С‚СЂР°РЅСЃР»РёС‚РµСЂР°С†РёРё
     Do Until i > l
         c = Mid$(s, i, 1)
-    ' простая транслитерация
+    ' РїСЂРѕСЃС‚Р°СЏ С‚СЂР°РЅСЃР»РёС‚РµСЂР°С†РёСЏ
         p = InStr(1, RusTab, c): If p > 0 Then c = Mid$(LatTab, p, 1)
-    ' проверка допустимых символов
+    ' РїСЂРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ
         If InStr(1, LatTab, c) = 0 Then GoTo HandleNext
-    ' получаем Soundex код символа
+    ' РїРѕР»СѓС‡Р°РµРј Soundex РєРѕРґ СЃРёРјРІРѕР»Р°
         h = Mid$(CodeTab, Asc(c) - 64, 1)
         If lH <> h Then
-    ' cмежные символы, или символы, разделенные буквами H или W,
-    ' входящие в одну и ту же группу, записываются как один
+    ' cРјРµР¶РЅС‹Рµ СЃРёРјРІРѕР»С‹, РёР»Рё СЃРёРјРІРѕР»С‹, СЂР°Р·РґРµР»РµРЅРЅС‹Рµ Р±СѓРєРІР°РјРё H РёР»Рё W,
+    ' РІС…РѕРґСЏС‰РёРµ РІ РѕРґРЅСѓ Рё С‚Сѓ Р¶Рµ РіСЂСѓРїРїСѓ, Р·Р°РїРёСЃС‹РІР°СЋС‚СЃСЏ РєР°Рє РѕРґРёРЅ
             If lH = -1 Then
-    ' первый символ в строке
+    ' РїРµСЂРІС‹Р№ СЃРёРјРІРѕР» РІ СЃС‚СЂРѕРєРµ
                 Result = c: lH = h
             Else
                 If h = 0 Then
-    ' не альфа символ: "HWAEIOUY" - пропуск (в русском пропускаем "УЕЁЫАОЭЯИЮЪЬ")
+    ' РЅРµ Р°Р»СЊС„Р° СЃРёРјРІРѕР»: "HWAEIOUY" - РїСЂРѕРїСѓСЃРє (РІ СЂСѓСЃСЃРєРѕРј РїСЂРѕРїСѓСЃРєР°РµРј "РЈР•РЃР«РђРћР­РЇРР®РЄР¬")
                     If InStr(1, "HW", c) = 0 Then lH = h '
                     GoTo HandleNext
                 End If
-    ' запоминаем предыдущий Soundex код и добавляем полученный к результирующей строке
+    ' Р·Р°РїРѕРјРёРЅР°РµРј РїСЂРµРґС‹РґСѓС‰РёР№ Soundex РєРѕРґ Рё РґРѕР±Р°РІР»СЏРµРј РїРѕР»СѓС‡РµРЅРЅС‹Р№ Рє СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµР№ СЃС‚СЂРѕРєРµ
                 lH = h: Result = Result & h
             End If
         End If
-    ' если длина Soundex кода >4 - выходим
+    ' РµСЃР»Рё РґР»РёРЅР° Soundex РєРѕРґР° >4 - РІС‹С…РѕРґРёРј
         If Len(Result) >= 4 Then Exit Do
-HandleNext: i = i + 1    ' следующий символ
+HandleNext: i = i + 1    ' СЃР»РµРґСѓСЋС‰РёР№ СЃРёРјРІРѕР»
     Loop
     Result = Result & String$(4 - Len(Result), "0")
 HandleExit: SoundEx = Result
 End Function
 Public Function SoundEx2(ByVal Word As String) As String
-' русский Refined Soundex
+' СЂСѓСЃСЃРєРёР№ Refined Soundex
 '-------------------------
-' Источник: https://habr.com/ru/post/114947/
+' РСЃС‚РѕС‡РЅРёРє: https://habr.com/ru/post/114947/
 '-------------------------
 Dim s As String, l As Long
 Dim Result As String
     s = Trim$(UCase$(Word)): l = Len(s)
     If l = 0 Then Result = String$(4, 0): GoTo HandleExit
-Const RusTab = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЭЮЯЬЪ"  ' для транслитерации
+Const RusTab = "РђР‘Р’Р“Р”Р•РЃР–Р—РР™РљР›РњРќРћРџР РЎРўРЈР¤РҐР¦Р§РЁР©Р«Р­Р®РЇР¬РЄ"  ' РґР»СЏ С‚СЂР°РЅСЃР»РёС‚РµСЂР°С†РёРё
 Const LatTab = "ABVGDEEGZIIKLMNOPRSTUFHCHHHIAWAXY"
 '               "ABCDEFGHIJKLNMOPQRSTUVWXYZ"
 Const CodeTab = "01360240043788015936020505"
-' схема кодирования по правилам Refined Soundex русских символов без транслитерации
-' по https://cyberleninka.ru/article/n/obzor-algoritmov-foneticheskogo-kodirovaniya
+' СЃС…РµРјР° РєРѕРґРёСЂРѕРІР°РЅРёСЏ РїРѕ РїСЂР°РІРёР»Р°Рј Refined Soundex СЂСѓСЃСЃРєРёС… СЃРёРјРІРѕР»РѕРІ Р±РµР· С‚СЂР°РЅСЃР»РёС‚РµСЂР°С†РёРё
+' РїРѕ https://cyberleninka.ru/article/n/obzor-algoritmov-foneticheskogo-kodirovaniya
 'Const CodeTab = "01246003307478801936023555500000"
-''               "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЬЭЮЯ"
-Dim h As Long:  h = 0   ' код текущего символа
-Dim lH As Long: lH = -1 ' код предыдущего символа. -1 - первый символ (нет предыдущего)
-Dim i As Long:  i = 1   ' текущая позиция во входной строке
-Dim c As String         ' текущий символ
-Dim p As Integer        ' позиция текущего символа в строке транслитерации
+''               "РђР‘Р’Р“Р”Р•РЃР–Р—РР™РљР›РњРќРћРџР РЎРўРЈР¤РҐР¦Р§РЁР©РЄР¬Р­Р®РЇ"
+Dim h As Long:  h = 0   ' РєРѕРґ С‚РµРєСѓС‰РµРіРѕ СЃРёРјРІРѕР»Р°
+Dim lH As Long: lH = -1 ' РєРѕРґ РїСЂРµРґС‹РґСѓС‰РµРіРѕ СЃРёРјРІРѕР»Р°. -1 - РїРµСЂРІС‹Р№ СЃРёРјРІРѕР» (РЅРµС‚ РїСЂРµРґС‹РґСѓС‰РµРіРѕ)
+Dim i As Long:  i = 1   ' С‚РµРєСѓС‰Р°СЏ РїРѕР·РёС†РёСЏ РІРѕ РІС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ
+Dim c As String         ' С‚РµРєСѓС‰РёР№ СЃРёРјРІРѕР»
+Dim p As Integer        ' РїРѕР·РёС†РёСЏ С‚РµРєСѓС‰РµРіРѕ СЃРёРјРІРѕР»Р° РІ СЃС‚СЂРѕРєРµ С‚СЂР°РЅСЃР»РёС‚РµСЂР°С†РёРё
     Do Until i > l
         c = Mid$(s, i, 1)
-    ' простая транслитерация
+    ' РїСЂРѕСЃС‚Р°СЏ С‚СЂР°РЅСЃР»РёС‚РµСЂР°С†РёСЏ
         p = InStr(1, RusTab, c): If p > 0 Then c = Mid$(LatTab, p, 1)
-    ' проверка допустимых символов
+    ' РїСЂРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ
         If InStr(1, LatTab, c) = 0 Then GoTo HandleNext
-    ' получаем Soundex код символа
+    ' РїРѕР»СѓС‡Р°РµРј Soundex РєРѕРґ СЃРёРјРІРѕР»Р°
         h = Mid$(CodeTab, Asc(c) - 64, 1)
-    ' входящие в одну и ту же группу, записываются как один
+    ' РІС…РѕРґСЏС‰РёРµ РІ РѕРґРЅСѓ Рё С‚Сѓ Р¶Рµ РіСЂСѓРїРїСѓ, Р·Р°РїРёСЃС‹РІР°СЋС‚СЃСЏ РєР°Рє РѕРґРёРЅ
         If lH = h Then GoTo HandleNext
-    ' первый символ в строке
+    ' РїРµСЂРІС‹Р№ СЃРёРјРІРѕР» РІ СЃС‚СЂРѕРєРµ
         If lH = -1 Then Result = c
-    ' запоминаем предыдущий Soundex код и добавляем полученный к результирующей строке
+    ' Р·Р°РїРѕРјРёРЅР°РµРј РїСЂРµРґС‹РґСѓС‰РёР№ Soundex РєРѕРґ Рё РґРѕР±Р°РІР»СЏРµРј РїРѕР»СѓС‡РµРЅРЅС‹Р№ Рє СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµР№ СЃС‚СЂРѕРєРµ
         lH = h: Result = Result & h
-HandleNext: i = i + 1  ' следующий символ
+HandleNext: i = i + 1  ' СЃР»РµРґСѓСЋС‰РёР№ СЃРёРјРІРѕР»
     Loop
 HandleExit: SoundEx2 = Result
 End Function
 Public Function SoundExDM(ByVal Word As String) As String
 ' SoundEx - Daitch-Mokotoff
 '-------------------------
-' описание алгоритма: http://www.avotaynu.com/soundex.htm
-' для проверки результатов онлайн: https://stevemorse.org/census/soundex.html
-' есть разница для "rs":    "Halberstadt"   мой "587943 587433", эталон - "587943"
-'                           "Peters"        мой "739400 734000", эталон - "739400"
-' т.е. эталон выдает вариант только для формы "rtz"
-' в тоже время в https://cyberleninka.ru/article/n/obzor-algoritmov-foneticheskogo-kodirovaniya
-' для последнего примера даны результаты "739400 734000"
-' также мой вариант рассматривает rs как коды 94 и 4 , а эталон как 9,4 (и 4)
-' т.е мой при анализе повторов мой будет сравнивать следующий с 94, а эталон с 4
-' и вообще требует оптимизации
+' РѕРїРёСЃР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР°: http://www.avotaynu.com/soundex.htm
+' РґР»СЏ РїСЂРѕРІРµСЂРєРё СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РѕРЅР»Р°Р№РЅ: https://stevemorse.org/census/soundex.html
+' РµСЃС‚СЊ СЂР°Р·РЅРёС†Р° РґР»СЏ "rs":    "Halberstadt"   РјРѕР№ "587943 587433", СЌС‚Р°Р»РѕРЅ - "587943"
+'                           "Peters"        РјРѕР№ "739400 734000", СЌС‚Р°Р»РѕРЅ - "739400"
+' С‚.Рµ. СЌС‚Р°Р»РѕРЅ РІС‹РґР°РµС‚ РІР°СЂРёР°РЅС‚ С‚РѕР»СЊРєРѕ РґР»СЏ С„РѕСЂРјС‹ "rtz"
+' РІ С‚РѕР¶Рµ РІСЂРµРјСЏ РІ https://cyberleninka.ru/article/n/obzor-algoritmov-foneticheskogo-kodirovaniya
+' РґР»СЏ РїРѕСЃР»РµРґРЅРµРіРѕ РїСЂРёРјРµСЂР° РґР°РЅС‹ СЂРµР·СѓР»СЊС‚Р°С‚С‹ "739400 734000"
+' С‚Р°РєР¶Рµ РјРѕР№ РІР°СЂРёР°РЅС‚ СЂР°СЃСЃРјР°С‚СЂРёРІР°РµС‚ rs РєР°Рє РєРѕРґС‹ 94 Рё 4 , Р° СЌС‚Р°Р»РѕРЅ РєР°Рє 9,4 (Рё 4)
+' С‚.Рµ РјРѕР№ РїСЂРё Р°РЅР°Р»РёР·Рµ РїРѕРІС‚РѕСЂРѕРІ РјРѕР№ Р±СѓРґРµС‚ СЃСЂР°РІРЅРёРІР°С‚СЊ СЃР»РµРґСѓСЋС‰РёР№ СЃ 94, Р° СЌС‚Р°Р»РѕРЅ СЃ 4
+' Рё РІРѕРѕР±С‰Рµ С‚СЂРµР±СѓРµС‚ РѕРїС‚РёРјРёР·Р°С†РёРё
 '-------------------------
-Const jMax = 6      ' максимальное количество символов в выходном коде
-Const nMax = 7      ' максимальная длина распознаваемого паттерна
-Const Delim = " "   ' разделитель альтернатив в результирующей строке
+Const jMax = 6      ' РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРёРјРІРѕР»РѕРІ РІ РІС‹С…РѕРґРЅРѕРј РєРѕРґРµ
+Const nMax = 7      ' РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ РґР»РёРЅР° СЂР°СЃРїРѕР·РЅР°РІР°РµРјРѕРіРѕ РїР°С‚С‚РµСЂРЅР°
+Const Delim = " "   ' СЂР°Р·РґРµР»РёС‚РµР»СЊ Р°Р»СЊС‚РµСЂРЅР°С‚РёРІ РІ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµР№ СЃС‚СЂРѕРєРµ
 Dim Result As String: Result = vbNullString 'String$(jMax, "0")
     On Error GoTo HandleError
     Word = Trim$(Word): If Len(Word) = 0 Then Err.Raise vbObjectError + 512 'GoTo HandleExit
     
-    Word = LCase$(Replace(TextTranslit(Word), " ", ""))     ' подготавливаем слово - транслитерация, убираем пробелы и нижний регистр
-Dim bolFound As Boolean                                     ' признак найденного паттерна
-Dim i As Integer, iMax As Integer: i = 1: iMax = Len(Word)  ' индекс символа текста
-Dim jEnd As Integer, jBeg As Integer                        ' позиция в результирующей строке
-Dim r As Integer, rMax As Integer: rMax = 1                 ' индекс варианта результата
-Dim rOld As Integer: rOld = 1                               ' предыдущее значение количества результатов
-Dim sPart As String, n As Integer                           ' распознаваемый фрагмент и его длина
-Dim Code, sCode As String, с As Integer, cMax As Integer: cMax = 0  ' текущий(ие) коды
-Dim Prev, sPrev As String, p As Integer, pMax As Integer: pMax = 0  ' предыдущий(ие) коды
+    Word = LCase$(Replace(TextTranslit(Word), " ", ""))     ' РїРѕРґРіРѕС‚Р°РІР»РёРІР°РµРј СЃР»РѕРІРѕ - С‚СЂР°РЅСЃР»РёС‚РµСЂР°С†РёСЏ, СѓР±РёСЂР°РµРј РїСЂРѕР±РµР»С‹ Рё РЅРёР¶РЅРёР№ СЂРµРіРёСЃС‚СЂ
+Dim bolFound As Boolean                                     ' РїСЂРёР·РЅР°Рє РЅР°Р№РґРµРЅРЅРѕРіРѕ РїР°С‚С‚РµСЂРЅР°
+Dim i As Integer, iMax As Integer: i = 1: iMax = Len(Word)  ' РёРЅРґРµРєСЃ СЃРёРјРІРѕР»Р° С‚РµРєСЃС‚Р°
+Dim jEnd As Integer, jBeg As Integer                        ' РїРѕР·РёС†РёСЏ РІ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµР№ СЃС‚СЂРѕРєРµ
+Dim r As Integer, rMax As Integer: rMax = 1                 ' РёРЅРґРµРєСЃ РІР°СЂРёР°РЅС‚Р° СЂРµР·СѓР»СЊС‚Р°С‚Р°
+Dim rOld As Integer: rOld = 1                               ' РїСЂРµРґС‹РґСѓС‰РµРµ Р·РЅР°С‡РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ
+Dim sPart As String, n As Integer                           ' СЂР°СЃРїРѕР·РЅР°РІР°РµРјС‹Р№ С„СЂР°РіРјРµРЅС‚ Рё РµРіРѕ РґР»РёРЅР°
+Dim Code, sCode As String, СЃ As Integer, cMax As Integer: cMax = 0  ' С‚РµРєСѓС‰РёР№(РёРµ) РєРѕРґС‹
+Dim Prev, sPrev As String, p As Integer, pMax As Integer: pMax = 0  ' РїСЂРµРґС‹РґСѓС‰РёР№(РёРµ) РєРѕРґС‹
     Prev = vbNullString
     Do Until (i > iMax) 'Or (jEnd > jMax)
-        If Len(Result) = rMax * (jMax + 1) - 1 Then Exit Do ' отсекаем ненужные проверки, когда все коды уже достигли максимальной возможной длины. вообще-то больше быть не должно
-        cMax = 0                                ' количество найденных вариантов кода -1
-        bolFound = False: Code = vbNullString   ' сбрасываем найденый фрагмент
-        n = iMax - i + 1: If n > nMax Then n = nMax   ' выбираем максимальную возможную длину фрагмента
+        If Len(Result) = rMax * (jMax + 1) - 1 Then Exit Do ' РѕС‚СЃРµРєР°РµРј РЅРµРЅСѓР¶РЅС‹Рµ РїСЂРѕРІРµСЂРєРё, РєРѕРіРґР° РІСЃРµ РєРѕРґС‹ СѓР¶Рµ РґРѕСЃС‚РёРіР»Рё РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ РІРѕР·РјРѕР¶РЅРѕР№ РґР»РёРЅС‹. РІРѕРѕР±С‰Рµ-С‚Рѕ Р±РѕР»СЊС€Рµ Р±С‹С‚СЊ РЅРµ РґРѕР»Р¶РЅРѕ
+        cMax = 0                                ' РєРѕР»РёС‡РµСЃС‚РІРѕ РЅР°Р№РґРµРЅРЅС‹С… РІР°СЂРёР°РЅС‚РѕРІ РєРѕРґР° -1
+        bolFound = False: Code = vbNullString   ' СЃР±СЂР°СЃС‹РІР°РµРј РЅР°Р№РґРµРЅС‹Р№ С„СЂР°РіРјРµРЅС‚
+        n = iMax - i + 1: If n > nMax Then n = nMax   ' РІС‹Р±РёСЂР°РµРј РјР°РєСЃРёРјР°Р»СЊРЅСѓСЋ РІРѕР·РјРѕР¶РЅСѓСЋ РґР»РёРЅСѓ С„СЂР°РіРјРµРЅС‚Р°
         Do Until n < 1
-    ' перебираем допустимые фрагменты по длине по убыванию
-        ' при нахождении фрагмента:
-            '1. устанавливаем флаг bolFound=True
-            '2. определяем место фрагмента:
-            '       [Н] вначале слова (i=1);
-            '       [Г] перед гласной (InStr(1, c_strSymbEngVowel, Mid$(Word, i + n, 1)) > 0),
-            '       [О] все сотальные случаи
-            '3. в зависимости от места возвращаем код фрагмента (Code) результата
-            ' для варианта с альтернативами (см. "ch","ck" и т.д.) массив альтернатив
+    ' РїРµСЂРµР±РёСЂР°РµРј РґРѕРїСѓСЃС‚РёРјС‹Рµ С„СЂР°РіРјРµРЅС‚С‹ РїРѕ РґР»РёРЅРµ РїРѕ СѓР±С‹РІР°РЅРёСЋ
+        ' РїСЂРё РЅР°С…РѕР¶РґРµРЅРёРё С„СЂР°РіРјРµРЅС‚Р°:
+            '1. СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј С„Р»Р°Рі bolFound=True
+            '2. РѕРїСЂРµРґРµР»СЏРµРј РјРµСЃС‚Рѕ С„СЂР°РіРјРµРЅС‚Р°:
+            '       [Рќ] РІРЅР°С‡Р°Р»Рµ СЃР»РѕРІР° (i=1);
+            '       [Р“] РїРµСЂРµРґ РіР»Р°СЃРЅРѕР№ (InStr(1, c_strSymbEngVowel, Mid$(Word, i + n, 1)) > 0),
+            '       [Рћ] РІСЃРµ СЃРѕС‚Р°Р»СЊРЅС‹Рµ СЃР»СѓС‡Р°Рё
+            '3. РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РјРµСЃС‚Р° РІРѕР·РІСЂР°С‰Р°РµРј РєРѕРґ С„СЂР°РіРјРµРЅС‚Р° (Code) СЂРµР·СѓР»СЊС‚Р°С‚Р°
+            ' РґР»СЏ РІР°СЂРёР°РЅС‚Р° СЃ Р°Р»СЊС‚РµСЂРЅР°С‚РёРІР°РјРё (СЃРј. "ch","ck" Рё С‚.Рґ.) РјР°СЃСЃРёРІ Р°Р»СЊС‚РµСЂРЅР°С‚РёРІ
             
             sPart = Mid$(Word, i, n)
             Select Case n
@@ -3956,85 +3966,85 @@ Dim Prev, sPrev As String, p As Integer, pMax As Integer: pMax = 0  ' предыдущий
                 End Select
             Case Else: Err.Raise vbObjectError + 512
             End Select
-'!!! все ниже написанное надо переписать заново !!!
-' Запись кода в результат.
-    ' используемый вариант со строкой результата упрощает его дублирование при обнаружении альтернатив
-    ' (дублирование - сложением строк), но требует более сложного кода для контроля позиции
-    ' и, возможно, устранения повторов в итоговой строке (не реализовано)
-    ' проще использовать коллекцию или массив это позволит не искать каждый раз начало/конец фрагмента
-    ' дублирование результатов при обнаружении альтернативных вариантов кода придется делать перебором
-    ' коллекция, также, позволит вставлять элементы в нужную позицию при дублировании
-    ' и исключить повторяющиеся элементы в результате отловом ошибки при присвоении индекса,
-    ' но.. - мы не ищем лёгких путей)
+'!!! РІСЃРµ РЅРёР¶Рµ РЅР°РїРёСЃР°РЅРЅРѕРµ РЅР°РґРѕ РїРµСЂРµРїРёСЃР°С‚СЊ Р·Р°РЅРѕРІРѕ !!!
+' Р—Р°РїРёСЃСЊ РєРѕРґР° РІ СЂРµР·СѓР»СЊС‚Р°С‚.
+    ' РёСЃРїРѕР»СЊР·СѓРµРјС‹Р№ РІР°СЂРёР°РЅС‚ СЃРѕ СЃС‚СЂРѕРєРѕР№ СЂРµР·СѓР»СЊС‚Р°С‚Р° СѓРїСЂРѕС‰Р°РµС‚ РµРіРѕ РґСѓР±Р»РёСЂРѕРІР°РЅРёРµ РїСЂРё РѕР±РЅР°СЂСѓР¶РµРЅРёРё Р°Р»СЊС‚РµСЂРЅР°С‚РёРІ
+    ' (РґСѓР±Р»РёСЂРѕРІР°РЅРёРµ - СЃР»РѕР¶РµРЅРёРµРј СЃС‚СЂРѕРє), РЅРѕ С‚СЂРµР±СѓРµС‚ Р±РѕР»РµРµ СЃР»РѕР¶РЅРѕРіРѕ РєРѕРґР° РґР»СЏ РєРѕРЅС‚СЂРѕР»СЏ РїРѕР·РёС†РёРё
+    ' Рё, РІРѕР·РјРѕР¶РЅРѕ, СѓСЃС‚СЂР°РЅРµРЅРёСЏ РїРѕРІС‚РѕСЂРѕРІ РІ РёС‚РѕРіРѕРІРѕР№ СЃС‚СЂРѕРєРµ (РЅРµ СЂРµР°Р»РёР·РѕРІР°РЅРѕ)
+    ' РїСЂРѕС‰Рµ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РєРѕР»Р»РµРєС†РёСЋ РёР»Рё РјР°СЃСЃРёРІ СЌС‚Рѕ РїРѕР·РІРѕР»РёС‚ РЅРµ РёСЃРєР°С‚СЊ РєР°Р¶РґС‹Р№ СЂР°Р· РЅР°С‡Р°Р»Рѕ/РєРѕРЅРµС† С„СЂР°РіРјРµРЅС‚Р°
+    ' РґСѓР±Р»РёСЂРѕРІР°РЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РїСЂРё РѕР±РЅР°СЂСѓР¶РµРЅРёРё Р°Р»СЊС‚РµСЂРЅР°С‚РёРІРЅС‹С… РІР°СЂРёР°РЅС‚РѕРІ РєРѕРґР° РїСЂРёРґРµС‚СЃСЏ РґРµР»Р°С‚СЊ РїРµСЂРµР±РѕСЂРѕРј
+    ' РєРѕР»Р»РµРєС†РёСЏ, С‚Р°РєР¶Рµ, РїРѕР·РІРѕР»РёС‚ РІСЃС‚Р°РІР»СЏС‚СЊ СЌР»РµРјРµРЅС‚С‹ РІ РЅСѓР¶РЅСѓСЋ РїРѕР·РёС†РёСЋ РїСЂРё РґСѓР±Р»РёСЂРѕРІР°РЅРёРё
+    ' Рё РёСЃРєР»СЋС‡РёС‚СЊ РїРѕРІС‚РѕСЂСЏСЋС‰РёРµСЃСЏ СЌР»РµРјРµРЅС‚С‹ РІ СЂРµР·СѓР»СЊС‚Р°С‚Рµ РѕС‚Р»РѕРІРѕРј РѕС€РёР±РєРё РїСЂРё РїСЂРёСЃРІРѕРµРЅРёРё РёРЅРґРµРєСЃР°,
+    ' РЅРѕ.. - РјС‹ РЅРµ РёС‰РµРј Р»С‘РіРєРёС… РїСѓС‚РµР№)
             If bolFound Or ((n = 1) And (i = iMax)) Then Else GoTo HandleNext
-    ' если фрагмент найден и распознан записываем его код в результат
-    ' если это не распознанный символ в конце строки - дополняем нулями до длины кода (jMax)
+    ' РµСЃР»Рё С„СЂР°РіРјРµРЅС‚ РЅР°Р№РґРµРЅ Рё СЂР°СЃРїРѕР·РЅР°РЅ Р·Р°РїРёСЃС‹РІР°РµРј РµРіРѕ РєРѕРґ РІ СЂРµР·СѓР»СЊС‚Р°С‚
+    ' РµСЃР»Рё СЌС‚Рѕ РЅРµ СЂР°СЃРїРѕР·РЅР°РЅРЅС‹Р№ СЃРёРјРІРѕР» РІ РєРѕРЅС†Рµ СЃС‚СЂРѕРєРё - РґРѕРїРѕР»РЅСЏРµРј РЅСѓР»СЏРјРё РґРѕ РґР»РёРЅС‹ РєРѕРґР° (jMax)
         
-        ' если предыдущий код имел единственный вариант берём его иначе берём первый из массива
+        ' РµСЃР»Рё РїСЂРµРґС‹РґСѓС‰РёР№ РєРѕРґ РёРјРµР» РµРґРёРЅСЃС‚РІРµРЅРЅС‹Р№ РІР°СЂРёР°РЅС‚ Р±РµСЂС‘Рј РµРіРѕ РёРЅР°С‡Рµ Р±РµСЂС‘Рј РїРµСЂРІС‹Р№ РёР· РјР°СЃСЃРёРІР°
             If pMax = 0 Then sPrev = Prev Else sPrev = Prev(p)
-        ' если единственный вариант кода берём его и переходим к формированию результирующей строки
+        ' РµСЃР»Рё РµРґРёРЅСЃС‚РІРµРЅРЅС‹Р№ РІР°СЂРёР°РЅС‚ РєРѕРґР° Р±РµСЂС‘Рј РµРіРѕ Рё РїРµСЂРµС…РѕРґРёРј Рє С„РѕСЂРјРёСЂРѕРІР°РЅРёСЋ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµР№ СЃС‚СЂРѕРєРё
             If cMax = 0 Then sCode = Code: GoTo HandleMakeResult
-        ' если есть альтернативные варианты кода символа
-            sCode = Code(0)          ' берём первый из массива кодов
-            rOld = rMax              ' запоминаем предыдущее количество результатов (нужно для определения конца старой последовательности)
-            rMax = rOld * (cMax + 1) ' определяем новое максимальное количество альтернативных результатов
-        ' клонируем результирующую строку и строку позиций
+        ' РµСЃР»Рё РµСЃС‚СЊ Р°Р»СЊС‚РµСЂРЅР°С‚РёРІРЅС‹Рµ РІР°СЂРёР°РЅС‚С‹ РєРѕРґР° СЃРёРјРІРѕР»Р°
+            sCode = Code(0)          ' Р±РµСЂС‘Рј РїРµСЂРІС‹Р№ РёР· РјР°СЃСЃРёРІР° РєРѕРґРѕРІ
+            rOld = rMax              ' Р·Р°РїРѕРјРёРЅР°РµРј РїСЂРµРґС‹РґСѓС‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ (РЅСѓР¶РЅРѕ РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ РєРѕРЅС†Р° СЃС‚Р°СЂРѕР№ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё)
+            rMax = rOld * (cMax + 1) ' РѕРїСЂРµРґРµР»СЏРµРј РЅРѕРІРѕРµ РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р°Р»СЊС‚РµСЂРЅР°С‚РёРІРЅС‹С… СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ
+        ' РєР»РѕРЅРёСЂСѓРµРј СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰СѓСЋ СЃС‚СЂРѕРєСѓ Рё СЃС‚СЂРѕРєСѓ РїРѕР·РёС†РёР№
 Dim c As Long: For c = 1 To cMax: Result = Result & Delim & Result: Next
 HandleMakeResult:
-        ' перебираем все результаты
-            jBeg = 1: jEnd = 0  ' начало/конец текущего варианта кода в результирующей строке
-            r = 1: c = 0: p = 0 ' индексы результата, кода и предыдущего кода
+        ' РїРµСЂРµР±РёСЂР°РµРј РІСЃРµ СЂРµР·СѓР»СЊС‚Р°С‚С‹
+            jBeg = 1: jEnd = 0  ' РЅР°С‡Р°Р»Рѕ/РєРѕРЅРµС† С‚РµРєСѓС‰РµРіРѕ РІР°СЂРёР°РЅС‚Р° РєРѕРґР° РІ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµР№ СЃС‚СЂРѕРєРµ
+            r = 1: c = 0: p = 0 ' РёРЅРґРµРєСЃС‹ СЂРµР·СѓР»СЊС‚Р°С‚Р°, РєРѕРґР° Рё РїСЂРµРґС‹РґСѓС‰РµРіРѕ РєРѕРґР°
             Do
-        ' получаем позицию окончания текущего варианта результата (окончание предыдущего + длина разделителя)
-            ' если несколько результатов - ищем её по позиции следующего разделителя
-            ' если один результат или разделитель не найден - равна длине строки+1
+        ' РїРѕР»СѓС‡Р°РµРј РїРѕР·РёС†РёСЋ РѕРєРѕРЅС‡Р°РЅРёСЏ С‚РµРєСѓС‰РµРіРѕ РІР°СЂРёР°РЅС‚Р° СЂРµР·СѓР»СЊС‚Р°С‚Р° (РѕРєРѕРЅС‡Р°РЅРёРµ РїСЂРµРґС‹РґСѓС‰РµРіРѕ + РґР»РёРЅР° СЂР°Р·РґРµР»РёС‚РµР»СЏ)
+            ' РµСЃР»Рё РЅРµСЃРєРѕР»СЊРєРѕ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ - РёС‰РµРј РµС‘ РїРѕ РїРѕР·РёС†РёРё СЃР»РµРґСѓСЋС‰РµРіРѕ СЂР°Р·РґРµР»РёС‚РµР»СЏ
+            ' РµСЃР»Рё РѕРґРёРЅ СЂРµР·СѓР»СЊС‚Р°С‚ РёР»Рё СЂР°Р·РґРµР»РёС‚РµР»СЊ РЅРµ РЅР°Р№РґРµРЅ - СЂР°РІРЅР° РґР»РёРЅРµ СЃС‚СЂРѕРєРё+1
                 If rMax > 1 Then jEnd = VBA.InStr(jBeg, Result, Delim) - 1
                 If jEnd <= 0 Then jEnd = Len(Result) + 1
-            ' пропускаем соседние повторяющиеся коды кроме MN/NM (66)
+            ' РїСЂРѕРїСѓСЃРєР°РµРј СЃРѕСЃРµРґРЅРёРµ РїРѕРІС‚РѕСЂСЏСЋС‰РёРµСЃСЏ РєРѕРґС‹ РєСЂРѕРјРµ MN/NM (66)
                 If (sCode = sPrev) And (sCode <> "66") Then sCode = vbNullString
-        ' формируем r-тый результат и обрезаем его по jMax
+        ' С„РѕСЂРјРёСЂСѓРµРј r-С‚С‹Р№ СЂРµР·СѓР»СЊС‚Р°С‚ Рё РѕР±СЂРµР·Р°РµРј РµРіРѕ РїРѕ jMax
                 If rMax = 1 Then sCode = Result & sCode Else sCode = Mid$(Result, jBeg, jEnd - jBeg + 1) & sCode
                 sCode = Left$(sCode, jMax)
-            ' если номер следующего символа слова больше длины слова (i+n>=iMax)
-            ' дополняем текущий вариант результата нулями до необходимой длинны(jMax)
+            ' РµСЃР»Рё РЅРѕРјРµСЂ СЃР»РµРґСѓСЋС‰РµРіРѕ СЃРёРјРІРѕР»Р° СЃР»РѕРІР° Р±РѕР»СЊС€Рµ РґР»РёРЅС‹ СЃР»РѕРІР° (i+n>=iMax)
+            ' РґРѕРїРѕР»РЅСЏРµРј С‚РµРєСѓС‰РёР№ РІР°СЂРёР°РЅС‚ СЂРµР·СѓР»СЊС‚Р°С‚Р° РЅСѓР»СЏРјРё РґРѕ РЅРµРѕР±С…РѕРґРёРјРѕР№ РґР»РёРЅРЅС‹(jMax)
                 If (i + n) > iMax Then sCode = sCode & String(jMax - Len(sCode), "0")
-        ' в множественных результатах можно устранить повторы
-            ' для этого делаем обратный просмотр Result от jBeg к началу по разделителями
-            ' сравниаваем предыдущие коды с текущим фрагментом sCode
-            ' если находим полностью совпадающий с текущим - удаляем текущий фрагмент,
-            '!это потребует смены алгоритма обхода индексов вариантов!
-            ' мы этого делать не будем
-        ' записываем r-тый результат.
+        ' РІ РјРЅРѕР¶РµСЃС‚РІРµРЅРЅС‹С… СЂРµР·СѓР»СЊС‚Р°С‚Р°С… РјРѕР¶РЅРѕ СѓСЃС‚СЂР°РЅРёС‚СЊ РїРѕРІС‚РѕСЂС‹
+            ' РґР»СЏ СЌС‚РѕРіРѕ РґРµР»Р°РµРј РѕР±СЂР°С‚РЅС‹Р№ РїСЂРѕСЃРјРѕС‚СЂ Result РѕС‚ jBeg Рє РЅР°С‡Р°Р»Сѓ РїРѕ СЂР°Р·РґРµР»РёС‚РµР»СЏРјРё
+            ' СЃСЂР°РІРЅРёР°РІР°РµРј РїСЂРµРґС‹РґСѓС‰РёРµ РєРѕРґС‹ СЃ С‚РµРєСѓС‰РёРј С„СЂР°РіРјРµРЅС‚РѕРј sCode
+            ' РµСЃР»Рё РЅР°С…РѕРґРёРј РїРѕР»РЅРѕСЃС‚СЊСЋ СЃРѕРІРїР°РґР°СЋС‰РёР№ СЃ С‚РµРєСѓС‰РёРј - СѓРґР°Р»СЏРµРј С‚РµРєСѓС‰РёР№ С„СЂР°РіРјРµРЅС‚,
+            '!СЌС‚Рѕ РїРѕС‚СЂРµР±СѓРµС‚ СЃРјРµРЅС‹ Р°Р»РіРѕСЂРёС‚РјР° РѕР±С…РѕРґР° РёРЅРґРµРєСЃРѕРІ РІР°СЂРёР°РЅС‚РѕРІ!
+            ' РјС‹ СЌС‚РѕРіРѕ РґРµР»Р°С‚СЊ РЅРµ Р±СѓРґРµРј
+        ' Р·Р°РїРёСЃС‹РІР°РµРј r-С‚С‹Р№ СЂРµР·СѓР»СЊС‚Р°С‚.
                 If rMax = 1 Then Result = sCode Else Result = VBA.Left$(Result, jBeg - 1) & sCode & VBA.Mid$(Result, jEnd + 1)
-                ' сдвигаем позицию начала текущего варианта результата
+                ' СЃРґРІРёРіР°РµРј РїРѕР·РёС†РёСЋ РЅР°С‡Р°Р»Р° С‚РµРєСѓС‰РµРіРѕ РІР°СЂРёР°РЅС‚Р° СЂРµР·СѓР»СЊС‚Р°С‚Р°
                 jBeg = jBeg + Len(sCode) + Len(Delim) '- 1
-' обход последовательностей - увеличиваем индексы вариантов и предыдущих вариантоы
-    ' т.к. новые варианты образуются путем добавления старых в конец строки -
-    ' при переборе чередование индексов будет следующее:
-        ' последовательно перебирая варианты результата,
-        ' для каждого текущего кода перебираем все варианты предыдущего,
-        ' а затем переходим к следующему варианту текущего
+' РѕР±С…РѕРґ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚РµР№ - СѓРІРµР»РёС‡РёРІР°РµРј РёРЅРґРµРєСЃС‹ РІР°СЂРёР°РЅС‚РѕРІ Рё РїСЂРµРґС‹РґСѓС‰РёС… РІР°СЂРёР°РЅС‚РѕС‹
+    ' С‚.Рє. РЅРѕРІС‹Рµ РІР°СЂРёР°РЅС‚С‹ РѕР±СЂР°Р·СѓСЋС‚СЃСЏ РїСѓС‚РµРј РґРѕР±Р°РІР»РµРЅРёСЏ СЃС‚Р°СЂС‹С… РІ РєРѕРЅРµС† СЃС‚СЂРѕРєРё -
+    ' РїСЂРё РїРµСЂРµР±РѕСЂРµ С‡РµСЂРµРґРѕРІР°РЅРёРµ РёРЅРґРµРєСЃРѕРІ Р±СѓРґРµС‚ СЃР»РµРґСѓСЋС‰РµРµ:
+        ' РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕ РїРµСЂРµР±РёСЂР°СЏ РІР°СЂРёР°РЅС‚С‹ СЂРµР·СѓР»СЊС‚Р°С‚Р°,
+        ' РґР»СЏ РєР°Р¶РґРѕРіРѕ С‚РµРєСѓС‰РµРіРѕ РєРѕРґР° РїРµСЂРµР±РёСЂР°РµРј РІСЃРµ РІР°СЂРёР°РЅС‚С‹ РїСЂРµРґС‹РґСѓС‰РµРіРѕ,
+        ' Р° Р·Р°С‚РµРј РїРµСЂРµС…РѕРґРёРј Рє СЃР»РµРґСѓСЋС‰РµРјСѓ РІР°СЂРёР°РЅС‚Сѓ С‚РµРєСѓС‰РµРіРѕ
         
-            ' если достигли конца старой (дублированной) последовательности -
-            ' увеличиваем индекс текущего кода (который сравниваем) и получаем его значение
+            ' РµСЃР»Рё РґРѕСЃС‚РёРіР»Рё РєРѕРЅС†Р° СЃС‚Р°СЂРѕР№ (РґСѓР±Р»РёСЂРѕРІР°РЅРЅРѕР№) РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё -
+            ' СѓРІРµР»РёС‡РёРІР°РµРј РёРЅРґРµРєСЃ С‚РµРєСѓС‰РµРіРѕ РєРѕРґР° (РєРѕС‚РѕСЂС‹Р№ СЃСЂР°РІРЅРёРІР°РµРј) Рё РїРѕР»СѓС‡Р°РµРј РµРіРѕ Р·РЅР°С‡РµРЅРёРµ
                 If r Mod rOld = 0 Then c = c + 1: c = IIf(c > cMax, 0, c): If cMax = 0 Then sCode = Code Else sCode = Code(c)    '
-            ' увеличиваем индекс предыдущего кода (с которым сравниваем) и получаем его значение
+            ' СѓРІРµР»РёС‡РёРІР°РµРј РёРЅРґРµРєСЃ РїСЂРµРґС‹РґСѓС‰РµРіРѕ РєРѕРґР° (СЃ РєРѕС‚РѕСЂС‹Рј СЃСЂР°РІРЅРёРІР°РµРј) Рё РїРѕР»СѓС‡Р°РµРј РµРіРѕ Р·РЅР°С‡РµРЅРёРµ
                 p = p + 1: p = IIf(p > pMax, 0, p): If pMax = 0 Then sPrev = Prev Else sPrev = Prev(p)
-            ' увеличиваем индекс результата, если перебрали все - выходим
+            ' СѓРІРµР»РёС‡РёРІР°РµРј РёРЅРґРµРєСЃ СЂРµР·СѓР»СЊС‚Р°С‚Р°, РµСЃР»Рё РїРµСЂРµР±СЂР°Р»Рё РІСЃРµ - РІС‹С…РѕРґРёРј
                 r = r + 1: If r > rMax Then Exit Do
             Loop
-            ' запоминаем предыдущий(ие) код(ы) и выходим из цикла
+            ' Р·Р°РїРѕРјРёРЅР°РµРј РїСЂРµРґС‹РґСѓС‰РёР№(РёРµ) РєРѕРґ(С‹) Рё РІС‹С…РѕРґРёРј РёР· С†РёРєР»Р°
             Prev = Code: pMax = cMax: Exit Do
 HandleNext: If n > 1 Then n = n - 1 Else Exit Do
         Loop
-        i = i + n ' следующий символ
+        i = i + n ' СЃР»РµРґСѓСЋС‰РёР№ СЃРёРјРІРѕР»
     Loop
 HandleExit:  SoundExDM = Result: Exit Function
 HandleError: Result = String$(jMax, "0"): Err.Clear: Resume HandleExit
 End Function
 
 Public Function SimilarityLCS(ByVal Word1 As String, ByVal Word2 As String) As Double
-' Наибольшая общая подпоследовательность - позволяет только вставки и удаления, но не замену
+' РќР°РёР±РѕР»СЊС€Р°СЏ РѕР±С‰Р°СЏ РїРѕРґРїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ - РїРѕР·РІРѕР»СЏРµС‚ С‚РѕР»СЊРєРѕ РІСЃС‚Р°РІРєРё Рё СѓРґР°Р»РµРЅРёСЏ, РЅРѕ РЅРµ Р·Р°РјРµРЅСѓ
 '-------------------------
 ' Longest Common Subsequence by George Brown - 11/14/04
 ' http://forums.devarticles.com/microsoft-access-development-49/approximate-string-matching-fyi-46951.html
@@ -4075,17 +4085,17 @@ Dim Result As Double
             End If
         Next j
     Next i
-    'If c(m, n)>0 Then Result = c(m, n)  ' Наибольшая общая подпоследовательность
+    'If c(m, n)>0 Then Result = c(m, n)  ' РќР°РёР±РѕР»СЊС€Р°СЏ РѕР±С‰Р°СЏ РїРѕРґРїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ
     If c(m, n) > 0 Then Result = 2 * c(m, n) / (Len1 + Len2) ' c(m, n) / IIf(Len1 > Len2, Len1, Len2)
     Erase x: Erase y: Erase c: Erase b
 HandleExit:  SimilarityLCS = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
 Public Function SimilarityLev(ByVal Word1 As String, ByVal Word2 As String) As Double
-' Расстояние Левенштейна - позволяет вставку, удаление и замену символов
+' Р Р°СЃСЃС‚РѕСЏРЅРёРµ Р›РµРІРµРЅС€С‚РµР№РЅР° - РїРѕР·РІРѕР»СЏРµС‚ РІСЃС‚Р°РІРєСѓ, СѓРґР°Р»РµРЅРёРµ Рё Р·Р°РјРµРЅСѓ СЃРёРјРІРѕР»РѕРІ
 '-------------------------
-' Источник: http://qaru.site/questions/390285/finding-similar-sounding-text-in-vba
-' также:    https://ru.wikibooks.org/wiki/Реализации_алгоритмов/Расстояние_Левенштейна#Visual_Basic_6.0
+' РСЃС‚РѕС‡РЅРёРє: http://qaru.site/questions/390285/finding-similar-sounding-text-in-vba
+' С‚Р°РєР¶Рµ:    https://ru.wikibooks.org/wiki/Р РµР°Р»РёР·Р°С†РёРё_Р°Р»РіРѕСЂРёС‚РјРѕРІ/Р Р°СЃСЃС‚РѕСЏРЅРёРµ_Р›РµРІРµРЅС€С‚РµР№РЅР°#Visual_Basic_6.0
 Dim Result As Double
 
     Result = False
@@ -4105,10 +4115,10 @@ Dim Result As Double
     For i = 1 To m
         For j = 1 To n
             If Mid$(Word1, i, 1) = Mid$(Word2, j, 1) Then cost = 0 Else cost = 1
-            a(0) = d(i - 1, j) + 1          ' удаление
-            a(1) = d(i, j - 1) + 1          ' вставка
-            a(2) = d(i - 1, j - 1) + cost   ' подстановка
-            ' выбираем наименьшее
+            a(0) = d(i - 1, j) + 1          ' СѓРґР°Р»РµРЅРёРµ
+            a(1) = d(i, j - 1) + 1          ' РІСЃС‚Р°РІРєР°
+            a(2) = d(i - 1, j - 1) + cost   ' РїРѕРґСЃС‚Р°РЅРѕРІРєР°
+            ' РІС‹Р±РёСЂР°РµРј РЅР°РёРјРµРЅСЊС€РµРµ
             r = a(0)
             For k = 1 To 2
                 If a(k) < r Then r = a(k)
@@ -4116,15 +4126,15 @@ Dim Result As Double
             d(i, j) = r
         Next j
     Next i
-'    Result = d(m, n)                       ' расстояние Левенштейна
-    Result = 1 - d(m, n) / IIf(m > n, m, n) ' расстояние нормированное по длине строки
+'    Result = d(m, n)                       ' СЂР°СЃСЃС‚РѕСЏРЅРёРµ Р›РµРІРµРЅС€С‚РµР№РЅР°
+    Result = 1 - d(m, n) / IIf(m > n, m, n) ' СЂР°СЃСЃС‚РѕСЏРЅРёРµ РЅРѕСЂРјРёСЂРѕРІР°РЅРЅРѕРµ РїРѕ РґР»РёРЅРµ СЃС‚СЂРѕРєРё
 HandleExit:  SimilarityLev = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
 Public Function SimilarityDL(ByVal Word1 As String, ByVal Word2 As String) As Double
-' Расстояние Дамерау-Левенштейна - позволяет вставку, удаление, замену и перестановку двух соседних символов
+' Р Р°СЃСЃС‚РѕСЏРЅРёРµ Р”Р°РјРµСЂР°Сѓ-Р›РµРІРµРЅС€С‚РµР№РЅР° - РїРѕР·РІРѕР»СЏРµС‚ РІСЃС‚Р°РІРєСѓ, СѓРґР°Р»РµРЅРёРµ, Р·Р°РјРµРЅСѓ Рё РїРµСЂРµСЃС‚Р°РЅРѕРІРєСѓ РґРІСѓС… СЃРѕСЃРµРґРЅРёС… СЃРёРјРІРѕР»РѕРІ
 '-------------------------
-' Источник: https://ru.wikipedia.org/wiki/Расстояние_Дамерау_—_Левенштейна
+' РСЃС‚РѕС‡РЅРёРє: https://ru.wikipedia.org/wiki/Р Р°СЃСЃС‚РѕСЏРЅРёРµ_Р”Р°РјРµСЂР°Сѓ_вЂ”_Р›РµРІРµРЅС€С‚РµР№РЅР°
 '-------------------------
 Dim Result As Double ': Result = False
     On Error GoTo HandleError
@@ -4143,15 +4153,15 @@ Dim a(3), r As Integer, cost As Integer
     For i = 1 To m
         For j = 1 To n
             If Mid$(Word1, i, 1) = Mid$(Word2, j, 1) Then cost = 0 Else cost = 1
-            a(0) = d(i - 1, j) + 1          ' удаление
-            a(1) = d(i, j - 1) + 1          ' вставка
-            a(2) = d(i - 1, j - 1) + cost   ' подстановка
-                                            ' перестановка
+            a(0) = d(i - 1, j) + 1          ' СѓРґР°Р»РµРЅРёРµ
+            a(1) = d(i, j - 1) + 1          ' РІСЃС‚Р°РІРєР°
+            a(2) = d(i - 1, j - 1) + cost   ' РїРѕРґСЃС‚Р°РЅРѕРІРєР°
+                                            ' РїРµСЂРµСЃС‚Р°РЅРѕРІРєР°
             If i And j And Mid$(Word1, i + 1, 1) = Mid$(Word2, j, 1) _
                  And Mid$(Word1, i, 1) = Mid$(Word2, j + 1, 1) Then _
             a(3) = d(i - 2, j - 2) + cost Else a(3) = &H7FFF
             
-            ' выбираем наименьшее
+            ' РІС‹Р±РёСЂР°РµРј РЅР°РёРјРµРЅСЊС€РµРµ
             r = a(0)
             For k = 1 To 3
                 If a(k) < r Then r = a(k)
@@ -4159,49 +4169,49 @@ Dim a(3), r As Integer, cost As Integer
             d(i, j) = r
         Next j
     Next i
-'    Result = d(m, n) ' расстояние Дамерау-Левенштейна
+'    Result = d(m, n) ' СЂР°СЃСЃС‚РѕСЏРЅРёРµ Р”Р°РјРµСЂР°Сѓ-Р›РµРІРµРЅС€С‚РµР№РЅР°
     Result = 1 - d(m, n) / IIf(m > n, m, n)
 HandleExit:  SimilarityDL = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
 Public Function SimilarityDice(ByVal Word1 As String, ByVal Word2 As String) As Double
-' Сходство Дайса
+' РЎС…РѕРґСЃС‚РІРѕ Р”Р°Р№СЃР°
 '-------------------------
 ' https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Dice%27s_coefficient
 '-------------------------
-Const n = 2 ' используем биграммы
+Const n = 2 ' РёСЃРїРѕР»СЊР·СѓРµРј Р±РёРіСЂР°РјРјС‹
 Dim Result As Double ': Result = False
     On Error GoTo HandleError
     If Word1 = vbNullString Or Word2 = vbNullString Then GoTo HandleExit
     Word1 = UCase$(Trim$(Word1)): Word2 = UCase$(Trim$(Word2))
     If Word1 = Word2 Then Result = 1: GoTo HandleExit
 Dim i As Integer, j As Integer
-Dim iMax As Integer: iMax = Len(Word1) - (n - 1)    ' n-грамм в Word1
-Dim jMax As Integer: jMax = Len(Word2) - (n - 1)    ' n-грамм в Word2
-    If (iMax < 1) Or (jMax < 1) Then GoTo HandleExit    ' слово меньше длины n-граммы
-' формируем коллекцию индексов n-грамм для Word2 (не хочется использовать объекты, но из массива сложно удалять)
-Dim Col As New Collection, с As Long: For j = 1 To jMax: Col.Add j: Next j
-' сопоставляем n-граммы Word1 с Word2
+Dim iMax As Integer: iMax = Len(Word1) - (n - 1)    ' n-РіСЂР°РјРј РІ Word1
+Dim jMax As Integer: jMax = Len(Word2) - (n - 1)    ' n-РіСЂР°РјРј РІ Word2
+    If (iMax < 1) Or (jMax < 1) Then GoTo HandleExit    ' СЃР»РѕРІРѕ РјРµРЅСЊС€Рµ РґР»РёРЅС‹ n-РіСЂР°РјРјС‹
+' С„РѕСЂРјРёСЂСѓРµРј РєРѕР»Р»РµРєС†РёСЋ РёРЅРґРµРєСЃРѕРІ n-РіСЂР°РјРј РґР»СЏ Word2 (РЅРµ С…РѕС‡РµС‚СЃСЏ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РѕР±СЉРµРєС‚С‹, РЅРѕ РёР· РјР°СЃСЃРёРІР° СЃР»РѕР¶РЅРѕ СѓРґР°Р»СЏС‚СЊ)
+Dim Col As New Collection, СЃ As Long: For j = 1 To jMax: Col.Add j: Next j
+' СЃРѕРїРѕСЃС‚Р°РІР»СЏРµРј n-РіСЂР°РјРјС‹ Word1 СЃ Word2
 Dim x As Integer: x = 0
     For i = 1 To iMax
         For j = 1 To Col.Count
-' при совпадении n-грамм:
-    ' увеличиваем счётчик совпадений,
-    ' вычёркиваем индекс из перебора n-грамм Word2
-    ' и переходим к следующей n-грамме Word1
+' РїСЂРё СЃРѕРІРїР°РґРµРЅРёРё n-РіСЂР°РјРј:
+    ' СѓРІРµР»РёС‡РёРІР°РµРј СЃС‡С‘С‚С‡РёРє СЃРѕРІРїР°РґРµРЅРёР№,
+    ' РІС‹С‡С‘СЂРєРёРІР°РµРј РёРЅРґРµРєСЃ РёР· РїРµСЂРµР±РѕСЂР° n-РіСЂР°РјРј Word2
+    ' Рё РїРµСЂРµС…РѕРґРёРј Рє СЃР»РµРґСѓСЋС‰РµР№ n-РіСЂР°РјРјРµ Word1
             If Mid$(Word1, i, n) = Mid$(Word2, Col(j), n) Then x = x + 1: Col.Remove j: Exit For
     Next j, i
-    Result = 2 * x / (iMax + jMax)  ' совпадения на среднее количество n-грамм в словах
+    Result = 2 * x / (iMax + jMax)  ' СЃРѕРІРїР°РґРµРЅРёСЏ РЅР° СЃСЂРµРґРЅРµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ n-РіСЂР°РјРј РІ СЃР»РѕРІР°С…
 HandleExit:  SimilarityDice = Result: Exit Function
 HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
 Public Function SimilarityJaro(ByVal Word1 As String, ByVal Word2 As String) As Double
-' Сходство Джаро-Винклера - минимальное число односимвольных преобразований, которое необходимо для того, чтобы изменить одно слово в другое
+' РЎС…РѕРґСЃС‚РІРѕ Р”Р¶Р°СЂРѕ-Р’РёРЅРєР»РµСЂР° - РјРёРЅРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ РѕРґРЅРѕСЃРёРјРІРѕР»СЊРЅС‹С… РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№, РєРѕС‚РѕСЂРѕРµ РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ С‚РѕРіРѕ, С‡С‚РѕР±С‹ РёР·РјРµРЅРёС‚СЊ РѕРґРЅРѕ СЃР»РѕРІРѕ РІ РґСЂСѓРіРѕРµ
 '-------------------------
 ' By: Ernanie F. Gregorio Jr. (from psc cd)
-' Источник: https://planet-source-code.com/vb/scripts/ShowCode.asp?txtCodeId=73978&lngWId=1
+' РСЃС‚РѕС‡РЅРёРє: https://planet-source-code.com/vb/scripts/ShowCode.asp?txtCodeId=73978&lngWId=1
 ' https://blog.developpez.com/philben/p12207/vba-access/vba-distance-de-jaro-winkler
-' https://ru.wikipedia.org/wiki/Сходство_Джаро_—_Винклера
+' https://ru.wikipedia.org/wiki/РЎС…РѕРґСЃС‚РІРѕ_Р”Р¶Р°СЂРѕ_вЂ”_Р’РёРЅРєР»РµСЂР°
 '-------------------------
 Dim Result As Double ': Result = False
     On Error GoTo HandleError
@@ -4248,7 +4258,7 @@ HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
 
 '=========================
-' Функции обработки текста
+' Р¤СѓРЅРєС†РёРё РѕР±СЂР°Р±РѕС‚РєРё С‚РµРєСЃС‚Р°
 '=========================
 Public Function GenPassword( _
     Optional PassLen As Integer = 12, _
@@ -4256,40 +4266,40 @@ Public Function GenPassword( _
     Optional bRepeats As Boolean = True, _
     Optional NewSeed As Boolean = True _
     ) As String
-' генерирует "случайный" текст указанной длины
+' РіРµРЅРµСЂРёСЂСѓРµС‚ "СЃР»СѓС‡Р°Р№РЅС‹Р№" С‚РµРєСЃС‚ СѓРєР°Р·Р°РЅРЅРѕР№ РґР»РёРЅС‹
 '-------------------------
-' PassLen - длина пароля
-' Symbols - допустимый набор символов. если не задан будет сформирован
-' bRepeats = True - разрешить одинаковые символы подряд
-' NewSeed = True - вызывает Randomize для создания новой "случайной" последовательности
+' PassLen - РґР»РёРЅР° РїР°СЂРѕР»СЏ
+' Symbols - РґРѕРїСѓСЃС‚РёРјС‹Р№ РЅР°Р±РѕСЂ СЃРёРјРІРѕР»РѕРІ. РµСЃР»Рё РЅРµ Р·Р°РґР°РЅ Р±СѓРґРµС‚ СЃС„РѕСЂРјРёСЂРѕРІР°РЅ
+' bRepeats = True - СЂР°Р·СЂРµС€РёС‚СЊ РѕРґРёРЅР°РєРѕРІС‹Рµ СЃРёРјРІРѕР»С‹ РїРѕРґСЂСЏРґ
+' NewSeed = True - РІС‹Р·С‹РІР°РµС‚ Randomize РґР»СЏ СЃРѕР·РґР°РЅРёСЏ РЅРѕРІРѕР№ "СЃР»СѓС‡Р°Р№РЅРѕР№" РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё
 '-------------------------
-' при генерации паролей в цикле, Randomize приводит к повтору последовательности после ~100-200 уникальных паролей
-' поэтому при генерации единичного пароля лучше задавать True, при генерации серии паролей в цикле - False
+' РїСЂРё РіРµРЅРµСЂР°С†РёРё РїР°СЂРѕР»РµР№ РІ С†РёРєР»Рµ, Randomize РїСЂРёРІРѕРґРёС‚ Рє РїРѕРІС‚РѕСЂСѓ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё РїРѕСЃР»Рµ ~100-200 СѓРЅРёРєР°Р»СЊРЅС‹С… РїР°СЂРѕР»РµР№
+' РїРѕСЌС‚РѕРјСѓ РїСЂРё РіРµРЅРµСЂР°С†РёРё РµРґРёРЅРёС‡РЅРѕРіРѕ РїР°СЂРѕР»СЏ Р»СѓС‡С€Рµ Р·Р°РґР°РІР°С‚СЊ True, РїСЂРё РіРµРЅРµСЂР°С†РёРё СЃРµСЂРёРё РїР°СЂРѕР»РµР№ РІ С†РёРєР»Рµ - False
 '-------------------------
-Const cMin = 0              ' минимальная допустимая длина итоговой строки (0-неограничено)
-Dim sMax As Byte: sMax = 3  ' максимальное количество однотипных символов подряд (0-неограничено)
-Const bDigits = True        ' добавлять цифры
-Const bLatin = True         ' добавлять символы латинского алфавита
-Const bCyrillic = False     ' добавлять символы кириллического алфавита
-Const bOthers = False       ' добавлять символы из доп. набора
-'Const bRepeats = True       ' разрешить одинаковые символы подряд
-Const sCase = 0             ' регистр символов формируемой строки
-                            ' 0-допустимы символы в верхнем и нижнем регистрах
-                            ' 1-только в верхнем, 2-только в нижнем
+Const cMin = 0              ' РјРёРЅРёРјР°Р»СЊРЅР°СЏ РґРѕРїСѓСЃС‚РёРјР°СЏ РґР»РёРЅР° РёС‚РѕРіРѕРІРѕР№ СЃС‚СЂРѕРєРё (0-РЅРµРѕРіСЂР°РЅРёС‡РµРЅРѕ)
+Dim sMax As Byte: sMax = 3  ' РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРґРЅРѕС‚РёРїРЅС‹С… СЃРёРјРІРѕР»РѕРІ РїРѕРґСЂСЏРґ (0-РЅРµРѕРіСЂР°РЅРёС‡РµРЅРѕ)
+Const bDigits = True        ' РґРѕР±Р°РІР»СЏС‚СЊ С†РёС„СЂС‹
+Const bLatin = True         ' РґРѕР±Р°РІР»СЏС‚СЊ СЃРёРјРІРѕР»С‹ Р»Р°С‚РёРЅСЃРєРѕРіРѕ Р°Р»С„Р°РІРёС‚Р°
+Const bCyrillic = False     ' РґРѕР±Р°РІР»СЏС‚СЊ СЃРёРјРІРѕР»С‹ РєРёСЂРёР»Р»РёС‡РµСЃРєРѕРіРѕ Р°Р»С„Р°РІРёС‚Р°
+Const bOthers = False       ' РґРѕР±Р°РІР»СЏС‚СЊ СЃРёРјРІРѕР»С‹ РёР· РґРѕРї. РЅР°Р±РѕСЂР°
+'Const bRepeats = True       ' СЂР°Р·СЂРµС€РёС‚СЊ РѕРґРёРЅР°РєРѕРІС‹Рµ СЃРёРјРІРѕР»С‹ РїРѕРґСЂСЏРґ
+Const sCase = 0             ' СЂРµРіРёСЃС‚СЂ СЃРёРјРІРѕР»РѕРІ С„РѕСЂРјРёСЂСѓРµРјРѕР№ СЃС‚СЂРѕРєРё
+                            ' 0-РґРѕРїСѓСЃС‚РёРјС‹ СЃРёРјРІРѕР»С‹ РІ РІРµСЂС…РЅРµРј Рё РЅРёР¶РЅРµРј СЂРµРіРёСЃС‚СЂР°С…
+                            ' 1-С‚РѕР»СЊРєРѕ РІ РІРµСЂС…РЅРµРј, 2-С‚РѕР»СЊРєРѕ РІ РЅРёР¶РЅРµРј
 Dim Result As String ': Result = vbNullString
     On Error GoTo HandleError
     If PassLen < cMin Then Err.Raise vbObjectError + 512
     If PassLen < 1 Then GoTo HandleExit
     If Len(Symbols) = 0 Then
-' если не задана - формируем последовательность допустимых символов
-'    ' идея для генерации "читаемых" паролей - вместо набора алфавитных символов
-'    ' генерировать на основе массива слогов и чередовать с другими символами
-'    ' естественно нужен будет словарь. разбить на слоги можно при помощи HyphenateWord
-' в порядке бреда:
-'    ' можно попробовать "улучшить" генератор используя вместо чтения слева (N*Rnd)
-'    ' чтение произвольной части сгенерированного числа
-'    ' что-то типа: Replace(cCur(Rnd*1E15),",","") - превратит Rnd в строку из 19 цифр
-'    ' из которой можно брать произвольный фрагмент
+' РµСЃР»Рё РЅРµ Р·Р°РґР°РЅР° - С„РѕСЂРјРёСЂСѓРµРј РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ РґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ
+'    ' РёРґРµСЏ РґР»СЏ РіРµРЅРµСЂР°С†РёРё "С‡РёС‚Р°РµРјС‹С…" РїР°СЂРѕР»РµР№ - РІРјРµСЃС‚Рѕ РЅР°Р±РѕСЂР° Р°Р»С„Р°РІРёС‚РЅС‹С… СЃРёРјРІРѕР»РѕРІ
+'    ' РіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ РЅР° РѕСЃРЅРѕРІРµ РјР°СЃСЃРёРІР° СЃР»РѕРіРѕРІ Рё С‡РµСЂРµРґРѕРІР°С‚СЊ СЃ РґСЂСѓРіРёРјРё СЃРёРјРІРѕР»Р°РјРё
+'    ' РµСЃС‚РµСЃС‚РІРµРЅРЅРѕ РЅСѓР¶РµРЅ Р±СѓРґРµС‚ СЃР»РѕРІР°СЂСЊ. СЂР°Р·Р±РёС‚СЊ РЅР° СЃР»РѕРіРё РјРѕР¶РЅРѕ РїСЂРё РїРѕРјРѕС‰Рё HyphenateWord
+' РІ РїРѕСЂСЏРґРєРµ Р±СЂРµРґР°:
+'    ' РјРѕР¶РЅРѕ РїРѕРїСЂРѕР±РѕРІР°С‚СЊ "СѓР»СѓС‡С€РёС‚СЊ" РіРµРЅРµСЂР°С‚РѕСЂ РёСЃРїРѕР»СЊР·СѓСЏ РІРјРµСЃС‚Рѕ С‡С‚РµРЅРёСЏ СЃР»РµРІР° (N*Rnd)
+'    ' С‡С‚РµРЅРёРµ РїСЂРѕРёР·РІРѕР»СЊРЅРѕР№ С‡Р°СЃС‚Рё СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅРѕРіРѕ С‡РёСЃР»Р°
+'    ' С‡С‚Рѕ-С‚Рѕ С‚РёРїР°: Replace(cCur(Rnd*1E15),",","") - РїСЂРµРІСЂР°С‚РёС‚ Rnd РІ СЃС‚СЂРѕРєСѓ РёР· 19 С†РёС„СЂ
+'    ' РёР· РєРѕС‚РѕСЂРѕР№ РјРѕР¶РЅРѕ Р±СЂР°С‚СЊ РїСЂРѕРёР·РІРѕР»СЊРЅС‹Р№ С„СЂР°РіРјРµРЅС‚
         If bDigits Then Symbols = Symbols & c_strSymbDigits
         If bLatin Then If sCase = 0 Then Symbols = Symbols & UCase$(c_strSymbEngAll) & LCase$(c_strSymbEngAll) Else If sCase = 1 Then Symbols = Symbols & UCase$(c_strSymbEngAll) Else Symbols = Symbols & LCase$(c_strSymbEngAll)
         If bCyrillic Then If sCase = 0 Then Symbols = Symbols & UCase$(c_strSymbRusAll) & LCase$(c_strSymbRusAll) Else If sCase = 1 Then Symbols = Symbols & UCase$(c_strSymbRusAll) Else Symbols = Symbols & LCase$(c_strSymbRusAll)
@@ -4297,8 +4307,8 @@ Dim Result As String ': Result = vbNullString
     End If
 Dim sLen As Long: sLen = Len(Symbols)
     If sLen < 1 Then GoTo HandleExit
-' проверить количество типов в последовательности чтоб не подвесить цикл на условии по количеству однотипных символов
-    ' sType д.б. один символ иначе надо будет делать проверку через массив/коллекцию типов
+' РїСЂРѕРІРµСЂРёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ С‚РёРїРѕРІ РІ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё С‡С‚РѕР± РЅРµ РїРѕРґРІРµСЃРёС‚СЊ С†РёРєР» РЅР° СѓСЃР»РѕРІРёРё РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ РѕРґРЅРѕС‚РёРїРЅС‹С… СЃРёРјРІРѕР»РѕРІ
+    ' sType Рґ.Р±. РѕРґРёРЅ СЃРёРјРІРѕР» РёРЅР°С‡Рµ РЅР°РґРѕ Р±СѓРґРµС‚ РґРµР»Р°С‚СЊ РїСЂРѕРІРµСЂРєСѓ С‡РµСЂРµР· РјР°СЃСЃРёРІ/РєРѕР»Р»РµРєС†РёСЋ С‚РёРїРѕРІ
 Dim sTemp As String: sTemp = vbNullString
 Dim sType As Integer
 Dim i As Long
@@ -4306,67 +4316,67 @@ Dim i As Long
         sType = GetCharType(Mid$(Symbols, i, 1))
         If InStr(1, sTemp, sType) = 0 Then sTemp = sTemp & sType
     Next i
-' проверяем ограничения
-    If sLen = 1 Then bRepeats = True ' если в наборе допустимых всего один символ снимаем запрет повторов
-    If Len(sTemp) <= 1 Then sMax = 0 ' если все символы набора одного типа снимаем условие на повторы однотипных символов
-' собственно генератор
+' РїСЂРѕРІРµСЂСЏРµРј РѕРіСЂР°РЅРёС‡РµРЅРёСЏ
+    If sLen = 1 Then bRepeats = True ' РµСЃР»Рё РІ РЅР°Р±РѕСЂРµ РґРѕРїСѓСЃС‚РёРјС‹С… РІСЃРµРіРѕ РѕРґРёРЅ СЃРёРјРІРѕР» СЃРЅРёРјР°РµРј Р·Р°РїСЂРµС‚ РїРѕРІС‚РѕСЂРѕРІ
+    If Len(sTemp) <= 1 Then sMax = 0 ' РµСЃР»Рё РІСЃРµ СЃРёРјРІРѕР»С‹ РЅР°Р±РѕСЂР° РѕРґРЅРѕРіРѕ С‚РёРїР° СЃРЅРёРјР°РµРј СѓСЃР»РѕРІРёРµ РЅР° РїРѕРІС‚РѕСЂС‹ РѕРґРЅРѕС‚РёРїРЅС‹С… СЃРёРјРІРѕР»РѕРІ
+' СЃРѕР±СЃС‚РІРµРЅРЅРѕ РіРµРЅРµСЂР°С‚РѕСЂ
 Dim sChar As String * 1
 Dim sPrev As Integer, sCount As Integer
-    ' создание новой "случайной" последовательности
+    ' СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕР№ "СЃР»СѓС‡Р°Р№РЅРѕР№" РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё
     sType = 0: sPrev = -1
     If NewSeed Then Randomize Timer
     Do Until Len(Result) = PassLen
-    ' выбираем символ
+    ' РІС‹Р±РёСЂР°РµРј СЃРёРјРІРѕР»
 HandleNewSymb: sChar = VBA.Mid$(Symbols, CLng((sLen - 1) * Rnd) + 1, 1)
-    ' проверяем соответствие дополнительным требованиям к формируемой строке:
-        '1. не более sMax однотипных символов подряд
+    ' РїСЂРѕРІРµСЂСЏРµРј СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рј С‚СЂРµР±РѕРІР°РЅРёСЏРј Рє С„РѕСЂРјРёСЂСѓРµРјРѕР№ СЃС‚СЂРѕРєРµ:
+        '1. РЅРµ Р±РѕР»РµРµ sMax РѕРґРЅРѕС‚РёРїРЅС‹С… СЃРёРјРІРѕР»РѕРІ РїРѕРґСЂСЏРґ
         If sMax > 0 Then sType = GetCharType(sChar): If sType <> sPrev Then sPrev = sType: sCount = 1 Else If sCount >= sMax Then GoTo HandleNewSymb Else sCount = sCount + 1
-        '2. запретить в результирующей строке находящиеся подряд одинаковые символы
+        '2. Р·Р°РїСЂРµС‚РёС‚СЊ РІ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµР№ СЃС‚СЂРѕРєРµ РЅР°С…РѕРґСЏС‰РёРµСЃСЏ РїРѕРґСЂСЏРґ РѕРґРёРЅР°РєРѕРІС‹Рµ СЃРёРјРІРѕР»С‹
         If Not bRepeats Then If LCase$(sChar) = LCase$(Right$(Result, 1)) Then GoTo HandleNewSymb
-    ' формируем результирующую строку
+    ' С„РѕСЂРјРёСЂСѓРµРј СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰СѓСЋ СЃС‚СЂРѕРєСѓ
         Result = Result & sChar
     Loop
 HandleExit:  GenPassword = Result: Exit Function
 HandleError: Result = vbNullString
     Select Case Err.Number
-    Case vbObjectError + 512: MsgBox "Слишком короткий пароль." & vbCrLf & "Должен быть не меньше " & cMin & " символов.", vbOKOnly Or vbExclamation, "Ошибка!"
+    Case vbObjectError + 512: MsgBox "РЎР»РёС€РєРѕРј РєРѕСЂРѕС‚РєРёР№ РїР°СЂРѕР»СЊ." & vbCrLf & "Р”РѕР»Р¶РµРЅ Р±С‹С‚СЊ РЅРµ РјРµРЅСЊС€Рµ " & cMin & " СЃРёРјРІРѕР»РѕРІ.", vbOKOnly Or vbExclamation, "РћС€РёР±РєР°!"
     End Select
     Err.Clear: Resume HandleExit
 End Function
 Public Function HyphenateWord( _
     ByVal Text As String, _
-    Optional Delimiter As String = "­") As String
-' расставляет переносы в словах
+    Optional Delimiter As String = "В­") As String
+' СЂР°СЃСЃС‚Р°РІР»СЏРµС‚ РїРµСЂРµРЅРѕСЃС‹ РІ СЃР»РѕРІР°С…
 '-------------------------
-' Источник: http://www.cyberforum.ru/vba/thread792944.html
-' Описание и обсуждение исходного алгоритма здесь https://habr.com/post/138088/
-' правила из набора паттернов сильно приблизительно соответствуют правилам русского языка
+' РСЃС‚РѕС‡РЅРёРє: http://www.cyberforum.ru/vba/thread792944.html
+' РћРїРёСЃР°РЅРёРµ Рё РѕР±СЃСѓР¶РґРµРЅРёРµ РёСЃС…РѕРґРЅРѕРіРѕ Р°Р»РіРѕСЂРёС‚РјР° Р·РґРµСЃСЊ https://habr.com/post/138088/
+' РїСЂР°РІРёР»Р° РёР· РЅР°Р±РѕСЂР° РїР°С‚С‚РµСЂРЅРѕРІ СЃРёР»СЊРЅРѕ РїСЂРёР±Р»РёР·РёС‚РµР»СЊРЅРѕ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‚ РїСЂР°РІРёР»Р°Рј СЂСѓСЃСЃРєРѕРіРѕ СЏР·С‹РєР°
 Const cstrTemp = "xgg xgs xsg xss sggsg gsssssg gssssg gsssg sgsg gssg sggg sggs"
 Dim sPattern() As String
 Dim i As Long, j As Long, k As Long
 Dim m As String, sText As String
     
     On Error GoTo HandleError
-' массив допустимых символов по типам: 0-знаки(x), 1-гласные(g), 2-согласные(s)
-    ' единственная поправка - для алгоритма необходимо, чтобы "й" была знаком, а не согласной
-    ' внесем соответствующую поправку в наборы символов массива
+' РјР°СЃСЃРёРІ РґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ РїРѕ С‚РёРїР°Рј: 0-Р·РЅР°РєРё(x), 1-РіР»Р°СЃРЅС‹Рµ(g), 2-СЃРѕРіР»Р°СЃРЅС‹Рµ(s)
+    ' РµРґРёРЅСЃС‚РІРµРЅРЅР°СЏ РїРѕРїСЂР°РІРєР° - РґР»СЏ Р°Р»РіРѕСЂРёС‚РјР° РЅРµРѕР±С…РѕРґРёРјРѕ, С‡С‚РѕР±С‹ "Р№" Р±С‹Р»Р° Р·РЅР°РєРѕРј, Р° РЅРµ СЃРѕРіР»Р°СЃРЅРѕР№
+    ' РІРЅРµСЃРµРј СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰СѓСЋ РїРѕРїСЂР°РІРєСѓ РІ РЅР°Р±РѕСЂС‹ СЃРёРјРІРѕР»РѕРІ РјР°СЃСЃРёРІР°
 Dim sArr: sArr = Array(c_strSymbRusSign & c_strSymbEngSign, c_strSymbRusVowel & c_strSymbEngVowel, c_strSymbRusConson & c_strSymbEngConson)
-' массив распознаваемых паттернов в слове
+' РјР°СЃСЃРёРІ СЂР°СЃРїРѕР·РЅР°РІР°РµРјС‹С… РїР°С‚С‚РµСЂРЅРѕРІ РІ СЃР»РѕРІРµ
 Dim sTemp() As String: sTemp = Split(cstrTemp) 'Call xSplit(cstrTemp, sTemp)
-' позиция разбиения соотв паттерна - номер символа паттерна (см. массив выше) после которого необходимо поставить разделитель
+' РїРѕР·РёС†РёСЏ СЂР°Р·Р±РёРµРЅРёСЏ СЃРѕРѕС‚РІ РїР°С‚С‚РµСЂРЅР° - РЅРѕРјРµСЂ СЃРёРјРІРѕР»Р° РїР°С‚С‚РµСЂРЅР° (СЃРј. РјР°СЃСЃРёРІ РІС‹С€Рµ) РїРѕСЃР»Рµ РєРѕС‚РѕСЂРѕРіРѕ РЅРµРѕР±С…РѕРґРёРјРѕ РїРѕСЃС‚Р°РІРёС‚СЊ СЂР°Р·РґРµР»РёС‚РµР»СЊ
 Dim sPos: sPos = Array(1, 1, 1, 1, 3, 3, 2, 2, 2, 2, 2, 2)
 
     sText = Text
-' заменяем символы исходной строки их обозначениями в паттерне (x, g, s)
+' Р·Р°РјРµРЅСЏРµРј СЃРёРјРІРѕР»С‹ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё РёС… РѕР±РѕР·РЅР°С‡РµРЅРёСЏРјРё РІ РїР°С‚С‚РµСЂРЅРµ (x, g, s)
     For i = 1 To Len(Text)
         m = LCase$(Mid$(Text, i, 1))
         For j = 0 To UBound(sArr)
             If InStr(sArr(j), m) Then Mid$(Text, i, 1) = Mid$("xgs", j + 1, 1): Exit For
     Next j, i
     
-' выявляем паттерны и вставляем разделитель в позицию разбиения
-' в преобразованную и исходную строки. Замена в преобразованной строке
-' нужна чтобы исключить уже отработанные шаблоны разбиения
+' РІС‹СЏРІР»СЏРµРј РїР°С‚С‚РµСЂРЅС‹ Рё РІСЃС‚Р°РІР»СЏРµРј СЂР°Р·РґРµР»РёС‚РµР»СЊ РІ РїРѕР·РёС†РёСЋ СЂР°Р·Р±РёРµРЅРёСЏ
+' РІ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРЅСѓСЋ Рё РёСЃС…РѕРґРЅСѓСЋ СЃС‚СЂРѕРєРё. Р—Р°РјРµРЅР° РІ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРЅРѕР№ СЃС‚СЂРѕРєРµ
+' РЅСѓР¶РЅР° С‡С‚РѕР±С‹ РёСЃРєР»СЋС‡РёС‚СЊ СѓР¶Рµ РѕС‚СЂР°Р±РѕС‚Р°РЅРЅС‹Рµ С€Р°Р±Р»РѕРЅС‹ СЂР°Р·Р±РёРµРЅРёСЏ
     For i = 0 To UBound(sTemp)
         j = 0
         Do
@@ -4392,89 +4402,89 @@ Public Function NumToWords( _
     Optional ByVal DecimalPlaces As Byte = 2, _
     Optional ByVal TranslateFrac As Boolean = False _
     ) As String
-' преобразование чисел в слова и склонение по падежам
+' РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С‡РёСЃРµР» РІ СЃР»РѕРІР° Рё СЃРєР»РѕРЅРµРЅРёРµ РїРѕ РїР°РґРµР¶Р°Рј
 '-------------------------
-' Number  - преобразуемое число (целое число, десятичная или натуральная дробь, число в экспоненциальной форме не распознается)
-' NewCase - падеж склонения (им","род","дат","вин","тв","пред)
-' NewNumb - число ("ед","мн")
-' NewGend - род ("м","ж") если заданы единицы измерения определяется по ним
-' Animate - признак того, что обозначение единиц измерения надо склонять как одушевлённые
-' NewType - тип числительного (количественное","порядковое) если задано дробное число - м.б. только количественное
-' Unit    - единица измерения - обозначение целой части (ед.ч., им.п.)
-' SubUnit - вспомогательная единица измерения - обозначение дробной части (ед.ч., им.п.)
-' DecimalPlaces - размерность вспомогательной единицы (количество знаков после запятой в десятичной дроби)
-' TranslateFrac - (пока не используется) если True также переводится в текст дробная часть
+' Number  - РїСЂРµРѕР±СЂР°Р·СѓРµРјРѕРµ С‡РёСЃР»Рѕ (С†РµР»РѕРµ С‡РёСЃР»Рѕ, РґРµСЃСЏС‚РёС‡РЅР°СЏ РёР»Рё РЅР°С‚СѓСЂР°Р»СЊРЅР°СЏ РґСЂРѕР±СЊ, С‡РёСЃР»Рѕ РІ СЌРєСЃРїРѕРЅРµРЅС†РёР°Р»СЊРЅРѕР№ С„РѕСЂРјРµ РЅРµ СЂР°СЃРїРѕР·РЅР°РµС‚СЃСЏ)
+' NewCase - РїР°РґРµР¶ СЃРєР»РѕРЅРµРЅРёСЏ (РёРј","СЂРѕРґ","РґР°С‚","РІРёРЅ","С‚РІ","РїСЂРµРґ)
+' NewNumb - С‡РёСЃР»Рѕ ("РµРґ","РјРЅ")
+' NewGend - СЂРѕРґ ("Рј","Р¶") РµСЃР»Рё Р·Р°РґР°РЅС‹ РµРґРёРЅРёС†С‹ РёР·РјРµСЂРµРЅРёСЏ РѕРїСЂРµРґРµР»СЏРµС‚СЃСЏ РїРѕ РЅРёРј
+' Animate - РїСЂРёР·РЅР°Рє С‚РѕРіРѕ, С‡С‚Рѕ РѕР±РѕР·РЅР°С‡РµРЅРёРµ РµРґРёРЅРёС† РёР·РјРµСЂРµРЅРёСЏ РЅР°РґРѕ СЃРєР»РѕРЅСЏС‚СЊ РєР°Рє РѕРґСѓС€РµРІР»С‘РЅРЅС‹Рµ
+' NewType - С‚РёРї С‡РёСЃР»РёС‚РµР»СЊРЅРѕРіРѕ (РєРѕР»РёС‡РµСЃС‚РІРµРЅРЅРѕРµ","РїРѕСЂСЏРґРєРѕРІРѕРµ) РµСЃР»Рё Р·Р°РґР°РЅРѕ РґСЂРѕР±РЅРѕРµ С‡РёСЃР»Рѕ - Рј.Р±. С‚РѕР»СЊРєРѕ РєРѕР»РёС‡РµСЃС‚РІРµРЅРЅРѕРµ
+' Unit    - РµРґРёРЅРёС†Р° РёР·РјРµСЂРµРЅРёСЏ - РѕР±РѕР·РЅР°С‡РµРЅРёРµ С†РµР»РѕР№ С‡Р°СЃС‚Рё (РµРґ.С‡., РёРј.Рї.)
+' SubUnit - РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅР°СЏ РµРґРёРЅРёС†Р° РёР·РјРµСЂРµРЅРёСЏ - РѕР±РѕР·РЅР°С‡РµРЅРёРµ РґСЂРѕР±РЅРѕР№ С‡Р°СЃС‚Рё (РµРґ.С‡., РёРј.Рї.)
+' DecimalPlaces - СЂР°Р·РјРµСЂРЅРѕСЃС‚СЊ РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅРѕР№ РµРґРёРЅРёС†С‹ (РєРѕР»РёС‡РµСЃС‚РІРѕ Р·РЅР°РєРѕРІ РїРѕСЃР»Рµ Р·Р°РїСЏС‚РѕР№ РІ РґРµСЃСЏС‚РёС‡РЅРѕР№ РґСЂРѕР±Рё)
+' TranslateFrac - (РїРѕРєР° РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ) РµСЃР»Рё True С‚Р°РєР¶Рµ РїРµСЂРµРІРѕРґРёС‚СЃСЏ РІ С‚РµРєСЃС‚ РґСЂРѕР±РЅР°СЏ С‡Р°СЃС‚СЊ
 '-------------------------
-' ToDo: !!! подчистить правила склонения !!! - код слишком запутанный надо пересмотреть
+' ToDo: !!! РїРѕРґС‡РёСЃС‚РёС‚СЊ РїСЂР°РІРёР»Р° СЃРєР»РѕРЅРµРЅРёСЏ !!! - РєРѕРґ СЃР»РёС€РєРѕРј Р·Р°РїСѓС‚Р°РЅРЅС‹Р№ РЅР°РґРѕ РїРµСЂРµСЃРјРѕС‚СЂРµС‚СЊ
 '-------------------------
-' как это должно быть:
-    ' 23,50     - двадцать три рубля пятьдесят копеек
-    ' 23 1/2    - двадцать три целых одна вторая рубля
-    '(вариант)  - двадцать три и одна вторая рубля
-' SubUnit и DecimalPlaces в десятичной дроби должны соответствовать друг другу.
-' т.е. если Unit = "рубль"     и SubUnit = "копейка",  DecimalPlaces д.б. = 2 (1/100 руб.),
-'    а если Unit = "килограмм" и SubUnit = "грамм",    DecimalPlaces д.б. = 3 (1/1000 кг)
-' !!! не выйдет фокус вроде: NumToWords(Day(Now), Unit:=LCase(Format(Now, "mmmm")), NewType:=NumeralCardinal, NewCase:=DeclineCaseImen, NewGend:=DeclineGendNeut)
-'     на выходе мы ожидаем что-то вроде "первое января", а получим: "первый январь", потому что программа правильно посчитает, что мы пересчитываем количество январей,
-'     а совсем не то, что вы наверное имели ввиду: "первое (число) января", чтобы получилось надо отдельно просклонять число, отдельно месяц (в род.пад.)
-'     правильно надо: NumToWords(Day(Now), NewType:=NumeralCardinal, NewCase:=DeclineCaseImen, NewGend:=DeclineGendNeut) & " " & DeclineWord(LCase(Format(Now, "mmmm")),DeclineCaseRod)
-' !!! контроль соответствия размерности обозначения дробной части знаменателю дроби не производится
-    ' например, - если DecimalPlaces не определено (=0)
-    ' все варианты типа: "0,1";"0,01" и "0,001" "рубль"/"копейка"
-    ' будут выведены как "ноль рублей одна копейка"
-' также получится ерунда если задать SubUnit и оставить пустым Unit:
-    ' "четыре целых десять копеек" ??? - даже не знаю как это правильно можно обработать...
-' или попробовать вывести дробь как порядковое
-    ' "первый и двенадцать сотых рубля" ??? - это вообще как должно правильно звучать?
+' РєР°Рє СЌС‚Рѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ:
+    ' 23,50     - РґРІР°РґС†Р°С‚СЊ С‚СЂРё СЂСѓР±Р»СЏ РїСЏС‚СЊРґРµСЃСЏС‚ РєРѕРїРµРµРє
+    ' 23 1/2    - РґРІР°РґС†Р°С‚СЊ С‚СЂРё С†РµР»С‹С… РѕРґРЅР° РІС‚РѕСЂР°СЏ СЂСѓР±Р»СЏ
+    '(РІР°СЂРёР°РЅС‚)  - РґРІР°РґС†Р°С‚СЊ С‚СЂРё Рё РѕРґРЅР° РІС‚РѕСЂР°СЏ СЂСѓР±Р»СЏ
+' SubUnit Рё DecimalPlaces РІ РґРµСЃСЏС‚РёС‡РЅРѕР№ РґСЂРѕР±Рё РґРѕР»Р¶РЅС‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°С‚СЊ РґСЂСѓРі РґСЂСѓРіСѓ.
+' С‚.Рµ. РµСЃР»Рё Unit = "СЂСѓР±Р»СЊ"     Рё SubUnit = "РєРѕРїРµР№РєР°",  DecimalPlaces Рґ.Р±. = 2 (1/100 СЂСѓР±.),
+'    Р° РµСЃР»Рё Unit = "РєРёР»РѕРіСЂР°РјРј" Рё SubUnit = "РіСЂР°РјРј",    DecimalPlaces Рґ.Р±. = 3 (1/1000 РєРі)
+' !!! РЅРµ РІС‹Р№РґРµС‚ С„РѕРєСѓСЃ РІСЂРѕРґРµ: NumToWords(Day(Now), Unit:=LCase(Format(Now, "mmmm")), NewType:=NumeralCardinal, NewCase:=DeclineCaseImen, NewGend:=DeclineGendNeut)
+'     РЅР° РІС‹С…РѕРґРµ РјС‹ РѕР¶РёРґР°РµРј С‡С‚Рѕ-С‚Рѕ РІСЂРѕРґРµ "РїРµСЂРІРѕРµ СЏРЅРІР°СЂСЏ", Р° РїРѕР»СѓС‡РёРј: "РїРµСЂРІС‹Р№ СЏРЅРІР°СЂСЊ", РїРѕС‚РѕРјСѓ С‡С‚Рѕ РїСЂРѕРіСЂР°РјРјР° РїСЂР°РІРёР»СЊРЅРѕ РїРѕСЃС‡РёС‚Р°РµС‚, С‡С‚Рѕ РјС‹ РїРµСЂРµСЃС‡РёС‚С‹РІР°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ СЏРЅРІР°СЂРµР№,
+'     Р° СЃРѕРІСЃРµРј РЅРµ С‚Рѕ, С‡С‚Рѕ РІС‹ РЅР°РІРµСЂРЅРѕРµ РёРјРµР»Рё РІРІРёРґСѓ: "РїРµСЂРІРѕРµ (С‡РёСЃР»Рѕ) СЏРЅРІР°СЂСЏ", С‡С‚РѕР±С‹ РїРѕР»СѓС‡РёР»РѕСЃСЊ РЅР°РґРѕ РѕС‚РґРµР»СЊРЅРѕ РїСЂРѕСЃРєР»РѕРЅСЏС‚СЊ С‡РёСЃР»Рѕ, РѕС‚РґРµР»СЊРЅРѕ РјРµСЃСЏС† (РІ СЂРѕРґ.РїР°Рґ.)
+'     РїСЂР°РІРёР»СЊРЅРѕ РЅР°РґРѕ: NumToWords(Day(Now), NewType:=NumeralCardinal, NewCase:=DeclineCaseImen, NewGend:=DeclineGendNeut) & " " & DeclineWord(LCase(Format(Now, "mmmm")),DeclineCaseRod)
+' !!! РєРѕРЅС‚СЂРѕР»СЊ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РѕР±РѕР·РЅР°С‡РµРЅРёСЏ РґСЂРѕР±РЅРѕР№ С‡Р°СЃС‚Рё Р·РЅР°РјРµРЅР°С‚РµР»СЋ РґСЂРѕР±Рё РЅРµ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ
+    ' РЅР°РїСЂРёРјРµСЂ, - РµСЃР»Рё DecimalPlaces РЅРµ РѕРїСЂРµРґРµР»РµРЅРѕ (=0)
+    ' РІСЃРµ РІР°СЂРёР°РЅС‚С‹ С‚РёРїР°: "0,1";"0,01" Рё "0,001" "СЂСѓР±Р»СЊ"/"РєРѕРїРµР№РєР°"
+    ' Р±СѓРґСѓС‚ РІС‹РІРµРґРµРЅС‹ РєР°Рє "РЅРѕР»СЊ СЂСѓР±Р»РµР№ РѕРґРЅР° РєРѕРїРµР№РєР°"
+' С‚Р°РєР¶Рµ РїРѕР»СѓС‡РёС‚СЃСЏ РµСЂСѓРЅРґР° РµСЃР»Рё Р·Р°РґР°С‚СЊ SubUnit Рё РѕСЃС‚Р°РІРёС‚СЊ РїСѓСЃС‚С‹Рј Unit:
+    ' "С‡РµС‚С‹СЂРµ С†РµР»С‹С… РґРµСЃСЏС‚СЊ РєРѕРїРµРµРє" ??? - РґР°Р¶Рµ РЅРµ Р·РЅР°СЋ РєР°Рє СЌС‚Рѕ РїСЂР°РІРёР»СЊРЅРѕ РјРѕР¶РЅРѕ РѕР±СЂР°Р±РѕС‚Р°С‚СЊ...
+' РёР»Рё РїРѕРїСЂРѕР±РѕРІР°С‚СЊ РІС‹РІРµСЃС‚Рё РґСЂРѕР±СЊ РєР°Рє РїРѕСЂСЏРґРєРѕРІРѕРµ
+    ' "РїРµСЂРІС‹Р№ Рё РґРІРµРЅР°РґС†Р°С‚СЊ СЃРѕС‚С‹С… СЂСѓР±Р»СЏ" ??? - СЌС‚Рѕ РІРѕРѕР±С‰Рµ РєР°Рє РґРѕР»Р¶РЅРѕ РїСЂР°РІРёР»СЊРЅРѕ Р·РІСѓС‡Р°С‚СЊ?
 '-------------------------
-Const сShowNullInWhole = True   ' выводить нулевую целую часть
-'Const сShowOnesInDemom = True   ' выводить единичные разряды в знаменателе (одна однотысячная","тысячная)
-Const сEmptyWholeUnit = "целая" ' обозначение целой части если не задана единица измерения
-Const сEmptyWholeUnit2 = "и"    ' текстовой разделитель целой и дробной части дроби если не заданы единицы измерения
+Const СЃShowNullInWhole = True   ' РІС‹РІРѕРґРёС‚СЊ РЅСѓР»РµРІСѓСЋ С†РµР»СѓСЋ С‡Р°СЃС‚СЊ
+'Const СЃShowOnesInDemom = True   ' РІС‹РІРѕРґРёС‚СЊ РµРґРёРЅРёС‡РЅС‹Рµ СЂР°Р·СЂСЏРґС‹ РІ Р·РЅР°РјРµРЅР°С‚РµР»Рµ (РѕРґРЅР° РѕРґРЅРѕС‚С‹СЃСЏС‡РЅР°СЏ","С‚С‹СЃСЏС‡РЅР°СЏ)
+Const СЃEmptyWholeUnit = "С†РµР»Р°СЏ" ' РѕР±РѕР·РЅР°С‡РµРЅРёРµ С†РµР»РѕР№ С‡Р°СЃС‚Рё РµСЃР»Рё РЅРµ Р·Р°РґР°РЅР° РµРґРёРЅРёС†Р° РёР·РјРµСЂРµРЅРёСЏ
+Const СЃEmptyWholeUnit2 = "Рё"    ' С‚РµРєСЃС‚РѕРІРѕР№ СЂР°Р·РґРµР»РёС‚РµР»СЊ С†РµР»РѕР№ Рё РґСЂРѕР±РЅРѕР№ С‡Р°СЃС‚Рё РґСЂРѕР±Рё РµСЃР»Рё РЅРµ Р·Р°РґР°РЅС‹ РµРґРёРЅРёС†С‹ РёР·РјРµСЂРµРЅРёСЏ
 
-Const cWhlDelim = " "   ' Chr(32)  - разделитель целой/дробной части натуральной дроби
-Const cNatDelim = "/"   ' Chr(47)  - разделитель числителя/знаменателя натуральной дроби
-Dim cDecDelim As String * 1: cDecDelim = p_GetLocaleInfo(LOCALE_SDECIMAL)   ' Chr(44)  - разделитель целой/дробной части десятичной дроби
-Dim cPosDelim As String * 1: cPosDelim = p_GetLocaleInfo(LOCALE_STHOUSAND)  ' Chr(160) - разделитель разрядов целой части
+Const cWhlDelim = " "   ' Chr(32)  - СЂР°Р·РґРµР»РёС‚РµР»СЊ С†РµР»РѕР№/РґСЂРѕР±РЅРѕР№ С‡Р°СЃС‚Рё РЅР°С‚СѓСЂР°Р»СЊРЅРѕР№ РґСЂРѕР±Рё
+Const cNatDelim = "/"   ' Chr(47)  - СЂР°Р·РґРµР»РёС‚РµР»СЊ С‡РёСЃР»РёС‚РµР»СЏ/Р·РЅР°РјРµРЅР°С‚РµР»СЏ РЅР°С‚СѓСЂР°Р»СЊРЅРѕР№ РґСЂРѕР±Рё
+Dim cDecDelim As String * 1: cDecDelim = p_GetLocaleInfo(LOCALE_SDECIMAL)   ' Chr(44)  - СЂР°Р·РґРµР»РёС‚РµР»СЊ С†РµР»РѕР№/РґСЂРѕР±РЅРѕР№ С‡Р°СЃС‚Рё РґРµСЃСЏС‚РёС‡РЅРѕР№ РґСЂРѕР±Рё
+Dim cPosDelim As String * 1: cPosDelim = p_GetLocaleInfo(LOCALE_STHOUSAND)  ' Chr(160) - СЂР°Р·РґРµР»РёС‚РµР»СЊ СЂР°Р·СЂСЏРґРѕРІ С†РµР»РѕР№ С‡Р°СЃС‚Рё
 
 Dim strWhole As String, strNomin As String, strDenom As String
 Dim bolWhole As Boolean, bolNomin As Boolean, bolDenom As Boolean
-Dim bytStep As Byte     ' текущий шаг обработки: 1-целая часть,2-числитель,3-знаменатель,0-не определено
+Dim bytStep As Byte     ' С‚РµРєСѓС‰РёР№ С€Р°Рі РѕР±СЂР°Р±РѕС‚РєРё: 1-С†РµР»Р°СЏ С‡Р°СЃС‚СЊ,2-С‡РёСЃР»РёС‚РµР»СЊ,3-Р·РЅР°РјРµРЅР°С‚РµР»СЊ,0-РЅРµ РѕРїСЂРµРґРµР»РµРЅРѕ
 Dim Result As String
     Result = vbNullString
     bolWhole = False: bolNomin = False: bolDenom = False
     On Error GoTo HandleError
     Number = Trim$(Number): Unit = Trim$(Unit): SubUnit = Trim$(SubUnit)
-' делим на целую и дробную часть
-    ' очищаем компоненты числа от разделителей разрядов и пробелов
-    ' Replace вместо CLng потому что исходная задача -
-    ' обрабатывать числа в том числе выходящие за ограничения типа Long
+' РґРµР»РёРј РЅР° С†РµР»СѓСЋ Рё РґСЂРѕР±РЅСѓСЋ С‡Р°СЃС‚СЊ
+    ' РѕС‡РёС‰Р°РµРј РєРѕРјРїРѕРЅРµРЅС‚С‹ С‡РёСЃР»Р° РѕС‚ СЂР°Р·РґРµР»РёС‚РµР»РµР№ СЂР°Р·СЂСЏРґРѕРІ Рё РїСЂРѕР±РµР»РѕРІ
+    ' Replace РІРјРµСЃС‚Рѕ CLng РїРѕС‚РѕРјСѓ С‡С‚Рѕ РёСЃС…РѕРґРЅР°СЏ Р·Р°РґР°С‡Р° -
+    ' РѕР±СЂР°Р±Р°С‚С‹РІР°С‚СЊ С‡РёСЃР»Р° РІ С‚РѕРј С‡РёСЃР»Рµ РІС‹С…РѕРґСЏС‰РёРµ Р·Р° РѕРіСЂР°РЅРёС‡РµРЅРёСЏ С‚РёРїР° Long
 Dim tmpSymPos As Long: tmpSymPos = Nz(InStrRev(Number, cDecDelim), 0)
     If (tmpSymPos > 0) Then
-' десятичная дробь
-    ' знаменатель десятичной дроби выводим если не задано обозначение дробной части
+' РґРµСЃСЏС‚РёС‡РЅР°СЏ РґСЂРѕР±СЊ
+    ' Р·РЅР°РјРµРЅР°С‚РµР»СЊ РґРµСЃСЏС‚РёС‡РЅРѕР№ РґСЂРѕР±Рё РІС‹РІРѕРґРёРј РµСЃР»Рё РЅРµ Р·Р°РґР°РЅРѕ РѕР±РѕР·РЅР°С‡РµРЅРёРµ РґСЂРѕР±РЅРѕР№ С‡Р°СЃС‚Рё
         bolDenom = Len(SubUnit) = 0
         strWhole = VBA.Left$(Number, tmpSymPos - 1)
         strNomin = VBA.Mid$(Number, tmpSymPos + Len(cDecDelim), Len(Number) - tmpSymPos)
-    ' формируем знаменатель десятичной дроби
-    ' количество десятичных знаков в знаменателе м.б. от 1 до макс известного программе 10^33. опреджеляем по индексу массива от i=37 (тысяча) и далее
+    ' С„РѕСЂРјРёСЂСѓРµРј Р·РЅР°РјРµРЅР°С‚РµР»СЊ РґРµСЃСЏС‚РёС‡РЅРѕР№ РґСЂРѕР±Рё
+    ' РєРѕР»РёС‡РµСЃС‚РІРѕ РґРµСЃСЏС‚РёС‡РЅС‹С… Р·РЅР°РєРѕРІ РІ Р·РЅР°РјРµРЅР°С‚РµР»Рµ Рј.Р±. РѕС‚ 1 РґРѕ РјР°РєСЃ РёР·РІРµСЃС‚РЅРѕРіРѕ РїСЂРѕРіСЂР°РјРјРµ 10^33. РѕРїСЂРµРґР¶РµР»СЏРµРј РїРѕ РёРЅРґРµРєСЃСѓ РјР°СЃСЃРёРІР° РѕС‚ i=37 (С‚С‹СЃСЏС‡Р°) Рё РґР°Р»РµРµ
         If bolDenom Then
-        ' если размерность единицы не указана - считаем по количеству разрядов в числителе
+        ' РµСЃР»Рё СЂР°Р·РјРµСЂРЅРѕСЃС‚СЊ РµРґРёРЅРёС†С‹ РЅРµ СѓРєР°Р·Р°РЅР° - СЃС‡РёС‚Р°РµРј РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ СЂР°Р·СЂСЏРґРѕРІ РІ С‡РёСЃР»РёС‚РµР»Рµ
             DecimalPlaces = Len(strNomin)
         Else
-        ' если размерность единицы указана
+        ' РµСЃР»Рё СЂР°Р·РјРµСЂРЅРѕСЃС‚СЊ РµРґРёРЅРёС†С‹ СѓРєР°Р·Р°РЅР°
             Select Case Len(strNomin)
             Case Is < DecimalPlaces
-            ' если размерность вспомогательной единицы больше числа знаков после запятой -
-                ' дополняем числитель нулями до соответствия размерностей
+            ' РµСЃР»Рё СЂР°Р·РјРµСЂРЅРѕСЃС‚СЊ РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅРѕР№ РµРґРёРЅРёС†С‹ Р±РѕР»СЊС€Рµ С‡РёСЃР»Р° Р·РЅР°РєРѕРІ РїРѕСЃР»Рµ Р·Р°РїСЏС‚РѕР№ -
+                ' РґРѕРїРѕР»РЅСЏРµРј С‡РёСЃР»РёС‚РµР»СЊ РЅСѓР»СЏРјРё РґРѕ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№
                 strNomin = strNomin & String(DecimalPlaces - Len(strNomin), "0")
             Case Is > DecimalPlaces:
-            ' если размерность вспомогательной единицы меньше числа знаков после запятой -
-                ' будем отдельно брать целую часть и числитель
-                Result = NumToWords(strWhole, NewType:=NewType, NewCase:=NewCase, Unit:=Unit, Animate:=Animate, DecimalPlaces:=0)     ' целая часть
-                ' числитель превращаем в десятичную дробь по количеству допустимых разрядов
+            ' РµСЃР»Рё СЂР°Р·РјРµСЂРЅРѕСЃС‚СЊ РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅРѕР№ РµРґРёРЅРёС†С‹ РјРµРЅСЊС€Рµ С‡РёСЃР»Р° Р·РЅР°РєРѕРІ РїРѕСЃР»Рµ Р·Р°РїСЏС‚РѕР№ -
+                ' Р±СѓРґРµРј РѕС‚РґРµР»СЊРЅРѕ Р±СЂР°С‚СЊ С†РµР»СѓСЋ С‡Р°СЃС‚СЊ Рё С‡РёСЃР»РёС‚РµР»СЊ
+                Result = NumToWords(strWhole, NewType:=NewType, NewCase:=NewCase, Unit:=Unit, Animate:=Animate, DecimalPlaces:=0)     ' С†РµР»Р°СЏ С‡Р°СЃС‚СЊ
+                ' С‡РёСЃР»РёС‚РµР»СЊ РїСЂРµРІСЂР°С‰Р°РµРј РІ РґРµСЃСЏС‚РёС‡РЅСѓСЋ РґСЂРѕР±СЊ РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ РґРѕРїСѓСЃС‚РёРјС‹С… СЂР°Р·СЂСЏРґРѕРІ
                 strNomin = Left$(strNomin, DecimalPlaces) & cDecDelim & Mid$(strNomin, DecimalPlaces + 1)
-                Result = Result & " " & NumToWords(strNomin, NewType:=NewType, NewCase:=NewCase, Unit:=SubUnit, Animate:=Animate, DecimalPlaces:=0)  ' дробная часть
+                Result = Result & " " & NumToWords(strNomin, NewType:=NewType, NewCase:=NewCase, Unit:=SubUnit, Animate:=Animate, DecimalPlaces:=0)  ' РґСЂРѕР±РЅР°СЏ С‡Р°СЃС‚СЊ
                 GoTo HandleExit
             End Select
         End If
@@ -4482,96 +4492,96 @@ Dim tmpSymPos As Long: tmpSymPos = Nz(InStrRev(Number, cDecDelim), 0)
     Else
         tmpSymPos = Nz(InStrRev(Number, cNatDelim), 0)
         If tmpSymPos > 0 Then
-' натуральная дробь
-            bolDenom = True ' ставим признак что это натуральная дробь
-            SubUnit = vbNullString ' для натуральной дроби вспомогательная единица измерения не имеет смысла
-            ' знаменатель
+' РЅР°С‚СѓСЂР°Р»СЊРЅР°СЏ РґСЂРѕР±СЊ
+            bolDenom = True ' СЃС‚Р°РІРёРј РїСЂРёР·РЅР°Рє С‡С‚Рѕ СЌС‚Рѕ РЅР°С‚СѓСЂР°Р»СЊРЅР°СЏ РґСЂРѕР±СЊ
+            SubUnit = vbNullString ' РґР»СЏ РЅР°С‚СѓСЂР°Р»СЊРЅРѕР№ РґСЂРѕР±Рё РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅР°СЏ РµРґРёРЅРёС†Р° РёР·РјРµСЂРµРЅРёСЏ РЅРµ РёРјРµРµС‚ СЃРјС‹СЃР»Р°
+            ' Р·РЅР°РјРµРЅР°С‚РµР»СЊ
             strDenom = VBA.Mid$(Number, tmpSymPos + Len(cNatDelim))
             Number = VBA.Left$(Number, tmpSymPos - 1): tmpSymPos = Nz(InStrRev(Number, cWhlDelim), 0)
-            ' числитель
+            ' С‡РёСЃР»РёС‚РµР»СЊ
             strNomin = VBA.Mid$(Number, tmpSymPos + Len(cWhlDelim), Len(Number) - tmpSymPos)
-            ' целая часть
+            ' С†РµР»Р°СЏ С‡Р°СЃС‚СЊ
             If tmpSymPos > 0 Then strWhole = VBA.Left$(Number, tmpSymPos - 1)
         Else
-' целое число или не число
+' С†РµР»РѕРµ С‡РёСЃР»Рѕ РёР»Рё РЅРµ С‡РёСЃР»Рѕ
             strWhole = Number: strNomin = 0: strDenom = 1
         End If
     End If
-' определяем необходимость вывода частей числа
-    ' числитель выводим если он непустой
-    ' знаменатель выводим если он непустой
-        ' и ранее решено его выводить (натуральная дробь или десятичная без вспомогательной единицы)
-    ' целую часть выводим если он непустой
-        ' или если задан вывод нулевой целой части дроби
-        ' или если не задан вывод числителя (числитель пустой)
+' РѕРїСЂРµРґРµР»СЏРµРј РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚СЊ РІС‹РІРѕРґР° С‡Р°СЃС‚РµР№ С‡РёСЃР»Р°
+    ' С‡РёСЃР»РёС‚РµР»СЊ РІС‹РІРѕРґРёРј РµСЃР»Рё РѕРЅ РЅРµРїСѓСЃС‚РѕР№
+    ' Р·РЅР°РјРµРЅР°С‚РµР»СЊ РІС‹РІРѕРґРёРј РµСЃР»Рё РѕРЅ РЅРµРїСѓСЃС‚РѕР№
+        ' Рё СЂР°РЅРµРµ СЂРµС€РµРЅРѕ РµРіРѕ РІС‹РІРѕРґРёС‚СЊ (РЅР°С‚СѓСЂР°Р»СЊРЅР°СЏ РґСЂРѕР±СЊ РёР»Рё РґРµСЃСЏС‚РёС‡РЅР°СЏ Р±РµР· РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅРѕР№ РµРґРёРЅРёС†С‹)
+    ' С†РµР»СѓСЋ С‡Р°СЃС‚СЊ РІС‹РІРѕРґРёРј РµСЃР»Рё РѕРЅ РЅРµРїСѓСЃС‚РѕР№
+        ' РёР»Рё РµСЃР»Рё Р·Р°РґР°РЅ РІС‹РІРѕРґ РЅСѓР»РµРІРѕР№ С†РµР»РѕР№ С‡Р°СЃС‚Рё РґСЂРѕР±Рё
+        ' РёР»Рё РµСЃР»Рё РЅРµ Р·Р°РґР°РЅ РІС‹РІРѕРґ С‡РёСЃР»РёС‚РµР»СЏ (С‡РёСЃР»РёС‚РµР»СЊ РїСѓСЃС‚РѕР№)
     On Error Resume Next
     bolNomin = p_NumType(strNomin) > 0
     bolDenom = p_NumType(strDenom) > 0 And bolDenom
-    bolWhole = p_NumType(strWhole) > 0 Or сShowNullInWhole
+    bolWhole = p_NumType(strWhole) > 0 Or СЃShowNullInWhole
     On Error GoTo HandleError
     
-' переменные для хранения строк частей числа
-Dim strNumb As String   ' разбираемая часть числа (целая/числитель/знаменатель)
-Dim strWord As String   ' слово текущей части разбираемого числа
-Dim strDelim As String  ' разделитель слов (обычно = Chr(32)) в результате
-' переменные для хранения параметров текущего триплета числа
-Dim bytNumb As Byte     ' тип разбираемого числа (для склонения, см. p_NumType)
-Dim intTrip As Integer  ' содержимое текущего триплета разбираемой части числа
-Dim bytTrip As Byte     ' порядковый номер триплета числа (с конца, начиная с 0)
-Dim bolNull As Boolean  ' признак первого выводимого триплета. (нужно для правильного склонения)
-    ' True  - означает отсутствие вывода или вывод первого триплета ещё не завершён
-    '   т.е. при True при необходимости выводим единицу измерения,
-    '   также в случае порядкового при True для триплета >0 изменяем склонение всех слов триплета, для 1 только первого
-    ' False - первый доступный триплет уже выведен, идёт вывод старших триплетов
-' переменные для хранения параметров склонения strWord
-Dim tmpType  As NumeralType, tmpCase As DeclineCase, tmpNumb As DeclineNumb, tmpGend As DeclineGend  ' уточнённые (непосредственно используются при склонении)
-'Dim NewGend As DeclineGend: NewGend = DeclineGendUndef ' род обозначения
-' собираем строку справа
-    ' обработка в три прохода: для целой части, для числителя и для знаменателя
-    bytStep = 2                     ' начинаем с знаменателя
+' РїРµСЂРµРјРµРЅРЅС‹Рµ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЃС‚СЂРѕРє С‡Р°СЃС‚РµР№ С‡РёСЃР»Р°
+Dim strNumb As String   ' СЂР°Р·Р±РёСЂР°РµРјР°СЏ С‡Р°СЃС‚СЊ С‡РёСЃР»Р° (С†РµР»Р°СЏ/С‡РёСЃР»РёС‚РµР»СЊ/Р·РЅР°РјРµРЅР°С‚РµР»СЊ)
+Dim strWord As String   ' СЃР»РѕРІРѕ С‚РµРєСѓС‰РµР№ С‡Р°СЃС‚Рё СЂР°Р·Р±РёСЂР°РµРјРѕРіРѕ С‡РёСЃР»Р°
+Dim strDelim As String  ' СЂР°Р·РґРµР»РёС‚РµР»СЊ СЃР»РѕРІ (РѕР±С‹С‡РЅРѕ = Chr(32)) РІ СЂРµР·СѓР»СЊС‚Р°С‚Рµ
+' РїРµСЂРµРјРµРЅРЅС‹Рµ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ С‚РµРєСѓС‰РµРіРѕ С‚СЂРёРїР»РµС‚Р° С‡РёСЃР»Р°
+Dim bytNumb As Byte     ' С‚РёРї СЂР°Р·Р±РёСЂР°РµРјРѕРіРѕ С‡РёСЃР»Р° (РґР»СЏ СЃРєР»РѕРЅРµРЅРёСЏ, СЃРј. p_NumType)
+Dim intTrip As Integer  ' СЃРѕРґРµСЂР¶РёРјРѕРµ С‚РµРєСѓС‰РµРіРѕ С‚СЂРёРїР»РµС‚Р° СЂР°Р·Р±РёСЂР°РµРјРѕР№ С‡Р°СЃС‚Рё С‡РёСЃР»Р°
+Dim bytTrip As Byte     ' РїРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ С‚СЂРёРїР»РµС‚Р° С‡РёСЃР»Р° (СЃ РєРѕРЅС†Р°, РЅР°С‡РёРЅР°СЏ СЃ 0)
+Dim bolNull As Boolean  ' РїСЂРёР·РЅР°Рє РїРµСЂРІРѕРіРѕ РІС‹РІРѕРґРёРјРѕРіРѕ С‚СЂРёРїР»РµС‚Р°. (РЅСѓР¶РЅРѕ РґР»СЏ РїСЂР°РІРёР»СЊРЅРѕРіРѕ СЃРєР»РѕРЅРµРЅРёСЏ)
+    ' True  - РѕР·РЅР°С‡Р°РµС‚ РѕС‚СЃСѓС‚СЃС‚РІРёРµ РІС‹РІРѕРґР° РёР»Рё РІС‹РІРѕРґ РїРµСЂРІРѕРіРѕ С‚СЂРёРїР»РµС‚Р° РµС‰С‘ РЅРµ Р·Р°РІРµСЂС€С‘РЅ
+    '   С‚.Рµ. РїСЂРё True РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РІС‹РІРѕРґРёРј РµРґРёРЅРёС†Сѓ РёР·РјРµСЂРµРЅРёСЏ,
+    '   С‚Р°РєР¶Рµ РІ СЃР»СѓС‡Р°Рµ РїРѕСЂСЏРґРєРѕРІРѕРіРѕ РїСЂРё True РґР»СЏ С‚СЂРёРїР»РµС‚Р° >0 РёР·РјРµРЅСЏРµРј СЃРєР»РѕРЅРµРЅРёРµ РІСЃРµС… СЃР»РѕРІ С‚СЂРёРїР»РµС‚Р°, РґР»СЏ 1 С‚РѕР»СЊРєРѕ РїРµСЂРІРѕРіРѕ
+    ' False - РїРµСЂРІС‹Р№ РґРѕСЃС‚СѓРїРЅС‹Р№ С‚СЂРёРїР»РµС‚ СѓР¶Рµ РІС‹РІРµРґРµРЅ, РёРґС‘С‚ РІС‹РІРѕРґ СЃС‚Р°СЂС€РёС… С‚СЂРёРїР»РµС‚РѕРІ
+' РїРµСЂРµРјРµРЅРЅС‹Рµ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ СЃРєР»РѕРЅРµРЅРёСЏ strWord
+Dim tmpType  As NumeralType, tmpCase As DeclineCase, tmpNumb As DeclineNumb, tmpGend As DeclineGend  ' СѓС‚РѕС‡РЅС‘РЅРЅС‹Рµ (РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ РёСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ РїСЂРё СЃРєР»РѕРЅРµРЅРёРё)
+'Dim NewGend As DeclineGend: NewGend = DeclineGendUndef ' СЂРѕРґ РѕР±РѕР·РЅР°С‡РµРЅРёСЏ
+' СЃРѕР±РёСЂР°РµРј СЃС‚СЂРѕРєСѓ СЃРїСЂР°РІР°
+    ' РѕР±СЂР°Р±РѕС‚РєР° РІ С‚СЂРё РїСЂРѕС…РѕРґР°: РґР»СЏ С†РµР»РѕР№ С‡Р°СЃС‚Рё, РґР»СЏ С‡РёСЃР»РёС‚РµР»СЏ Рё РґР»СЏ Р·РЅР°РјРµРЅР°С‚РµР»СЏ
+    bytStep = 2                     ' РЅР°С‡РёРЅР°РµРј СЃ Р·РЅР°РјРµРЅР°С‚РµР»СЏ
     Do
-        bytTrip = 0                 ' порядковый номер триплета (справа)
-        bolNull = True              ' признак пустого вывода
-        strWord = vbNullString      ' обозначение ед.изм/разряда или слово текущего числа
-    ' если вся часть равна 0 и это число с дробной частью возможно следует опустить целую часть
-    ' ед.изм. Unit должна ставиться после целой части если есть дробная часть, это десятичная дробь и задан SubUnit
-    ' иначе ставится после знаменателя и склоняется относительно единицы (1)
-    ' т.е. "один рубль пятьдесят копеек", но "одна целая(и) пятьдесят сотых рубля" и "одна целая(и) одна вторая рубля"
-    '      "десять рублей пятьдесят копеек", но "десять целых(и) пятьдесят сотых рубля" и "десять целых(и) одна вторая рубля"
-    ' или  "одна верста пятьсот саженей", но "одна целая(и) пятьсот тысячных версты" или "одна целая(и) одна вторая версты"
-    '      "десять вёрст пятьсот саженей", но "десять целых(и) пятьсот тысячных версты" или "десять целых(и) одна вторая версты"
+        bytTrip = 0                 ' РїРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ С‚СЂРёРїР»РµС‚Р° (СЃРїСЂР°РІР°)
+        bolNull = True              ' РїСЂРёР·РЅР°Рє РїСѓСЃС‚РѕРіРѕ РІС‹РІРѕРґР°
+        strWord = vbNullString      ' РѕР±РѕР·РЅР°С‡РµРЅРёРµ РµРґ.РёР·Рј/СЂР°Р·СЂСЏРґР° РёР»Рё СЃР»РѕРІРѕ С‚РµРєСѓС‰РµРіРѕ С‡РёСЃР»Р°
+    ' РµСЃР»Рё РІСЃСЏ С‡Р°СЃС‚СЊ СЂР°РІРЅР° 0 Рё СЌС‚Рѕ С‡РёСЃР»Рѕ СЃ РґСЂРѕР±РЅРѕР№ С‡Р°СЃС‚СЊСЋ РІРѕР·РјРѕР¶РЅРѕ СЃР»РµРґСѓРµС‚ РѕРїСѓСЃС‚РёС‚СЊ С†РµР»СѓСЋ С‡Р°СЃС‚СЊ
+    ' РµРґ.РёР·Рј. Unit РґРѕР»Р¶РЅР° СЃС‚Р°РІРёС‚СЊСЃСЏ РїРѕСЃР»Рµ С†РµР»РѕР№ С‡Р°СЃС‚Рё РµСЃР»Рё РµСЃС‚СЊ РґСЂРѕР±РЅР°СЏ С‡Р°СЃС‚СЊ, СЌС‚Рѕ РґРµСЃСЏС‚РёС‡РЅР°СЏ РґСЂРѕР±СЊ Рё Р·Р°РґР°РЅ SubUnit
+    ' РёРЅР°С‡Рµ СЃС‚Р°РІРёС‚СЃСЏ РїРѕСЃР»Рµ Р·РЅР°РјРµРЅР°С‚РµР»СЏ Рё СЃРєР»РѕРЅСЏРµС‚СЃСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РµРґРёРЅРёС†С‹ (1)
+    ' С‚.Рµ. "РѕРґРёРЅ СЂСѓР±Р»СЊ РїСЏС‚СЊРґРµСЃСЏС‚ РєРѕРїРµРµРє", РЅРѕ "РѕРґРЅР° С†РµР»Р°СЏ(Рё) РїСЏС‚СЊРґРµСЃСЏС‚ СЃРѕС‚С‹С… СЂСѓР±Р»СЏ" Рё "РѕРґРЅР° С†РµР»Р°СЏ(Рё) РѕРґРЅР° РІС‚РѕСЂР°СЏ СЂСѓР±Р»СЏ"
+    '      "РґРµСЃСЏС‚СЊ СЂСѓР±Р»РµР№ РїСЏС‚СЊРґРµСЃСЏС‚ РєРѕРїРµРµРє", РЅРѕ "РґРµСЃСЏС‚СЊ С†РµР»С‹С…(Рё) РїСЏС‚СЊРґРµСЃСЏС‚ СЃРѕС‚С‹С… СЂСѓР±Р»СЏ" Рё "РґРµСЃСЏС‚СЊ С†РµР»С‹С…(Рё) РѕРґРЅР° РІС‚РѕСЂР°СЏ СЂСѓР±Р»СЏ"
+    ' РёР»Рё  "РѕРґРЅР° РІРµСЂСЃС‚Р° РїСЏС‚СЊСЃРѕС‚ СЃР°Р¶РµРЅРµР№", РЅРѕ "РѕРґРЅР° С†РµР»Р°СЏ(Рё) РїСЏС‚СЊСЃРѕС‚ С‚С‹СЃСЏС‡РЅС‹С… РІРµСЂСЃС‚С‹" РёР»Рё "РѕРґРЅР° С†РµР»Р°СЏ(Рё) РѕРґРЅР° РІС‚РѕСЂР°СЏ РІРµСЂСЃС‚С‹"
+    '      "РґРµСЃСЏС‚СЊ РІС‘СЂСЃС‚ РїСЏС‚СЊСЃРѕС‚ СЃР°Р¶РµРЅРµР№", РЅРѕ "РґРµСЃСЏС‚СЊ С†РµР»С‹С…(Рё) РїСЏС‚СЊСЃРѕС‚ С‚С‹СЃСЏС‡РЅС‹С… РІРµСЂСЃС‚С‹" РёР»Рё "РґРµСЃСЏС‚СЊ С†РµР»С‹С…(Рё) РѕРґРЅР° РІС‚РѕСЂР°СЏ РІРµСЂСЃС‚С‹"
         Select Case bytStep
-        Case 0: If bolWhole Then strNumb = strWhole: strWord = IIf((Len(Unit) = 0) Or bolDenom Or (bolNomin And (Len(SubUnit) = 0)), IIf(bolNomin, IIf(NewType = NumeralCardinal, сEmptyWholeUnit2, сEmptyWholeUnit), vbNullString), Unit): GoTo HandleBegin
+        Case 0: If bolWhole Then strNumb = strWhole: strWord = IIf((Len(Unit) = 0) Or bolDenom Or (bolNomin And (Len(SubUnit) = 0)), IIf(bolNomin, IIf(NewType = NumeralCardinal, СЃEmptyWholeUnit2, СЃEmptyWholeUnit), vbNullString), Unit): GoTo HandleBegin
         Case 1: If bolNomin Then strNumb = strNomin: strWord = IIf(bolDenom, vbNullString, SubUnit): GoTo HandleBegin
         Case 2: If bolDenom Then strNumb = strDenom: strWord = Unit: GoTo HandleBegin
         Case Else: Exit Do
         End Select
         GoTo HandleNextPart
 HandleBegin:
-' начало обработки части числа
-    ' подготовка строки разбираемой части числа
-        If Len(strNumb) = 0 Then strNumb = 0        ' пустая строка = 0
-        ' очищаем от разделителей разрядов и пробелов
+' РЅР°С‡Р°Р»Рѕ РѕР±СЂР°Р±РѕС‚РєРё С‡Р°СЃС‚Рё С‡РёСЃР»Р°
+    ' РїРѕРґРіРѕС‚РѕРІРєР° СЃС‚СЂРѕРєРё СЂР°Р·Р±РёСЂР°РµРјРѕР№ С‡Р°СЃС‚Рё С‡РёСЃР»Р°
+        If Len(strNumb) = 0 Then strNumb = 0        ' РїСѓСЃС‚Р°СЏ СЃС‚СЂРѕРєР° = 0
+        ' РѕС‡РёС‰Р°РµРј РѕС‚ СЂР°Р·РґРµР»РёС‚РµР»РµР№ СЂР°Р·СЂСЏРґРѕРІ Рё РїСЂРѕР±РµР»РѕРІ
         strNumb = Replace$(Replace(strNumb, cPosDelim, vbNullString), Space(1), vbNullString)
-        ' убираем нули вначале (кроме числа целиком состоящего из нулей)
+        ' СѓР±РёСЂР°РµРј РЅСѓР»Рё РІРЅР°С‡Р°Р»Рµ (РєСЂРѕРјРµ С‡РёСЃР»Р° С†РµР»РёРєРѕРј СЃРѕСЃС‚РѕСЏС‰РµРіРѕ РёР· РЅСѓР»РµР№)
         tmpSymPos = 1: Do While VBA.Mid$(strNumb, tmpSymPos, 1) = "0": tmpSymPos = tmpSymPos + 1: Loop: If (tmpSymPos > 1) Then If (tmpSymPos > Len(strNumb)) Then strNumb = "0" Else strNumb = VBA.Mid$(strNumb, tmpSymPos)
-    ' определяем тип числа (см.p_NumType) необходимо для правильного склонения
+    ' РѕРїСЂРµРґРµР»СЏРµРј С‚РёРї С‡РёСЃР»Р° (СЃРј.p_NumType) РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ РїСЂР°РІРёР»СЊРЅРѕРіРѕ СЃРєР»РѕРЅРµРЅРёСЏ
         Select Case bytStep
         Case 0: bytNumb = p_NumType(strNumb):   tmpType = NewType
         Case 1: bytNumb = p_NumType(strNumb):   If bolDenom Then tmpType = NumeralOrdinal Else tmpType = NewType
         Case 2: bytNumb = p_NumType(strNomin):  tmpType = NumeralCardinal  ': tmpCase = DeclineCaseImen
         End Select
         
-' начало обработки числа
-        intTrip = Abs(CInt(VBA.Right$(strNumb, 3))) ' берём младший (0) триплет числа
+' РЅР°С‡Р°Р»Рѕ РѕР±СЂР°Р±РѕС‚РєРё С‡РёСЃР»Р°
+        intTrip = Abs(CInt(VBA.Right$(strNumb, 3))) ' Р±РµСЂС‘Рј РјР»Р°РґС€РёР№ (0) С‚СЂРёРїР»РµС‚ С‡РёСЃР»Р°
 HandleUnits:
-' обозначение единицы измерения, получаем его род и добавляем его к результирующей строке части числа
-    ' если вывода ещё не было (это первый не пустой триплет) в strWord сейчас единица измерения части или пусто
+' РѕР±РѕР·РЅР°С‡РµРЅРёРµ РµРґРёРЅРёС†С‹ РёР·РјРµСЂРµРЅРёСЏ, РїРѕР»СѓС‡Р°РµРј РµРіРѕ СЂРѕРґ Рё РґРѕР±Р°РІР»СЏРµРј РµРіРѕ Рє СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµР№ СЃС‚СЂРѕРєРµ С‡Р°СЃС‚Рё С‡РёСЃР»Р°
+    ' РµСЃР»Рё РІС‹РІРѕРґР° РµС‰С‘ РЅРµ Р±С‹Р»Рѕ (СЌС‚Рѕ РїРµСЂРІС‹Р№ РЅРµ РїСѓСЃС‚РѕР№ С‚СЂРёРїР»РµС‚) РІ strWord СЃРµР№С‡Р°СЃ РµРґРёРЅРёС†Р° РёР·РјРµСЂРµРЅРёСЏ С‡Р°СЃС‚Рё РёР»Рё РїСѓСЃС‚Рѕ
         tmpGend = DeclineGendUndef
         If Len(strWord) > 0 Then
-    ' склоняем обозначение единицы измерения и определяем его род
-        ' число слова.  ед.ч для чисел на 1 (кроме 11) и чисел на 2-4 (кроме 12-14) в им.,род. и вин.п., остальные - во мн.ч.
-        ' падеж слова.  NewCase, кроме им. и вин.п. для чисел не заканчивающихся на 1 (кроме 11) они в род.п.
+    ' СЃРєР»РѕРЅСЏРµРј РѕР±РѕР·РЅР°С‡РµРЅРёРµ РµРґРёРЅРёС†С‹ РёР·РјРµСЂРµРЅРёСЏ Рё РѕРїСЂРµРґРµР»СЏРµРј РµРіРѕ СЂРѕРґ
+        ' С‡РёСЃР»Рѕ СЃР»РѕРІР°.  РµРґ.С‡ РґР»СЏ С‡РёСЃРµР» РЅР° 1 (РєСЂРѕРјРµ 11) Рё С‡РёСЃРµР» РЅР° 2-4 (РєСЂРѕРјРµ 12-14) РІ РёРј.,СЂРѕРґ. Рё РІРёРЅ.Рї., РѕСЃС‚Р°Р»СЊРЅС‹Рµ - РІРѕ РјРЅ.С‡.
+        ' РїР°РґРµР¶ СЃР»РѕРІР°.  NewCase, РєСЂРѕРјРµ РёРј. Рё РІРёРЅ.Рї. РґР»СЏ С‡РёСЃРµР» РЅРµ Р·Р°РєР°РЅС‡РёРІР°СЋС‰РёС…СЃСЏ РЅР° 1 (РєСЂРѕРјРµ 11) РѕРЅРё РІ СЂРѕРґ.Рї.
             tmpCase = NewCase: tmpNumb = DeclineNumbPlural
             If (bytStep = 2) Or (tmpType = NumeralCardinal) Then
                 tmpNumb = DeclineNumbSingle: If (bytStep = 2) Then tmpCase = DeclineCaseRod
@@ -4583,31 +4593,31 @@ HandleUnits:
                 Case Else:  If (tmpCase = DeclineCaseImen) Or (tmpCase = DeclineCaseVin) Then tmpCase = DeclineCaseRod
                 End Select
             End If
-            ' уточняем для обозначений - прилагательных
+            ' СѓС‚РѕС‡РЅСЏРµРј РґР»СЏ РѕР±РѕР·РЅР°С‡РµРЅРёР№ - РїСЂРёР»Р°РіР°С‚РµР»СЊРЅС‹С…
             If bytNumb = 2 Then If p_GetWordSpeechPartType(strWord) = SpeechPartTypeAdject Then tmpNumb = DeclineNumbPlural
-        ' склоняем и запись в результат
+        ' СЃРєР»РѕРЅСЏРµРј Рё Р·Р°РїРёСЃСЊ РІ СЂРµР·СѓР»СЊС‚Р°С‚
             strWord = DeclineWord(strWord, tmpCase, tmpNumb, tmpGend, Animate): If tmpGend <> DeclineGendUndef Then NewGend = tmpGend
             If Len(Result) > 0 Then Result = strWord & strDelim & Result Else Result = strWord
         End If
-        ' род числительного - по роду ед.измерения/разряда/если не определен - муж.род (двадцать один), жен.род (одна целая две сотых)
+        ' СЂРѕРґ С‡РёСЃР»РёС‚РµР»СЊРЅРѕРіРѕ - РїРѕ СЂРѕРґСѓ РµРґ.РёР·РјРµСЂРµРЅРёСЏ/СЂР°Р·СЂСЏРґР°/РµСЃР»Рё РЅРµ РѕРїСЂРµРґРµР»РµРЅ - РјСѓР¶.СЂРѕРґ (РґРІР°РґС†Р°С‚СЊ РѕРґРёРЅ), Р¶РµРЅ.СЂРѕРґ (РѕРґРЅР° С†РµР»Р°СЏ РґРІРµ СЃРѕС‚С‹С…)
         If tmpGend = DeclineGendUndef Then If NewGend = DeclineGendUndef Then tmpGend = DeclineGendMale Else tmpGend = NewGend
         'If tmpGend = DeclineGendUndef Then If NewGend = DeclineGendUndef Then tmpGend = DeclineGendFem Else tmpGend = NewGend
         Do
-' делим часть числа на триплеты разрядов (перебираем цифры справа по 3).
-' первый уже получен и находится в intTrip, в bytTrip - порядковый номер текущего триплета
+' РґРµР»РёРј С‡Р°СЃС‚СЊ С‡РёСЃР»Р° РЅР° С‚СЂРёРїР»РµС‚С‹ СЂР°Р·СЂСЏРґРѕРІ (РїРµСЂРµР±РёСЂР°РµРј С†РёС„СЂС‹ СЃРїСЂР°РІР° РїРѕ 3).
+' РїРµСЂРІС‹Р№ СѓР¶Рµ РїРѕР»СѓС‡РµРЅ Рё РЅР°С…РѕРґРёС‚СЃСЏ РІ intTrip, РІ bytTrip - РїРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ С‚РµРєСѓС‰РµРіРѕ С‚СЂРёРїР»РµС‚Р°
 HandleThousands:
-' обозначение разряда, получаем его род и добавляем его к результирующей строке части числа
-            strDelim = Space(1)         ' разделитель элементов числа - пробел (кроме составных порядковых)
-    ' пропускаем пустые триплеты (кроме младшего. 0 в младшем - возможно 0 целых)
+' РѕР±РѕР·РЅР°С‡РµРЅРёРµ СЂР°Р·СЂСЏРґР°, РїРѕР»СѓС‡Р°РµРј РµРіРѕ СЂРѕРґ Рё РґРѕР±Р°РІР»СЏРµРј РµРіРѕ Рє СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµР№ СЃС‚СЂРѕРєРµ С‡Р°СЃС‚Рё С‡РёСЃР»Р°
+            strDelim = Space(1)         ' СЂР°Р·РґРµР»РёС‚РµР»СЊ СЌР»РµРјРµРЅС‚РѕРІ С‡РёСЃР»Р° - РїСЂРѕР±РµР» (РєСЂРѕРјРµ СЃРѕСЃС‚Р°РІРЅС‹С… РїРѕСЂСЏРґРєРѕРІС‹С…)
+    ' РїСЂРѕРїСѓСЃРєР°РµРј РїСѓСЃС‚С‹Рµ С‚СЂРёРїР»РµС‚С‹ (РєСЂРѕРјРµ РјР»Р°РґС€РµРіРѕ. 0 РІ РјР»Р°РґС€РµРј - РІРѕР·РјРѕР¶РЅРѕ 0 С†РµР»С‹С…)
             If intTrip = 0 Then If (Not bolWhole) Or (bytStep <> 0) Or (bytNumb <> 0) Then GoTo HandleNextTriplet
-    ' у нулевого триплета нет своего обозначения разряда, его - пропускаем
+    ' Сѓ РЅСѓР»РµРІРѕРіРѕ С‚СЂРёРїР»РµС‚Р° РЅРµС‚ СЃРІРѕРµРіРѕ РѕР±РѕР·РЅР°С‡РµРЅРёСЏ СЂР°Р·СЂСЏРґР°, РµРіРѕ - РїСЂРѕРїСѓСЃРєР°РµРј
             If bytTrip = 0 Then GoTo HandleDigits
-    ' для старших триплетов получаем обозначение разряда, склоняем его и определяем его род
-        ' обозначение разряда - порядковое, число соответствующее разряду
-        ' род обозначения разряда используется при склонении старших триплетов числительного
-    ' склоняем обозначение разряда и определяем его род
-        ' число слова.  ед.ч для чисел на 1 (кроме 11) и чисел на 2-4 (кроме 12-14) в им.,род. и вин.п., остальные - во мн.ч.
-        ' падеж слова.  NewCase, кроме им.,род. и вин.п. для чисел не заканчивающихся на 1 (кроме 11) они в род.п.
+    ' РґР»СЏ СЃС‚Р°СЂС€РёС… С‚СЂРёРїР»РµС‚РѕРІ РїРѕР»СѓС‡Р°РµРј РѕР±РѕР·РЅР°С‡РµРЅРёРµ СЂР°Р·СЂСЏРґР°, СЃРєР»РѕРЅСЏРµРј РµРіРѕ Рё РѕРїСЂРµРґРµР»СЏРµРј РµРіРѕ СЂРѕРґ
+        ' РѕР±РѕР·РЅР°С‡РµРЅРёРµ СЂР°Р·СЂСЏРґР° - РїРѕСЂСЏРґРєРѕРІРѕРµ, С‡РёСЃР»Рѕ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРµ СЂР°Р·СЂСЏРґСѓ
+        ' СЂРѕРґ РѕР±РѕР·РЅР°С‡РµРЅРёСЏ СЂР°Р·СЂСЏРґР° РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РїСЂРё СЃРєР»РѕРЅРµРЅРёРё СЃС‚Р°СЂС€РёС… С‚СЂРёРїР»РµС‚РѕРІ С‡РёСЃР»РёС‚РµР»СЊРЅРѕРіРѕ
+    ' СЃРєР»РѕРЅСЏРµРј РѕР±РѕР·РЅР°С‡РµРЅРёРµ СЂР°Р·СЂСЏРґР° Рё РѕРїСЂРµРґРµР»СЏРµРј РµРіРѕ СЂРѕРґ
+        ' С‡РёСЃР»Рѕ СЃР»РѕРІР°.  РµРґ.С‡ РґР»СЏ С‡РёСЃРµР» РЅР° 1 (РєСЂРѕРјРµ 11) Рё С‡РёСЃРµР» РЅР° 2-4 (РєСЂРѕРјРµ 12-14) РІ РёРј.,СЂРѕРґ. Рё РІРёРЅ.Рї., РѕСЃС‚Р°Р»СЊРЅС‹Рµ - РІРѕ РјРЅ.С‡.
+        ' РїР°РґРµР¶ СЃР»РѕРІР°.  NewCase, РєСЂРѕРјРµ РёРј.,СЂРѕРґ. Рё РІРёРЅ.Рї. РґР»СЏ С‡РёСЃРµР» РЅРµ Р·Р°РєР°РЅС‡РёРІР°СЋС‰РёС…СЃСЏ РЅР° 1 (РєСЂРѕРјРµ 11) РѕРЅРё РІ СЂРѕРґ.Рї.
             strWord = vbNullString
             tmpCase = NewCase: tmpNumb = DeclineNumbPlural
             If ((bytStep = 2) Or (NewType = NumeralCardinal)) And Not bolNull Then tmpCase = DeclineCaseImen
@@ -4620,44 +4630,44 @@ HandleThousands:
                 Case Else:  If (tmpCase = DeclineCaseImen) Or (tmpCase = DeclineCaseVin) Then tmpCase = DeclineCaseRod
                 End Select
             End If
-        ' склоняем и запись в результат
+        ' СЃРєР»РѕРЅСЏРµРј Рё Р·Р°РїРёСЃСЊ РІ СЂРµР·СѓР»СЊС‚Р°С‚
             strWord = p_NumDecline(intTrip, bytTrip, tmpCase, tmpNumb, tmpGend, tmpType, Animate)
             If Len(strWord) = 0 Then GoTo HandleDigits
             If Len(Result) > 0 Then Result = strWord & strDelim & Result Else Result = strWord
-        ' если обозначение разряда делали порядковым, т.е. если младший разряд (единицы) пустой
-            ' делаем значения разряда количественными
-            ' делаем разделитель пустым т.к. порядковые на -тысячный/-милионный и т.п. пишутся слитно
-            ' для знаменателя - в дальнейшем склоняем значения разряда в зависимости от типа числа в знаменателе
+        ' РµСЃР»Рё РѕР±РѕР·РЅР°С‡РµРЅРёРµ СЂР°Р·СЂСЏРґР° РґРµР»Р°Р»Рё РїРѕСЂСЏРґРєРѕРІС‹Рј, С‚.Рµ. РµСЃР»Рё РјР»Р°РґС€РёР№ СЂР°Р·СЂСЏРґ (РµРґРёРЅРёС†С‹) РїСѓСЃС‚РѕР№
+            ' РґРµР»Р°РµРј Р·РЅР°С‡РµРЅРёСЏ СЂР°Р·СЂСЏРґР° РєРѕР»РёС‡РµСЃС‚РІРµРЅРЅС‹РјРё
+            ' РґРµР»Р°РµРј СЂР°Р·РґРµР»РёС‚РµР»СЊ РїСѓСЃС‚С‹Рј С‚.Рє. РїРѕСЂСЏРґРєРѕРІС‹Рµ РЅР° -С‚С‹СЃСЏС‡РЅС‹Р№/-РјРёР»РёРѕРЅРЅС‹Р№ Рё С‚.Рї. РїРёС€СѓС‚СЃСЏ СЃР»РёС‚РЅРѕ
+            ' РґР»СЏ Р·РЅР°РјРµРЅР°С‚РµР»СЏ - РІ РґР°Р»СЊРЅРµР№С€РµРј СЃРєР»РѕРЅСЏРµРј Р·РЅР°С‡РµРЅРёСЏ СЂР°Р·СЂСЏРґР° РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РёРїР° С‡РёСЃР»Р° РІ Р·РЅР°РјРµРЅР°С‚РµР»Рµ
             If tmpType = NumeralCardinal Then tmpType = NumeralOrdinal: strDelim = vbNullString: If bytStep = 2 Then bytNumb = p_NumType(intTrip)
 HandleDigits:
-'    ' пропускаем пустые триплеты (кроме младшего. 0 в младшем - возможно 0 целых)
+'    ' РїСЂРѕРїСѓСЃРєР°РµРј РїСѓСЃС‚С‹Рµ С‚СЂРёРїР»РµС‚С‹ (РєСЂРѕРјРµ РјР»Р°РґС€РµРіРѕ. 0 РІ РјР»Р°РґС€РµРј - РІРѕР·РјРѕР¶РЅРѕ 0 С†РµР»С‹С…)
 '            If intTrip = 0 Then If (Not bolWhole) Or (bytStep <> 0) Or (bytNumb <> 0) Then GoTo HandleNextTriplet
             Do
-' перебираем последовательно элементы триплета:
-    ' сотни, десятки (кроме второго), второй десяток (10-19), единицы и ноль
-    ' проверяем состав триплета и уменьшаем остаток
-    ' склоняем слово разбираемого триплета с учётом рода обозначения разряда/единицы измерения
+' РїРµСЂРµР±РёСЂР°РµРј РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕ СЌР»РµРјРµРЅС‚С‹ С‚СЂРёРїР»РµС‚Р°:
+    ' СЃРѕС‚РЅРё, РґРµСЃСЏС‚РєРё (РєСЂРѕРјРµ РІС‚РѕСЂРѕРіРѕ), РІС‚РѕСЂРѕР№ РґРµСЃСЏС‚РѕРє (10-19), РµРґРёРЅРёС†С‹ Рё РЅРѕР»СЊ
+    ' РїСЂРѕРІРµСЂСЏРµРј СЃРѕСЃС‚Р°РІ С‚СЂРёРїР»РµС‚Р° Рё СѓРјРµРЅСЊС€Р°РµРј РѕСЃС‚Р°С‚РѕРє
+    ' СЃРєР»РѕРЅСЏРµРј СЃР»РѕРІРѕ СЂР°Р·Р±РёСЂР°РµРјРѕРіРѕ С‚СЂРёРїР»РµС‚Р° СЃ СѓС‡С‘С‚РѕРј СЂРѕРґР° РѕР±РѕР·РЅР°С‡РµРЅРёСЏ СЂР°Р·СЂСЏРґР°/РµРґРёРЅРёС†С‹ РёР·РјРµСЂРµРЅРёСЏ
                 tmpCase = NewCase: If tmpCase = DeclineCaseUndef Then tmpCase = DeclineCaseImen
                 Select Case bytNumb
                 Case 0, 1:  tmpNumb = DeclineNumbSingle
                 Case Else:  tmpNumb = DeclineNumbPlural
                 End Select
                 If tmpType = NumeralCardinal Then
-                ' первое число в первом триплете склоняем как порядковое в указанном (NewCase) падеже,
-                ' кроме им. и вин., их - в род.п. для чисел не на 1 и 2-4
+                ' РїРµСЂРІРѕРµ С‡РёСЃР»Рѕ РІ РїРµСЂРІРѕРј С‚СЂРёРїР»РµС‚Рµ СЃРєР»РѕРЅСЏРµРј РєР°Рє РїРѕСЂСЏРґРєРѕРІРѕРµ РІ СѓРєР°Р·Р°РЅРЅРѕРј (NewCase) РїР°РґРµР¶Рµ,
+                ' РєСЂРѕРјРµ РёРј. Рё РІРёРЅ., РёС… - РІ СЂРѕРґ.Рї. РґР»СЏ С‡РёСЃРµР» РЅРµ РЅР° 1 Рё 2-4
                     Select Case bytStep
                     Case 0: tmpNumb = NewNumb
                     'Case 1: If Not bolDenom Then tmpNumb = DeclineNumbSingle
                     Case 2: If (bytNumb <> 1 And bytNumb <> 2) And ((tmpCase = DeclineCaseImen) Or (tmpCase = DeclineCaseVin)) Then tmpCase = DeclineCaseRod
                     End Select
                 ElseIf ((NewType = NumeralCardinal) And (bytStep = 0)) Or (bytStep = 2) Then
-                ' старшие разряды в первом триплете
-                ' и старшие триплеты (кроме первого выводимого) склоняем в им.п.
+                ' СЃС‚Р°СЂС€РёРµ СЂР°Р·СЂСЏРґС‹ РІ РїРµСЂРІРѕРј С‚СЂРёРїР»РµС‚Рµ
+                ' Рё СЃС‚Р°СЂС€РёРµ С‚СЂРёРїР»РµС‚С‹ (РєСЂРѕРјРµ РїРµСЂРІРѕРіРѕ РІС‹РІРѕРґРёРјРѕРіРѕ) СЃРєР»РѕРЅСЏРµРј РІ РёРј.Рї.
                     tmpCase = DeclineCaseImen
                     If bolNull And bytTrip > 0 Then
-                ' старшие триплеты (в первом выводимом) склоняем:
-                '   все разряды склоняем в р.п., искл.: одно- и сто-
-                '   -тысячный -миллионный и т.п., берём пустой разделитель
+                ' СЃС‚Р°СЂС€РёРµ С‚СЂРёРїР»РµС‚С‹ (РІ РїРµСЂРІРѕРј РІС‹РІРѕРґРёРјРѕРј) СЃРєР»РѕРЅСЏРµРј:
+                '   РІСЃРµ СЂР°Р·СЂСЏРґС‹ СЃРєР»РѕРЅСЏРµРј РІ СЂ.Рї., РёСЃРєР».: РѕРґРЅРѕ- Рё СЃС‚Рѕ-
+                '   -С‚С‹СЃСЏС‡РЅС‹Р№ -РјРёР»Р»РёРѕРЅРЅС‹Р№ Рё С‚.Рї., Р±РµСЂС‘Рј РїСѓСЃС‚РѕР№ СЂР°Р·РґРµР»РёС‚РµР»СЊ
                         If (intTrip Mod 10 = 1) And ((intTrip Mod 100) \ 10 <> 1) Then
                             tmpGend = DeclineGendNeut ': tmpNumb = DeclineNumbSingle
                         ElseIf intTrip <> 100 Then
@@ -4665,46 +4675,46 @@ HandleDigits:
                         End If
                     End If
                 End If
-        ' склоняем и запись в результат
+        ' СЃРєР»РѕРЅСЏРµРј Рё Р·Р°РїРёСЃСЊ РІ СЂРµР·СѓР»СЊС‚Р°С‚
                 strWord = p_NumDecline(intTrip, , tmpCase, tmpNumb, tmpGend, tmpType, Animate, NumbRest:=intTrip)
                 If Len(strWord) > 0 Then If Len(Result) > 0 Then Result = strWord & strDelim & Result Else Result = strWord
-            ' переопределяем тип числительного (только первый элемент составного числительного м.б. порядковым)
+            ' РїРµСЂРµРѕРїСЂРµРґРµР»СЏРµРј С‚РёРї С‡РёСЃР»РёС‚РµР»СЊРЅРѕРіРѕ (С‚РѕР»СЊРєРѕ РїРµСЂРІС‹Р№ СЌР»РµРјРµРЅС‚ СЃРѕСЃС‚Р°РІРЅРѕРіРѕ С‡РёСЃР»РёС‚РµР»СЊРЅРѕРіРѕ Рј.Р±. РїРѕСЂСЏРґРєРѕРІС‹Рј)
                 tmpNumb = DeclineNumbUndef ': tmpGend = DeclineGendUndef
                 If tmpType = NumeralCardinal Then tmpType = NumeralOrdinal
             Loop While intTrip > 0
             bolNull = False
 HandleNextTriplet:
-        ' обрезаем разобранный триплет
+        ' РѕР±СЂРµР·Р°РµРј СЂР°Р·РѕР±СЂР°РЅРЅС‹Р№ С‚СЂРёРїР»РµС‚
             If Len(strNumb) > 2 Then strNumb = VBA.Left$(strNumb, Len(strNumb) - 3) Else strNumb = vbNullString
-        ' повторяем пока не достигнем старшего триплета
+        ' РїРѕРІС‚РѕСЂСЏРµРј РїРѕРєР° РЅРµ РґРѕСЃС‚РёРіРЅРµРј СЃС‚Р°СЂС€РµРіРѕ С‚СЂРёРїР»РµС‚Р°
             If Len(strNumb) = 0 Then Exit Do
-        ' берем очередной триплет части числа и (если был вывод) его тип
+        ' Р±РµСЂРµРј РѕС‡РµСЂРµРґРЅРѕР№ С‚СЂРёРїР»РµС‚ С‡Р°СЃС‚Рё С‡РёСЃР»Р° Рё (РµСЃР»Рё Р±С‹Р» РІС‹РІРѕРґ) РµРіРѕ С‚РёРї
             intTrip = Abs(CInt(VBA.Right$(strNumb, 3))): If Not (bolNull And (tmpType = NumeralCardinal)) Then bytNumb = p_NumType(intTrip)
-        ' увеличиваем счетчик разобранных триплетов
+        ' СѓРІРµР»РёС‡РёРІР°РµРј СЃС‡РµС‚С‡РёРє СЂР°Р·РѕР±СЂР°РЅРЅС‹С… С‚СЂРёРїР»РµС‚РѕРІ
             bytTrip = bytTrip + 1
         Loop 'While Len(strNumb)>0
 HandleNextPart:
-        ' переходим к обработке следующей части дроби
+        ' РїРµСЂРµС…РѕРґРёРј Рє РѕР±СЂР°Р±РѕС‚РєРµ СЃР»РµРґСѓСЋС‰РµР№ С‡Р°СЃС‚Рё РґСЂРѕР±Рё
         If bytStep = 0 Then Exit Do Else bytStep = bytStep - 1
     Loop While bytStep >= 0
-'    ' добавляем минус
-'    If VBA.Left$(Number, 1) = "-" And Len(Result)>0 Then Result = "минус " & Result
+'    ' РґРѕР±Р°РІР»СЏРµРј РјРёРЅСѓСЃ
+'    If VBA.Left$(Number, 1) = "-" And Len(Result)>0 Then Result = "РјРёРЅСѓСЃ " & Result
 HandleExit:  NumToWords = Result: Exit Function
 HandleError: Result = vbNullString: Err.Clear: Resume HandleExit
 End Function
 
 Private Function p_NumType(ByVal Numb As Variant, Optional InNomin As Boolean = False) As Byte
-' для NumToWords. получает тип числа 0-999
+' РґР»СЏ NumToWords. РїРѕР»СѓС‡Р°РµС‚ С‚РёРї С‡РёСЃР»Р° 0-999
 '-------------------------
-' InNomin - флаг устанавливаемый при проверке числителя для правильного склонения знаменателя
-' в этом случае числа на 2 должны склоняться в ед.ч. во всех остальных - во мн.ч.
-' возвращает:
-'   0 - если Numb = 0
-'   1 - если Numb = xx1 и <>x11         (при InNomin=True также xx2 и <>x12)
-'   2 - если Numb = xx2-4 и <>x12-x14   (при InNomin=True кроме xx2 и <>x12)
-'  255 - все остальное
+' InNomin - С„Р»Р°Рі СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјС‹Р№ РїСЂРё РїСЂРѕРІРµСЂРєРµ С‡РёСЃР»РёС‚РµР»СЏ РґР»СЏ РїСЂР°РІРёР»СЊРЅРѕРіРѕ СЃРєР»РѕРЅРµРЅРёСЏ Р·РЅР°РјРµРЅР°С‚РµР»СЏ
+' РІ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ С‡РёСЃР»Р° РЅР° 2 РґРѕР»Р¶РЅС‹ СЃРєР»РѕРЅСЏС‚СЊСЃСЏ РІ РµРґ.С‡. РІРѕ РІСЃРµС… РѕСЃС‚Р°Р»СЊРЅС‹С… - РІРѕ РјРЅ.С‡.
+' РІРѕР·РІСЂР°С‰Р°РµС‚:
+'   0 - РµСЃР»Рё Numb = 0
+'   1 - РµСЃР»Рё Numb = xx1 Рё <>x11         (РїСЂРё InNomin=True С‚Р°РєР¶Рµ xx2 Рё <>x12)
+'   2 - РµСЃР»Рё Numb = xx2-4 Рё <>x12-x14   (РїСЂРё InNomin=True РєСЂРѕРјРµ xx2 Рё <>x12)
+'  255 - РІСЃРµ РѕСЃС‚Р°Р»СЊРЅРѕРµ
 '-------------------------
-' для правильного склонения важна последняя цифра триплета
+' РґР»СЏ РїСЂР°РІРёР»СЊРЅРѕРіРѕ СЃРєР»РѕРЅРµРЅРёСЏ РІР°Р¶РЅР° РїРѕСЃР»РµРґРЅСЏСЏ С†РёС„СЂР° С‚СЂРёРїР»РµС‚Р°
 '-------------------------
 Dim Result As Byte
     Result = 255
@@ -4732,588 +4742,588 @@ Public Function DeclineWord( _
     Optional IsFio As Byte = 0, _
     Optional ByRef SymbCase As Integer = 0, Optional ByRef Template As String _
     ) As String
-' склонение слова. работает весьма условно
+' СЃРєР»РѕРЅРµРЅРёРµ СЃР»РѕРІР°. СЂР°Р±РѕС‚Р°РµС‚ РІРµСЃСЊРјР° СѓСЃР»РѕРІРЅРѕ
 '-------------------------
-' Крайне условно пытается различать род, число, часть речи, выделять окончание
-' Никак не различает одушевленное/неодушевленное (из-за этого, в частности, неправильно склоняет в мн.ч. вин.п.)
-' для лучших результатов пользуйтесь Morpher'ом с http://morpher.ru
-' или Padej'ом http://www.delphikingdom.com/asp/viewitem.asp?catalogid=412
-' Word - существительное в единственном числе именительном падеже
-' NewCase - падеж ("р","д","в","т","п")
-' NewNumb - число ("ед","мн")
-' NewGend - род ("м","ж")
-' Animate - признак (одушевленное","неодушевленное)
-' IsFio - признак ФИО (0-не ФИО, 1-Фамилия, 2-Имя, 3-Отчество)
-' SymbCase, Template - состояние регистра символов исходного слова и шаблон
+' РљСЂР°Р№РЅРµ СѓСЃР»РѕРІРЅРѕ РїС‹С‚Р°РµС‚СЃСЏ СЂР°Р·Р»РёС‡Р°С‚СЊ СЂРѕРґ, С‡РёСЃР»Рѕ, С‡Р°СЃС‚СЊ СЂРµС‡Рё, РІС‹РґРµР»СЏС‚СЊ РѕРєРѕРЅС‡Р°РЅРёРµ
+' РќРёРєР°Рє РЅРµ СЂР°Р·Р»РёС‡Р°РµС‚ РѕРґСѓС€РµРІР»РµРЅРЅРѕРµ/РЅРµРѕРґСѓС€РµРІР»РµРЅРЅРѕРµ (РёР·-Р·Р° СЌС‚РѕРіРѕ, РІ С‡Р°СЃС‚РЅРѕСЃС‚Рё, РЅРµРїСЂР°РІРёР»СЊРЅРѕ СЃРєР»РѕРЅСЏРµС‚ РІ РјРЅ.С‡. РІРёРЅ.Рї.)
+' РґР»СЏ Р»СѓС‡С€РёС… СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РїРѕР»СЊР·СѓР№С‚РµСЃСЊ Morpher'РѕРј СЃ http://morpher.ru
+' РёР»Рё Padej'РѕРј http://www.delphikingdom.com/asp/viewitem.asp?catalogid=412
+' Word - СЃСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅРѕРµ РІ РµРґРёРЅСЃС‚РІРµРЅРЅРѕРј С‡РёСЃР»Рµ РёРјРµРЅРёС‚РµР»СЊРЅРѕРј РїР°РґРµР¶Рµ
+' NewCase - РїР°РґРµР¶ ("СЂ","Рґ","РІ","С‚","Рї")
+' NewNumb - С‡РёСЃР»Рѕ ("РµРґ","РјРЅ")
+' NewGend - СЂРѕРґ ("Рј","Р¶")
+' Animate - РїСЂРёР·РЅР°Рє (РѕРґСѓС€РµРІР»РµРЅРЅРѕРµ","РЅРµРѕРґСѓС€РµРІР»РµРЅРЅРѕРµ)
+' IsFio - РїСЂРёР·РЅР°Рє Р¤РРћ (0-РЅРµ Р¤РРћ, 1-Р¤Р°РјРёР»РёСЏ, 2-РРјСЏ, 3-РћС‚С‡РµСЃС‚РІРѕ)
+' SymbCase, Template - СЃРѕСЃС‚РѕСЏРЅРёРµ СЂРµРіРёСЃС‚СЂР° СЃРёРјРІРѕР»РѕРІ РёСЃС…РѕРґРЅРѕРіРѕ СЃР»РѕРІР° Рё С€Р°Р±Р»РѕРЅ
 '-------------------------
-' v.1.0.1       : 06.07.2019 - склонение числительных вынесено в отдельную функцию
+' v.1.0.1       : 06.07.2019 - СЃРєР»РѕРЅРµРЅРёРµ С‡РёСЃР»РёС‚РµР»СЊРЅС‹С… РІС‹РЅРµСЃРµРЅРѕ РІ РѕС‚РґРµР»СЊРЅСѓСЋ С„СѓРЅРєС†РёСЋ
 '-------------------------
 Dim WordBeg As String, WordEnd As String
 Dim WordType As SpeechPartType
 Dim sChar As String '* 1
 Dim i As Long, iMax As Long
 Dim Result As String
-' надо переписать на более вменяемо выглядящие правила
+' РЅР°РґРѕ РїРµСЂРµРїРёСЃР°С‚СЊ РЅР° Р±РѕР»РµРµ РІРјРµРЅСЏРµРјРѕ РІС‹РіР»СЏРґСЏС‰РёРµ РїСЂР°РІРёР»Р°
     On Error GoTo HandleError
     If NewCase = DeclineCaseUndef Then NewCase = DeclineCaseImen Else If NewCase > DeclineCasePred Or NewCase < DeclineCaseImen Then Err.Raise vbObjectError + 512
     If NewNumb = DeclineNumbUndef Then NewNumb = DeclineNumbSingle
-    If IsFio Then Animate = True ' определять одушевленные не умеем, однако ФИО - однозначно одушевленные
-' получаем шаблон регистра символов слова
+    If IsFio Then Animate = True ' РѕРїСЂРµРґРµР»СЏС‚СЊ РѕРґСѓС€РµРІР»РµРЅРЅС‹Рµ РЅРµ СѓРјРµРµРј, РѕРґРЅР°РєРѕ Р¤РРћ - РѕРґРЅРѕР·РЅР°С‡РЅРѕ РѕРґСѓС€РµРІР»РµРЅРЅС‹Рµ
+' РїРѕР»СѓС‡Р°РµРј С€Р°Р±Р»РѕРЅ СЂРµРіРёСЃС‚СЂР° СЃРёРјРІРѕР»РѕРІ СЃР»РѕРІР°
     Word = Trim$(Word): If SymbCase = 0 Then SymbCase = p_GetSymbCase(Word, Template)
     
     Result = LCase$(Word)
-' Обработка исключений
-'' Шаблон исключения
+' РћР±СЂР°Р±РѕС‚РєР° РёСЃРєР»СЋС‡РµРЅРёР№
+'' РЁР°Р±Р»РѕРЅ РёСЃРєР»СЋС‡РµРЅРёСЏ
 '    Case ""
 '        Select Case NewCase
-'        Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = ""   ' им.п. мн.ч    (кто/что)       Nominative
-'        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "", "")  ' р.п. ед/мн.ч  (кого/чего)     Genitive
-'        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "", "")  ' д.п. ед/мн.ч  (кому/чему)     Dative
-'        Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "", "")  ' в.п. ед/мн.ч  (кого/что)      Accusative
-'        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "", "")  ' т.п. ед/мн.ч  (кем/чем)       Ablative
-'        Case DeclineCasePred: WordEnd = Choose(NewNumb, "", "")  ' п.п. ед/мн.ч  (о ком/о чём)   Prepositional
+'        Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = ""   ' РёРј.Рї. РјРЅ.С‡    (РєС‚Рѕ/С‡С‚Рѕ)       Nominative
+'        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "", "")  ' СЂ.Рї. РµРґ/РјРЅ.С‡  (РєРѕРіРѕ/С‡РµРіРѕ)     Genitive
+'        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "", "")  ' Рґ.Рї. РµРґ/РјРЅ.С‡  (РєРѕРјСѓ/С‡РµРјСѓ)     Dative
+'        Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "", "")  ' РІ.Рї. РµРґ/РјРЅ.С‡  (РєРѕРіРѕ/С‡С‚Рѕ)      Accusative
+'        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "", "")  ' С‚.Рї. РµРґ/РјРЅ.С‡  (РєРµРј/С‡РµРј)       Ablative
+'        Case DeclineCasePred: WordEnd = Choose(NewNumb, "", "")  ' Рї.Рї. РµРґ/РјРЅ.С‡  (Рѕ РєРѕРј/Рѕ С‡С‘Рј)   Prepositional
 '        'Case Else 'DeclineCaseUndef = 0
 '        End Select
-'        i = Len(Result)-2: GoTo HandleExit ' i = кол-во знаков от начала слова к которым добавляется окончание
-' Пропускаем предлоги и пр. несклоняемые слова
+'        i = Len(Result)-2: GoTo HandleExit ' i = РєРѕР»-РІРѕ Р·РЅР°РєРѕРІ РѕС‚ РЅР°С‡Р°Р»Р° СЃР»РѕРІР° Рє РєРѕС‚РѕСЂС‹Рј РґРѕР±Р°РІР»СЏРµС‚СЃСЏ РѕРєРѕРЅС‡Р°РЅРёРµ
+' РџСЂРѕРїСѓСЃРєР°РµРј РїСЂРµРґР»РѕРіРё Рё РїСЂ. РЅРµСЃРєР»РѕРЅСЏРµРјС‹Рµ СЃР»РѕРІР°
     Select Case Result
-    Case "в", "с", "к", "у", "а", "и", "о", "об", "на", "по", "во", "за", "от", "не", "ни", "ли", _
-         "или", "еле", "над", "при", "под", "для", "через", "перед", "ввиду", "наподобие", "вроде", _
-         "вблизи", "вглубь", "вдоль", "возле", "около", "среди", "вокруг", "внутри", "впереди", "после", _
-         "насчет", "навстречу", "вслед", "вместо", "ввиду", "благодаря", "вследствие"
+    Case "РІ", "СЃ", "Рє", "Сѓ", "Р°", "Рё", "Рѕ", "РѕР±", "РЅР°", "РїРѕ", "РІРѕ", "Р·Р°", "РѕС‚", "РЅРµ", "РЅРё", "Р»Рё", _
+         "РёР»Рё", "РµР»Рµ", "РЅР°Рґ", "РїСЂРё", "РїРѕРґ", "РґР»СЏ", "С‡РµСЂРµР·", "РїРµСЂРµРґ", "РІРІРёРґСѓ", "РЅР°РїРѕРґРѕР±РёРµ", "РІСЂРѕРґРµ", _
+         "РІР±Р»РёР·Рё", "РІРіР»СѓР±СЊ", "РІРґРѕР»СЊ", "РІРѕР·Р»Рµ", "РѕРєРѕР»Рѕ", "СЃСЂРµРґРё", "РІРѕРєСЂСѓРі", "РІРЅСѓС‚СЂРё", "РІРїРµСЂРµРґРё", "РїРѕСЃР»Рµ", _
+         "РЅР°СЃС‡РµС‚", "РЅР°РІСЃС‚СЂРµС‡Сѓ", "РІСЃР»РµРґ", "РІРјРµСЃС‚Рѕ", "РІРІРёРґСѓ", "Р±Р»Р°РіРѕРґР°СЂСЏ", "РІСЃР»РµРґСЃС‚РІРёРµ"
         i = Len(Result): GoTo HandleExit
     End Select
-' прочие исключения
+' РїСЂРѕС‡РёРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
     If IsFio = 1 Then
-    ' не склоняются фамилии на:
+    ' РЅРµ СЃРєР»РѕРЅСЏСЋС‚СЃСЏ С„Р°РјРёР»РёРё РЅР°:
     Select Case Right(Result, 1)
-    Case "о": i = Len(Result): GoTo HandleExit
+    Case "Рѕ": i = Len(Result): GoTo HandleExit
     End Select
     End If
     Select Case Result
-    ' замена гласной (е -> ь)
-    Case "лев", "лёд", "лён": If NewCase <> DeclineCaseImen Or NewNumb = DeclineNumbPlural Then Mid$(Result, 2, 1) = "ь"
-    ' выпадение гласной (2-я с конца)
-    Case "павел", "угол", "конец", "лоб", "сон", "рот", "потолок": If Not (NewCase = DeclineCaseImen Or (Not Animate And NewCase = DeclineCaseVin)) Or NewNumb = DeclineNumbPlural Then i = Len(Result) - 2: Result = Left$(Result, i) & Mid(Result, i + 2)
-    ' выпадение гласной (3-я с конца)
-    Case "пень", "уголь", "день", "огонь": If Not (NewCase = DeclineCaseImen Or (Not Animate And NewCase = DeclineCaseVin)) Or NewNumb = DeclineNumbPlural Then i = Len(Result) - 3: Result = Left$(Result, i) & Mid(Result, i + 2)
-    ' выпадение гласной (особые случаи)
-    Case "ложь": NewNumb = DeclineNumbSingle: If Not (NewCase = DeclineCaseImen Or NewCase = DeclineCaseVin Or NewCase = DeclineCaseTvor) Then i = Len(Result) - 3: Result = Left$(Result, i) & Mid(Result, i + 2)
-    ' местоимения
-    Case "я": Animate = True
+    ' Р·Р°РјРµРЅР° РіР»Р°СЃРЅРѕР№ (Рµ -> СЊ)
+    Case "Р»РµРІ", "Р»С‘Рґ", "Р»С‘РЅ": If NewCase <> DeclineCaseImen Or NewNumb = DeclineNumbPlural Then Mid$(Result, 2, 1) = "СЊ"
+    ' РІС‹РїР°РґРµРЅРёРµ РіР»Р°СЃРЅРѕР№ (2-СЏ СЃ РєРѕРЅС†Р°)
+    Case "РїР°РІРµР»", "СѓРіРѕР»", "РєРѕРЅРµС†", "Р»РѕР±", "СЃРѕРЅ", "СЂРѕС‚", "РїРѕС‚РѕР»РѕРє": If Not (NewCase = DeclineCaseImen Or (Not Animate And NewCase = DeclineCaseVin)) Or NewNumb = DeclineNumbPlural Then i = Len(Result) - 2: Result = Left$(Result, i) & Mid(Result, i + 2)
+    ' РІС‹РїР°РґРµРЅРёРµ РіР»Р°СЃРЅРѕР№ (3-СЏ СЃ РєРѕРЅС†Р°)
+    Case "РїРµРЅСЊ", "СѓРіРѕР»СЊ", "РґРµРЅСЊ", "РѕРіРѕРЅСЊ": If Not (NewCase = DeclineCaseImen Or (Not Animate And NewCase = DeclineCaseVin)) Or NewNumb = DeclineNumbPlural Then i = Len(Result) - 3: Result = Left$(Result, i) & Mid(Result, i + 2)
+    ' РІС‹РїР°РґРµРЅРёРµ РіР»Р°СЃРЅРѕР№ (РѕСЃРѕР±С‹Рµ СЃР»СѓС‡Р°Рё)
+    Case "Р»РѕР¶СЊ": NewNumb = DeclineNumbSingle: If Not (NewCase = DeclineCaseImen Or NewCase = DeclineCaseVin Or NewCase = DeclineCaseTvor) Then i = Len(Result) - 3: Result = Left$(Result, i) & Mid(Result, i + 2)
+    ' РјРµСЃС‚РѕРёРјРµРЅРёСЏ
+    Case "СЏ": Animate = True
         Select Case NewCase
-        Case DeclineCaseImen: WordEnd = Choose(NewNumb, "я", "мы")
-        Case DeclineCaseRod, DeclineCaseVin: WordEnd = Choose(NewNumb, "меня", "нас")
-        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "мне", "нам")
-        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "мной", "нами")
-        Case DeclineCasePred: WordEnd = Choose(NewNumb, "мне", "нас")
+        Case DeclineCaseImen: WordEnd = Choose(NewNumb, "СЏ", "РјС‹")
+        Case DeclineCaseRod, DeclineCaseVin: WordEnd = Choose(NewNumb, "РјРµРЅСЏ", "РЅР°СЃ")
+        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "РјРЅРµ", "РЅР°Рј")
+        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РјРЅРѕР№", "РЅР°РјРё")
+        Case DeclineCasePred: WordEnd = Choose(NewNumb, "РјРЅРµ", "РЅР°СЃ")
         End Select
         i = Len(Result) - 1: GoTo HandleExit
-    Case "ты": Animate = True
+    Case "С‚С‹": Animate = True
         Select Case NewCase
-        Case DeclineCaseImen: WordEnd = Choose(NewNumb, "ты", "вы")
-        Case DeclineCaseRod, DeclineCaseVin: WordEnd = Choose(NewNumb, "тебя", "вас")
-        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "тебе", "вам")
-        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "тобой", "вами")
-        Case DeclineCasePred: WordEnd = Choose(NewNumb, "тебе", "вас")
+        Case DeclineCaseImen: WordEnd = Choose(NewNumb, "С‚С‹", "РІС‹")
+        Case DeclineCaseRod, DeclineCaseVin: WordEnd = Choose(NewNumb, "С‚РµР±СЏ", "РІР°СЃ")
+        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "С‚РµР±Рµ", "РІР°Рј")
+        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "С‚РѕР±РѕР№", "РІР°РјРё")
+        Case DeclineCasePred: WordEnd = Choose(NewNumb, "С‚РµР±Рµ", "РІР°СЃ")
         End Select
         i = Len(Result) - 2: GoTo HandleExit
-    Case "вы": Animate = True
+    Case "РІС‹": Animate = True
         Select Case NewCase
-        Case DeclineCaseImen: WordEnd = "ы"
-        Case DeclineCaseRod, DeclineCaseVin: WordEnd = "ас"
-        Case DeclineCaseDat:  WordEnd = "ам"
-        Case DeclineCaseTvor: WordEnd = "ами"
-        Case DeclineCasePred: WordEnd = "ас"
+        Case DeclineCaseImen: WordEnd = "С‹"
+        Case DeclineCaseRod, DeclineCaseVin: WordEnd = "Р°СЃ"
+        Case DeclineCaseDat:  WordEnd = "Р°Рј"
+        Case DeclineCaseTvor: WordEnd = "Р°РјРё"
+        Case DeclineCasePred: WordEnd = "Р°СЃ"
         End Select
         i = Len(Result) - 1: GoTo HandleExit
-    Case "он": 'Animate = True
+    Case "РѕРЅ": 'Animate = True
         If NewGend = DeclineGendUndef Then NewGend = DeclineGendMale
         Select Case NewCase
-        Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "он", "она", "оно"), "они")
-        Case DeclineCaseRod, DeclineCaseVin: WordEnd = Choose(NewNumb, Choose(NewGend, "него", "неё", "них"), "их")
-        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, Choose(NewGend, "нему", "ней", "ним"), "ним")
-        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, Choose(NewGend, "ним", "ней", "ними"), "ними")
-        Case DeclineCasePred: WordEnd = Choose(NewNumb, Choose(NewGend, "нём", "ней", "них"), "них")
+        Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "РѕРЅ", "РѕРЅР°", "РѕРЅРѕ"), "РѕРЅРё")
+        Case DeclineCaseRod, DeclineCaseVin: WordEnd = Choose(NewNumb, Choose(NewGend, "РЅРµРіРѕ", "РЅРµС‘", "РЅРёС…"), "РёС…")
+        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, Choose(NewGend, "РЅРµРјСѓ", "РЅРµР№", "РЅРёРј"), "РЅРёРј")
+        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, Choose(NewGend, "РЅРёРј", "РЅРµР№", "РЅРёРјРё"), "РЅРёРјРё")
+        Case DeclineCasePred: WordEnd = Choose(NewNumb, Choose(NewGend, "РЅС‘Рј", "РЅРµР№", "РЅРёС…"), "РЅРёС…")
         End Select
-        '"н" обязательно после предлогов как проверять пока не решил
+        '"РЅ" РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РїРѕСЃР»Рµ РїСЂРµРґР»РѕРіРѕРІ РєР°Рє РїСЂРѕРІРµСЂСЏС‚СЊ РїРѕРєР° РЅРµ СЂРµС€РёР»
         i = Len(Result) - 2: GoTo HandleExit
-    Case "то": Animate = False: NewGend = DeclineGendNeut
+    Case "С‚Рѕ": Animate = False: NewGend = DeclineGendNeut
         Select Case NewCase
-        Case DeclineCaseImen: WordEnd = Choose(NewNumb, "о", "е")
-        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ого", "ех")
-        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ому", "ем")
-        Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "от", "ех")
-        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ем", "еми")
-        Case DeclineCasePred: WordEnd = Choose(NewNumb, "ом", "ех")
+        Case DeclineCaseImen: WordEnd = Choose(NewNumb, "Рѕ", "Рµ")
+        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "РѕРіРѕ", "РµС…")
+        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "РѕРјСѓ", "РµРј")
+        Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "РѕС‚", "РµС…")
+        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РµРј", "РµРјРё")
+        Case DeclineCasePred: WordEnd = Choose(NewNumb, "РѕРј", "РµС…")
         End Select
         i = Len(Result) - 1: GoTo HandleExit
-    Case "это": Animate = False: NewGend = DeclineGendNeut
+    Case "СЌС‚Рѕ": Animate = False: NewGend = DeclineGendNeut
         NewGend = DeclineGendNeut
         Select Case NewCase
-        Case DeclineCaseImen: WordEnd = Choose(NewNumb, "о", "и")
-        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ого", "их")
-        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ому", "им")
-        Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "от", "их")
-        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "им", "ими")
-        Case DeclineCasePred: WordEnd = Choose(NewNumb, "ом", "их")
+        Case DeclineCaseImen: WordEnd = Choose(NewNumb, "Рѕ", "Рё")
+        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "РѕРіРѕ", "РёС…")
+        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "РѕРјСѓ", "РёРј")
+        Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "РѕС‚", "РёС…")
+        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РёРј", "РёРјРё")
+        Case DeclineCasePred: WordEnd = Choose(NewNumb, "РѕРј", "РёС…")
         End Select
         i = Len(Result) - 1: GoTo HandleExit
-    Case "номер": Animate = False: NewGend = DeclineGendMale
+    Case "РЅРѕРјРµСЂ": Animate = False: NewGend = DeclineGendMale
         Select Case NewCase
-        Case DeclineCaseImen, DeclineCaseVin: If NewNumb = DeclineNumbPlural Then WordEnd = "а"
-        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "а", "ов")
-        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "у", "ам")
-        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ом", "ами")
-        Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+        Case DeclineCaseImen, DeclineCaseVin: If NewNumb = DeclineNumbPlural Then WordEnd = "Р°"
+        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "Р°", "РѕРІ")
+        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Сѓ", "Р°Рј")
+        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РѕРј", "Р°РјРё")
+        Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "Р°С…")
         End Select
         i = Len(Result): GoTo HandleExit
     End Select
     
-'    SymbCase = p_GetSymbCase(Word, Template) ' получаем шаблон регистра
-    iMax = Len(Result): WordEnd = vbNullString: i = iMax ' позиция начала окончания
-' Определение части речи (очень приблизительно)
+'    SymbCase = p_GetSymbCase(Word, Template) ' РїРѕР»СѓС‡Р°РµРј С€Р°Р±Р»РѕРЅ СЂРµРіРёСЃС‚СЂР°
+    iMax = Len(Result): WordEnd = vbNullString: i = iMax ' РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РѕРєРѕРЅС‡Р°РЅРёСЏ
+' РћРїСЂРµРґРµР»РµРЅРёРµ С‡Р°СЃС‚Рё СЂРµС‡Рё (РѕС‡РµРЅСЊ РїСЂРёР±Р»РёР·РёС‚РµР»СЊРЅРѕ)
     WordType = p_GetWordSpeechPartType(LCase$(Word))
     Select Case WordType
     Case SpeechPartTypeNoun, _
-         SpeechPartTypeAdject   ' существительные и прилагательные склоняем по правилам ниже
-    Case SpeechPartTypeNumeral  ' числительные склоняем отдельно
+         SpeechPartTypeAdject   ' СЃСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅС‹Рµ Рё РїСЂРёР»Р°РіР°С‚РµР»СЊРЅС‹Рµ СЃРєР»РѕРЅСЏРµРј РїРѕ РїСЂР°РІРёР»Р°Рј РЅРёР¶Рµ
+    Case SpeechPartTypeNumeral  ' С‡РёСЃР»РёС‚РµР»СЊРЅС‹Рµ СЃРєР»РѕРЅСЏРµРј РѕС‚РґРµР»СЊРЅРѕ
         Result = p_NumDecline(Word, , NewCase, NewNumb, NewGend, , Animate): i = Len(Result): GoTo HandleExit
-    Case Else: GoTo HandleExit  ' все остальные (необрабатываемые) - пропускаем
-'    Case SpeechPartTypePronoun ' местоимения
-'    Case SpeechPartTypeVerb    ' глаголы
-'    Case SpeechPartTypePretext ' предлоги
-'    Case SpeechPartTypeUndef   ' неизвестные
+    Case Else: GoTo HandleExit  ' РІСЃРµ РѕСЃС‚Р°Р»СЊРЅС‹Рµ (РЅРµРѕР±СЂР°Р±Р°С‚С‹РІР°РµРјС‹Рµ) - РїСЂРѕРїСѓСЃРєР°РµРј
+'    Case SpeechPartTypePronoun ' РјРµСЃС‚РѕРёРјРµРЅРёСЏ
+'    Case SpeechPartTypeVerb    ' РіР»Р°РіРѕР»С‹
+'    Case SpeechPartTypePretext ' РїСЂРµРґР»РѕРіРё
+'    Case SpeechPartTypeUndef   ' РЅРµРёР·РІРµСЃС‚РЅС‹Рµ
     End Select
-' Определяем начало, окончание слова и букву перед окончанием
-    ' возможо замену ё>е надо делать после определения окончания
-    ' для обработки -ок, -ёк и -он, -ён
-    'Result = Replace(Result, "ё", "е")
+' РћРїСЂРµРґРµР»СЏРµРј РЅР°С‡Р°Р»Рѕ, РѕРєРѕРЅС‡Р°РЅРёРµ СЃР»РѕРІР° Рё Р±СѓРєРІСѓ РїРµСЂРµРґ РѕРєРѕРЅС‡Р°РЅРёРµРј
+    ' РІРѕР·РјРѕР¶Рѕ Р·Р°РјРµРЅСѓ С‘>Рµ РЅР°РґРѕ РґРµР»Р°С‚СЊ РїРѕСЃР»Рµ РѕРїСЂРµРґРµР»РµРЅРёСЏ РѕРєРѕРЅС‡Р°РЅРёСЏ
+    ' РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё -РѕРє, -С‘Рє Рё -РѕРЅ, -С‘РЅ
+    'Result = Replace(Result, "С‘", "Рµ")
     Call p_GetWordParts(Result, WordBeg, WordEnd, Template)
-    i = iMax - Len(WordEnd)                     ' позиция начала окончания
-' Дополнительное ограниичение: если длина слова < 3 и последняя гласная - лучше не склонять
+    i = iMax - Len(WordEnd)                     ' РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РѕРєРѕРЅС‡Р°РЅРёСЏ
+' Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РѕРіСЂР°РЅРёРёС‡РµРЅРёРµ: РµСЃР»Рё РґР»РёРЅР° СЃР»РѕРІР° < 3 Рё РїРѕСЃР»РµРґРЅСЏСЏ РіР»Р°СЃРЅР°СЏ - Р»СѓС‡С€Рµ РЅРµ СЃРєР»РѕРЅСЏС‚СЊ
     If i < 3 And InStr(1, c_strSymbRusVowel, WordEnd) Then GoTo HandleExit
-    sChar = LCase$(Mid$(Result, i, 1))          ' буква перед окончанием
-' Определение рода (очень приблизительно)
+    sChar = LCase$(Mid$(Result, i, 1))          ' Р±СѓРєРІР° РїРµСЂРµРґ РѕРєРѕРЅС‡Р°РЅРёРµРј
+' РћРїСЂРµРґРµР»РµРЅРёРµ СЂРѕРґР° (РѕС‡РµРЅСЊ РїСЂРёР±Р»РёР·РёС‚РµР»СЊРЅРѕ)
     If NewGend = DeclineGendUndef Then _
        NewGend = p_GetWordGender(Word, WordEnd) 'And NewNumb <> DeclineNumbPlural
-    If NewGend = DeclineGendNeut Then Animate = False ' ср.р считаем неодушевленным
-' Обработка окончаний и склонение
+    If NewGend = DeclineGendNeut Then Animate = False ' СЃСЂ.СЂ СЃС‡РёС‚Р°РµРј РЅРµРѕРґСѓС€РµРІР»РµРЅРЅС‹Рј
+' РћР±СЂР°Р±РѕС‚РєР° РѕРєРѕРЅС‡Р°РЅРёР№ Рё СЃРєР»РѕРЅРµРЅРёРµ
     Select Case WordEnd
-    'Case "ии"
-    '' мн.число
-    'Case "и"
-    '' мн.число
-    Case "а"
+    'Case "РёРё"
+    '' РјРЅ.С‡РёСЃР»Рѕ
+    'Case "Рё"
+    '' РјРЅ.С‡РёСЃР»Рѕ
+    Case "Р°"
         Select Case sChar
-        Case "к", "г", "х"
-    ' -ка, -га, -ха
+        Case "Рє", "Рі", "С…"
+    ' -РєР°, -РіР°, -С…Р°
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "и"
-            Case DeclineCaseRod: If NewNumb <> 2 Then WordEnd = "и": GoTo HandleExit
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "Рё"
+            Case DeclineCaseRod: If NewNumb <> 2 Then WordEnd = "Рё": GoTo HandleExit
                     Select Case Mid$(WordBeg, i - 1, 1)
-                    Case "й":                   WordEnd = "е" & sChar: i = i - 2 '-йка, -йга
-                    Case "ч", "ш", "ж", "ц":    WordEnd = "е" & sChar: i = i - 1 '-чка, -шка
+                    Case "Р№":                   WordEnd = "Рµ" & sChar: i = i - 2 '-Р№РєР°, -Р№РіР°
+                    Case "С‡", "С€", "Р¶", "С†":    WordEnd = "Рµ" & sChar: i = i - 1 '-С‡РєР°, -С€РєР°
                     Case Else:                  WordEnd = ""
                     End Select
-            Case DeclineCaseDat: WordEnd = Choose(NewNumb, "е", "ам")
-            Case DeclineCaseVin: If NewNumb <> DeclineNumbPlural Then WordEnd = "у": GoTo HandleExit
+            Case DeclineCaseDat: WordEnd = Choose(NewNumb, "Рµ", "Р°Рј")
+            Case DeclineCaseVin: If NewNumb <> DeclineNumbPlural Then WordEnd = "Сѓ": GoTo HandleExit
                     If Animate Then
                     Select Case Mid$(WordBeg, i - 1, 1)
-                    Case "й":                   WordEnd = "е" & sChar: i = i - 2 '-йка, -йга
-                    Case "ч", "ш", "ж", "ц":    WordEnd = "е" & sChar: i = i - 1 '-чка, -шка
+                    Case "Р№":                   WordEnd = "Рµ" & sChar: i = i - 2 '-Р№РєР°, -Р№РіР°
+                    Case "С‡", "С€", "Р¶", "С†":    WordEnd = "Рµ" & sChar: i = i - 1 '-С‡РєР°, -С€РєР°
                     Case Else:                  WordEnd = ""
                     End Select
-                    Else: WordEnd = "и"
+                    Else: WordEnd = "Рё"
                     End If
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ой", "ами")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РѕР№", "Р°РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "Р°С…")
             End Select
-        Case "ч", "щ"
-    ' -ча, -ща
+        Case "С‡", "С‰"
+    ' -С‡Р°, -С‰Р°
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "и"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "и", "")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "е", "ам")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "у", IIf(Animate, "ей", "и"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ей", "ами")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "Рё"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "Рё", "")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Рµ", "Р°Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "Сѓ", IIf(Animate, "РµР№", "Рё"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РµР№", "Р°РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "Р°С…")
             End Select
-        Case "ц"
-    ' -ца
+        Case "С†"
+    ' -С†Р°
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "ы"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ы", "")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "е", "ам")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "у", IIf(Animate, "", "ы"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ей", "ами")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "С‹"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "С‹", "")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Рµ", "Р°Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "Сѓ", IIf(Animate, "", "С‹"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РµР№", "Р°РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "Р°С…")
             End Select
-        Case "в", "н"
+        Case "РІ", "РЅ"
             If IsFio = 1 And NewGend = 2 Then
-    ' женские фамилии на -ва, -на
+    ' Р¶РµРЅСЃРєРёРµ С„Р°РјРёР»РёРё РЅР° -РІР°, -РЅР°
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "ы"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ой", "ых")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ой", "ым")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "у", "ых")
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ой", "ыми")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "ой", "ых")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "С‹"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "РѕР№", "С‹С…")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "РѕР№", "С‹Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "Сѓ", "С‹С…")
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РѕР№", "С‹РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "РѕР№", "С‹С…")
             End Select
             ElseIf IsFio = 2 And NewGend = 2 Then
-    ' женские имена на -ва, -на
+    ' Р¶РµРЅСЃРєРёРµ РёРјРµРЅР° РЅР° -РІР°, -РЅР°
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "ы"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ы", "")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "е", "ам")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "у", "")
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ой", "ами")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "С‹"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "С‹", "")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Рµ", "Р°Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "Сѓ", "")
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РѕР№", "Р°РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "Р°С…")
             End Select
             ElseIf IsFio = 3 And NewGend = 2 Then
-    ' женские отчества на -вна
+    ' Р¶РµРЅСЃРєРёРµ РѕС‚С‡РµСЃС‚РІР° РЅР° -РІРЅР°
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "ы"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ы", "ых")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "е", "ам")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "ну", "ен"): i = i - 1 ': Stop
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ой", "ами")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "С‹"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "С‹", "С‹С…")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Рµ", "Р°Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "РЅСѓ", "РµРЅ"): i = i - 1 ': Stop
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РѕР№", "Р°РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "Р°С…")
             End Select
-    ' прочие на -ва, -на
+    ' РїСЂРѕС‡РёРµ РЅР° -РІР°, -РЅР°
             Else
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "ы"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ы", "ых")
-            Case DeclineCaseDat, DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ым")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "у", IIf(Animate, "", "ы"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ой", "ыми")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "С‹"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "С‹", "С‹С…")
+            Case DeclineCaseDat, DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "С‹Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "Сѓ", IIf(Animate, "", "С‹"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РѕР№", "С‹РјРё")
             End Select
             End If
         Case Else
-    ' прочие на -а
+    ' РїСЂРѕС‡РёРµ РЅР° -Р°
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "ы"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ы", "")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "е", "ам")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "у", IIf(Animate, "", "ы"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ой", "ами")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "С‹"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "С‹", "")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Рµ", "Р°Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "Сѓ", IIf(Animate, "", "С‹"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РѕР№", "Р°РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "Р°С…")
             End Select
         End Select
-    Case "я"
+    Case "СЏ"
         Select Case sChar
-        Case "м"
-    ' на -мя
+        Case "Рј"
+    ' РЅР° -РјСЏ
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "ена"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ени", "ян")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ени", "енам")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "я", IIf(Animate, "ян", "ена"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "енем", "енами")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "ени", "енах")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "РµРЅР°"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "РµРЅРё", "СЏРЅ")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "РµРЅРё", "РµРЅР°Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "СЏ", IIf(Animate, "СЏРЅ", "РµРЅР°"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РµРЅРµРј", "РµРЅР°РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "РµРЅРё", "РµРЅР°С…")
             End Select
         Case Else
-    ' прочие на -я
+    ' РїСЂРѕС‡РёРµ РЅР° -СЏ
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "и"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "и", "")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "е", "ям")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "ю", IIf(Animate, "", "и"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ей", "ями")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ях")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "Рё"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "Рё", "")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Рµ", "СЏРј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "СЋ", IIf(Animate, "", "Рё"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РµР№", "СЏРјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "СЏС…")
             End Select
         End Select
-    Case "о"
-    ' на -о
+    Case "Рѕ"
+    ' РЅР° -Рѕ
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "а"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "а", "")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "у", "ам")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "о", IIf(Animate, "", "а"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ом", "ами")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "Р°"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "Р°", "")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Сѓ", "Р°Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "Рѕ", IIf(Animate, "", "Р°"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РѕРј", "Р°РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "Р°С…")
             End Select
-    Case "е"
-    ' на -е
+    Case "Рµ"
+    ' РЅР° -Рµ
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "я"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "я", "ей")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ю", "ям")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "е", IIf(Animate, "ей", "я"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ем", "ями")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ях")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "СЏ"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "СЏ", "РµР№")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "СЋ", "СЏРј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "Рµ", IIf(Animate, "РµР№", "СЏ"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РµРј", "СЏРјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "СЏС…")
             End Select
-    Case "ое"
-    ' на -ое
-            If InStr(1, "кгх", sChar) Then sChar = "и" Else sChar = "ы"
+    Case "РѕРµ"
+    ' РЅР° -РѕРµ
+            If InStr(1, "РєРіС…", sChar) Then sChar = "Рё" Else sChar = "С‹"
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = sChar & "е"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ого", sChar & "х")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ому", sChar & "м")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "ое", sChar & IIf(Animate, "х", "е")) '
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, sChar & "м", sChar & "ми")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "ом", sChar & "х")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = sChar & "Рµ"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "РѕРіРѕ", sChar & "С…")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "РѕРјСѓ", sChar & "Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "РѕРµ", sChar & IIf(Animate, "С…", "Рµ")) '
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, sChar & "Рј", sChar & "РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "РѕРј", sChar & "С…")
             End Select
-    Case "ее"
-    ' на -ее
-            If sChar <> "ц" Then sChar = "и" Else sChar = "ы"
+    Case "РµРµ"
+    ' РЅР° -РµРµ
+            If sChar <> "С†" Then sChar = "Рё" Else sChar = "С‹"
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = sChar & "е"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "его", sChar & "х")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ему", sChar & "м")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "ее", IIf(Animate, "их", sChar & "е"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, sChar & "м", sChar & "ми")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "ем", sChar & "х")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = sChar & "Рµ"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "РµРіРѕ", sChar & "С…")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "РµРјСѓ", sChar & "Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "РµРµ", IIf(Animate, "РёС…", sChar & "Рµ"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, sChar & "Рј", sChar & "РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "РµРј", sChar & "С…")
             End Select
-    Case "ие"
-    ' на -ие
+    Case "РёРµ"
+    ' РЅР° -РёРµ
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "ия"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ия", "ий")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ию", "иям")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "ие", IIf(Animate, "их", "ия"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ием", "иями")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "ии", "иях")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "РёСЏ"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "РёСЏ", "РёР№")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "РёСЋ", "РёСЏРј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "РёРµ", IIf(Animate, "РёС…", "РёСЏ"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РёРµРј", "РёСЏРјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "РёРё", "РёСЏС…")
             End Select
-    Case "ия"
-    ' на -ия
+    Case "РёСЏ"
+    ' РЅР° -РёСЏ
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "ии"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ии", "ий")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ии", "иям")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "ию", IIf(Animate, "ий", "ии"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ией", "иями")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "ии", "иях")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "РёРё"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "РёРё", "РёР№")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "РёРё", "РёСЏРј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "РёСЋ", IIf(Animate, "РёР№", "РёРё"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РёРµР№", "РёСЏРјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "РёРё", "РёСЏС…")
             End Select
-    Case "ья"
-    ' на -ия
+    Case "СЊСЏ"
+    ' РЅР° -РёСЏ
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "ьи"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ьи", "ий")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ье", "ьям")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "ью", IIf(Animate, "ий", "ьи"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ьей", "ьями")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "ье", "ьях")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "СЊРё"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "СЊРё", "РёР№")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "СЊРµ", "СЊСЏРј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "СЊСЋ", IIf(Animate, "РёР№", "СЊРё"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "СЊРµР№", "СЊСЏРјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "СЊРµ", "СЊСЏС…")
             End Select
-    Case "ая"
-    ' на -ая
-        If InStr(1, "цчшщж", sChar) Then
-            If NewNumb = DeclineNumbPlural And sChar = "ц" Then sChar = "ы" Else sChar = "и"
+    Case "Р°СЏ"
+    ' РЅР° -Р°СЏ
+        If InStr(1, "С†С‡С€С‰Р¶", sChar) Then
+            If NewNumb = DeclineNumbPlural And sChar = "С†" Then sChar = "С‹" Else sChar = "Рё"
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "ие"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "ей", sChar & "х")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ей", sChar & "м")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "ую", IIf(Animate, sChar & "х", "ие"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ей", sChar & "ми")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "ей", sChar & "х")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "РёРµ"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "РµР№", sChar & "С…")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "РµР№", sChar & "Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "СѓСЋ", IIf(Animate, sChar & "С…", "РёРµ"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РµР№", sChar & "РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "РµР№", sChar & "С…")
             End Select
         Else
             If NewNumb = DeclineNumbPlural Then
-            If InStr(1, "кгх", sChar) Then sChar = "и" Else sChar = "ы"
+            If InStr(1, "РєРіС…", sChar) Then sChar = "Рё" Else sChar = "С‹"
             End If
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = sChar & "е"
-            Case DeclineCaseRod, DeclineCasePred: WordEnd = Choose(NewNumb, "ой", sChar & "х")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ой", sChar & "м")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "ую", sChar & IIf(Animate, "х", "е"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ой", sChar & "ми")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = sChar & "Рµ"
+            Case DeclineCaseRod, DeclineCasePred: WordEnd = Choose(NewNumb, "РѕР№", sChar & "С…")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "РѕР№", sChar & "Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "СѓСЋ", sChar & IIf(Animate, "С…", "Рµ"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РѕР№", sChar & "РјРё")
             End Select
         End If
-    Case "ин", "ын"
+    Case "РёРЅ", "С‹РЅ"
         i = i + 2
         If IsFio = 1 Then
-    ' фамилии на -ин, -ын
+    ' С„Р°РјРёР»РёРё РЅР° -РёРЅ, -С‹РЅ
             Select Case NewCase
-            Case DeclineCaseImen: WordEnd = Choose(NewNumb, vbNullString, "ы")
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "а", "ых")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "у", "ым")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "а", "ых")
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ым", "ыми")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ых")
+            Case DeclineCaseImen: WordEnd = Choose(NewNumb, vbNullString, "С‹")
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "Р°", "С‹С…")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Сѓ", "С‹Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "Р°", "С‹С…")
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "С‹Рј", "С‹РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "С‹С…")
             End Select
         Else
-    ' прочие на -ин, -ын
+    ' РїСЂРѕС‡РёРµ РЅР° -РёРЅ, -С‹РЅ
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = WordEnd & "ы"
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "а", "")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "у", "ам")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "а", "")
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ом", "ами")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = WordEnd & "С‹"
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "Р°", "")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Сѓ", "Р°Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "Р°", "")
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РѕРј", "Р°РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "Р°С…")
             End Select
         End If
-    Case "ой", "ый"
-            If (NewNumb = DeclineNumbPlural) And (WordEnd = "ой") And (sChar = "ш" Or sChar = "х") Then sChar = "и" Else sChar = "ы"
+    Case "РѕР№", "С‹Р№"
+            If (NewNumb = DeclineNumbPlural) And (WordEnd = "РѕР№") And (sChar = "С€" Or sChar = "С…") Then sChar = "Рё" Else sChar = "С‹"
             Select Case NewCase
-            Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, WordEnd, "ая", "ое"), sChar & "е")
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ого", "ой"), sChar & "х")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ому", "ой"), sChar & "м")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, IIf(Animate, "ого", WordEnd), "ую"), sChar & "х")
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ым", "ой"), sChar & "ми")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ом", "ой"), sChar & "х")
+            Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, WordEnd, "Р°СЏ", "РѕРµ"), sChar & "Рµ")
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РѕРіРѕ", "РѕР№"), sChar & "С…")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РѕРјСѓ", "РѕР№"), sChar & "Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, IIf(Animate, "РѕРіРѕ", WordEnd), "СѓСЋ"), sChar & "С…")
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "С‹Рј", "РѕР№"), sChar & "РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РѕРј", "РѕР№"), sChar & "С…")
             End Select
-    Case "ий"
+    Case "РёР№"
         Select Case sChar
-        Case "к"    ' -кий
+        Case "Рє"    ' -РєРёР№
             Select Case NewCase
-            Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "ий", "ая", "ое"), "ие")
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ого", "ой"), "их")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ому", "ой"), "им")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ого", "ой"), "их")
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "им", "ой"), "ими")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ом", "ой"), "их")
+            Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "РёР№", "Р°СЏ", "РѕРµ"), "РёРµ")
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РѕРіРѕ", "РѕР№"), "РёС…")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РѕРјСѓ", "РѕР№"), "РёРј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РѕРіРѕ", "РѕР№"), "РёС…")
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РёРј", "РѕР№"), "РёРјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РѕРј", "РѕР№"), "РёС…")
             End Select
-        Case "р"    ' -рий
+        Case "СЂ"    ' -СЂРёР№
             Select Case NewCase
-            Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "ий", "ия", "ие"), "ии")
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ия", "ию"), "иев")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ию", "ии"), "иям")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ия", "ию"), "иев")
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ием", "ией"), "иями")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ие", "ии"), "иях")
+            Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "РёР№", "РёСЏ", "РёРµ"), "РёРё")
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РёСЏ", "РёСЋ"), "РёРµРІ")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РёСЋ", "РёРё"), "РёСЏРј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РёСЏ", "РёСЋ"), "РёРµРІ")
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РёРµРј", "РёРµР№"), "РёСЏРјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РёРµ", "РёРё"), "РёСЏС…")
             End Select
-        Case "л"    ' -лий
+        Case "Р»"    ' -Р»РёР№
             Select Case NewCase
-            Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "ий", "ия", "ие"), "ии")
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ия", "ию"), "иев")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ию", "ии"), "иям")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ий", "ию"), "иев")
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ием", "ией"), "иями")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ии", "ии"), "иях")
+            Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "РёР№", "РёСЏ", "РёРµ"), "РёРё")
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РёСЏ", "РёСЋ"), "РёРµРІ")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РёСЋ", "РёРё"), "РёСЏРј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РёР№", "РёСЋ"), "РёРµРІ")
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РёРµРј", "РёРµР№"), "РёСЏРјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РёРё", "РёРё"), "РёСЏС…")
             End Select
-        Case "т"    ' -тий
+        Case "С‚"    ' -С‚РёР№
             Select Case NewCase
-            Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "ий", "ья", "ье"), "ьи")
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ьего", "ьей"), "ьих")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ьему", "ьей"), "ьим")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ьего", "ьей"), "ьих")
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ьим", "ьей"), "ьими")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ьем", "ьей"), "ьих")
+            Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "РёР№", "СЊСЏ", "СЊРµ"), "СЊРё")
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "СЊРµРіРѕ", "СЊРµР№"), "СЊРёС…")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "СЊРµРјСѓ", "СЊРµР№"), "СЊРёРј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "СЊРµРіРѕ", "СЊРµР№"), "СЊРёС…")
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "СЊРёРј", "СЊРµР№"), "СЊРёРјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "СЊРµРј", "СЊРµР№"), "СЊРёС…")
             End Select
-        Case "ж", "ш", "щ", "н"   ' -жий и -ший
+        Case "Р¶", "С€", "С‰", "РЅ"   ' -Р¶РёР№ Рё -С€РёР№
             Select Case NewCase
-            Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "ий", IIf(sChar = "н", "я", "а") & "я", "ее"), "ие")
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "его", "ей"), "их")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ему", "ей"), "им")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, Choose(NewGend, IIf(Animate, "его", "ий"), IIf(sChar = "н", "ю", "у") & "ю", "ее"), IIf(Animate, "их", "ие"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "им", "ей"), "ими")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "ем", "ей"), "их")
+            Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "РёР№", IIf(sChar = "РЅ", "СЏ", "Р°") & "СЏ", "РµРµ"), "РёРµ")
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РµРіРѕ", "РµР№"), "РёС…")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РµРјСѓ", "РµР№"), "РёРј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, Choose(NewGend, IIf(Animate, "РµРіРѕ", "РёР№"), IIf(sChar = "РЅ", "СЋ", "Сѓ") & "СЋ", "РµРµ"), IIf(Animate, "РёС…", "РёРµ"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РёРј", "РµР№"), "РёРјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend <> DeclineGendFem, "РµРј", "РµР№"), "РёС…")
             End Select
         End Select
-    Case "ай", "ей", "уй", "эй", "юй", "яй" ', "ий"
-        If sChar <> "к" Then
-    ' прочие на -ай, -ей, -уй, -эй, -юй, -яй ', -ий
+    Case "Р°Р№", "РµР№", "СѓР№", "СЌР№", "СЋР№", "СЏР№" ', "РёР№"
+        If sChar <> "Рє" Then
+    ' РїСЂРѕС‡РёРµ РЅР° -Р°Р№, -РµР№, -СѓР№, -СЌР№, -СЋР№, -СЏР№ ', -РёР№
             i = i + 1
             Select Case NewCase
-            Case DeclineCaseImen: WordEnd = Choose(NewNumb, "й", "и")
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "я", "ев")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ю", "ям")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "я", "й"), IIf(Animate, "ев", "и"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ем", "ями")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ях")
+            Case DeclineCaseImen: WordEnd = Choose(NewNumb, "Р№", "Рё")
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "СЏ", "РµРІ")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "СЋ", "СЏРј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "СЏ", "Р№"), IIf(Animate, "РµРІ", "Рё"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РµРј", "СЏРјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "СЏС…")
             End Select
         End If
-    Case "ав"
-    ' на -ав
+    Case "Р°РІ"
+    ' РЅР° -Р°РІ
             i = i + 2
             Select Case NewCase
-            Case DeclineCaseImen: WordEnd = Choose(NewNumb, vbNullString, "ы")
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "а", "ов")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "у", "ам")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "а", ""), IIf(Animate, "ов", "ы"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ом", "ами")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+            Case DeclineCaseImen: WordEnd = Choose(NewNumb, vbNullString, "С‹")
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "Р°", "РѕРІ")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Сѓ", "Р°Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "Р°", ""), IIf(Animate, "РѕРІ", "С‹"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РѕРј", "Р°РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "Р°С…")
             End Select
-    Case "ок", "ёк"
-    ' на -ок
-            If Left$(WordEnd, 1) = "ё" Then sChar = "ь" Else sChar = ""
+    Case "РѕРє", "С‘Рє"
+    ' РЅР° -РѕРє
+            If Left$(WordEnd, 1) = "С‘" Then sChar = "СЊ" Else sChar = ""
             Select Case NewCase
-            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = IIf(Left$(WordEnd, 1) = "ё", "ь", "") & "ки"
-            Case DeclineCaseRod:  WordEnd = sChar & Choose(NewNumb, "ка", "ков")
-            Case DeclineCaseDat:  WordEnd = sChar & Choose(NewNumb, "ку", "кам")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, sChar & "ка", WordEnd), IIf(Animate, sChar & "ков", sChar & "ки"))
-            Case DeclineCaseTvor: WordEnd = sChar & Choose(NewNumb, "ком", "ками")
-            Case DeclineCasePred: WordEnd = sChar & Choose(NewNumb, "ке", "ках")
+            Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = IIf(Left$(WordEnd, 1) = "С‘", "СЊ", "") & "РєРё"
+            Case DeclineCaseRod:  WordEnd = sChar & Choose(NewNumb, "РєР°", "РєРѕРІ")
+            Case DeclineCaseDat:  WordEnd = sChar & Choose(NewNumb, "РєСѓ", "РєР°Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, sChar & "РєР°", WordEnd), IIf(Animate, sChar & "РєРѕРІ", sChar & "РєРё"))
+            Case DeclineCaseTvor: WordEnd = sChar & Choose(NewNumb, "РєРѕРј", "РєР°РјРё")
+            Case DeclineCasePred: WordEnd = sChar & Choose(NewNumb, "РєРµ", "РєР°С…")
             End Select
             i = Len(Result) - 2
-'    Case "еёк" '>йка и т.д.
-'    Case "их", "ых"
-'    Case "ин", "ын"
+'    Case "РµС‘Рє" '>Р№РєР° Рё С‚.Рґ.
+'    Case "РёС…", "С‹С…"
+'    Case "РёРЅ", "С‹РЅ"
     Case Else
-    ' все остальное
+    ' РІСЃРµ РѕСЃС‚Р°Р»СЊРЅРѕРµ
         WordBeg = LCase$(Result): WordEnd = vbNullString: i = iMax
         sChar = Right$(WordBeg, 1)
         Select Case LCase$(Right$(Template, 1))
-        Case "s" ' заканчивается на согласную
-        ' женские фамилии на согласную оставляем как есть
+        Case "s" ' Р·Р°РєР°РЅС‡РёРІР°РµС‚СЃСЏ РЅР° СЃРѕРіР»Р°СЃРЅСѓСЋ
+        ' Р¶РµРЅСЃРєРёРµ С„Р°РјРёР»РёРё РЅР° СЃРѕРіР»Р°СЃРЅСѓСЋ РѕСЃС‚Р°РІР»СЏРµРј РєР°Рє РµСЃС‚СЊ
             If IsFio = 1 And NewGend = 2 Then GoTo HandleExit
             Select Case sChar
-            Case "й"
-        ' на -й
+            Case "Р№"
+        ' РЅР° -Р№
                 Select Case NewCase
-                Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "и":
-                Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "я", "ёв")
-                Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ю", "ям")
-                Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "я", WordEnd), IIf(Animate, "ев", "и"))
-                Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ем", "ями")
-                Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ях")
+                Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "Рё":
+                Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "СЏ", "С‘РІ")
+                Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "СЋ", "СЏРј")
+                Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "СЏ", WordEnd), IIf(Animate, "РµРІ", "Рё"))
+                Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РµРј", "СЏРјРё")
+                Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "СЏС…")
                 End Select
                 i = i - 1
-            Case "ч", "ш", "щ", "ж"
-        ' на -ч,-ш,-щ,-ж
+            Case "С‡", "С€", "С‰", "Р¶"
+        ' РЅР° -С‡,-С€,-С‰,-Р¶
                 Select Case NewCase
-                Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "и"
-                Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "а", "ей")
-                Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "у", "ам")
-                Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "а", WordEnd), IIf(Animate, "ей", "и"))
-                Case DeclineCaseTvor: WordEnd = Choose(IsFio + 1, Choose(NewNumb, "ом", "ами"), Choose(NewNumb, "ем", "ами"), Choose(NewNumb, "ом", "ами"), Choose(NewNumb, "ем", "ами"))
-                Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+                Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "Рё"
+                Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "Р°", "РµР№")
+                Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Сѓ", "Р°Рј")
+                Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "Р°", WordEnd), IIf(Animate, "РµР№", "Рё"))
+                Case DeclineCaseTvor: WordEnd = Choose(IsFio + 1, Choose(NewNumb, "РѕРј", "Р°РјРё"), Choose(NewNumb, "РµРј", "Р°РјРё"), Choose(NewNumb, "РѕРј", "Р°РјРё"), Choose(NewNumb, "РµРј", "Р°РјРё"))
+                Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "Р°С…")
                 End Select
-            Case "з"
-      ' на -з
+            Case "Р·"
+      ' РЅР° -Р·
                 Select Case NewCase
-                Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "ы"
-                Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "а", "ов")
-                Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "у", "ам")
-                Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "а", ""), IIf(Animate, "ов", "ы"))
-                Case DeclineCaseTvor: WordEnd = Choose(IsFio + 1, Choose(NewNumb, "ом", "ами"), Choose(NewNumb, "ым", "ыми"), Choose(NewNumb, "ом", "ами"), Choose(NewNumb, "ем", "ами"))
-                Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+                Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = "С‹"
+                Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "Р°", "РѕРІ")
+                Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Сѓ", "Р°Рј")
+                Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "Р°", ""), IIf(Animate, "РѕРІ", "С‹"))
+                Case DeclineCaseTvor: WordEnd = Choose(IsFio + 1, Choose(NewNumb, "РѕРј", "Р°РјРё"), Choose(NewNumb, "С‹Рј", "С‹РјРё"), Choose(NewNumb, "РѕРј", "Р°РјРё"), Choose(NewNumb, "РµРј", "Р°РјРё"))
+                Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "Р°С…")
                 End Select
             Case Else
-      ' на остальные согласные
+      ' РЅР° РѕСЃС‚Р°Р»СЊРЅС‹Рµ СЃРѕРіР»Р°СЃРЅС‹Рµ
                 Select Case NewCase
-                Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = IIf(InStr(1, "кгхжчшщ", sChar), "и", "ы")
-                Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "а", IIf(IsFio = 1, "ых", "ов"))
-                Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "у", IIf(IsFio = 1, "ым", "ам"))
-                Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "а", ""), IIf(Animate, IIf(IsFio = 1, "ых", "ов"), "ы"))  ' "ы"",""ов"
-                Case DeclineCaseTvor: WordEnd = Choose(IsFio + 1, Choose(NewNumb, "ом", "ами"), Choose(NewNumb, "ым", "ыми"), Choose(NewNumb, "ом", "ами"), Choose(NewNumb, "ем", "ами"))
-                Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", IIf(IsFio = 1, "ых", "ах"))
+                Case DeclineCaseImen: If NewNumb = DeclineNumbPlural Then WordEnd = IIf(InStr(1, "РєРіС…Р¶С‡С€С‰", sChar), "Рё", "С‹")
+                Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "Р°", IIf(IsFio = 1, "С‹С…", "РѕРІ"))
+                Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Сѓ", IIf(IsFio = 1, "С‹Рј", "Р°Рј"))
+                Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "Р°", ""), IIf(Animate, IIf(IsFio = 1, "С‹С…", "РѕРІ"), "С‹"))  ' "С‹"",""РѕРІ"
+                Case DeclineCaseTvor: WordEnd = Choose(IsFio + 1, Choose(NewNumb, "РѕРј", "Р°РјРё"), Choose(NewNumb, "С‹Рј", "С‹РјРё"), Choose(NewNumb, "РѕРј", "Р°РјРё"), Choose(NewNumb, "РµРј", "Р°РјРё"))
+                Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", IIf(IsFio = 1, "С‹С…", "Р°С…"))
                 End Select
             End Select
         Case "x"
-    ' заканчивается на -ь
+    ' Р·Р°РєР°РЅС‡РёРІР°РµС‚СЃСЏ РЅР° -СЊ
         i = i - 1
         Select Case VBA.Left$(VBA.Right$(Result, 2), 1)
-        Case "ч", "ш", "ж":
+        Case "С‡", "С€", "Р¶":
             If IsFio = 1 Then GoTo HandleExit
             Select Case NewCase
-            Case DeclineCaseImen: WordEnd = Choose(NewNumb, "ь", "и")
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "и", "ей")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "и", "ам")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "ь", IIf(Animate, "ей", "и")) ' если дочь -> дочерей
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ью", "ами")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, "и", "ах")
+            Case DeclineCaseImen: WordEnd = Choose(NewNumb, "СЊ", "Рё")
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "Рё", "РµР№")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Рё", "Р°Рј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "СЊ", IIf(Animate, "РµР№", "Рё")) ' РµСЃР»Рё РґРѕС‡СЊ -> РґРѕС‡РµСЂРµР№
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "СЊСЋ", "Р°РјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рё", "Р°С…")
             End Select
         Case Else:
             If IsFio = 1 And NewGend <> 1 Then GoTo HandleExit
             Select Case NewCase
-            Case DeclineCaseImen: WordEnd = Choose(NewNumb, "ь", "и")
-            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend = 1, "я", "и"), "ей")
-            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, IIf(NewGend = 1, "ю", "и"), "ям")
-            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "я", "ь"), IIf(Animate, "ей", "и"))
-            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend = 1, "ём", "ью"), "ями")
-            Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend = 1, "е", "и"), "ях")
+            Case DeclineCaseImen: WordEnd = Choose(NewNumb, "СЊ", "Рё")
+            Case DeclineCaseRod:  WordEnd = Choose(NewNumb, IIf(NewGend = 1, "СЏ", "Рё"), "РµР№")
+            Case DeclineCaseDat:  WordEnd = Choose(NewNumb, IIf(NewGend = 1, "СЋ", "Рё"), "СЏРј")
+            Case DeclineCaseVin:  WordEnd = Choose(NewNumb, IIf(Animate, "СЏ", "СЊ"), IIf(Animate, "РµР№", "Рё"))
+            Case DeclineCaseTvor: WordEnd = Choose(NewNumb, IIf(NewGend = 1, "С‘Рј", "СЊСЋ"), "СЏРјРё")
+            Case DeclineCasePred: WordEnd = Choose(NewNumb, IIf(NewGend = 1, "Рµ", "Рё"), "СЏС…")
             End Select
         End Select
         End Select
@@ -5333,33 +5343,33 @@ Public Function DeclineWords( _
     Optional ByRef IsFio, _
     Optional SkipWords As String _
     ) As String
-' склонение слов. работает весьма условно
+' СЃРєР»РѕРЅРµРЅРёРµ СЃР»РѕРІ. СЂР°Р±РѕС‚Р°РµС‚ РІРµСЃСЊРјР° СѓСЃР»РѕРІРЅРѕ
 '-------------------------
-' Word - существительное в единственном числе именительном падеже
-' NewCase - падеж ("и","р","д","в","т","п")
-' NewNumb - число ("ед","мн")
-' NewGend - род ("м","ж")
-' Animate - признак одушевлённости / неодушевлённости
-' IsFIO - признак ФИО
-' SkipWords - список номеров слов, которые необходимо пропустить при склонении словосочетания
-'   начиная с 1, по возрастанию через ",", диапазон через "-"
-'   например: "2,4-5,7-" - при склонении будут пропущены все слова кроме 1,3 и 6
+' Word - СЃСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅРѕРµ РІ РµРґРёРЅСЃС‚РІРµРЅРЅРѕРј С‡РёСЃР»Рµ РёРјРµРЅРёС‚РµР»СЊРЅРѕРј РїР°РґРµР¶Рµ
+' NewCase - РїР°РґРµР¶ ("Рё","СЂ","Рґ","РІ","С‚","Рї")
+' NewNumb - С‡РёСЃР»Рѕ ("РµРґ","РјРЅ")
+' NewGend - СЂРѕРґ ("Рј","Р¶")
+' Animate - РїСЂРёР·РЅР°Рє РѕРґСѓС€РµРІР»С‘РЅРЅРѕСЃС‚Рё / РЅРµРѕРґСѓС€РµРІР»С‘РЅРЅРѕСЃС‚Рё
+' IsFIO - РїСЂРёР·РЅР°Рє Р¤РРћ
+' SkipWords - СЃРїРёСЃРѕРє РЅРѕРјРµСЂРѕРІ СЃР»РѕРІ, РєРѕС‚РѕСЂС‹Рµ РЅРµРѕР±С…РѕРґРёРјРѕ РїСЂРѕРїСѓСЃС‚РёС‚СЊ РїСЂРё СЃРєР»РѕРЅРµРЅРёРё СЃР»РѕРІРѕСЃРѕС‡РµС‚Р°РЅРёСЏ
+'   РЅР°С‡РёРЅР°СЏ СЃ 1, РїРѕ РІРѕР·СЂР°СЃС‚Р°РЅРёСЋ С‡РµСЂРµР· ",", РґРёР°РїР°Р·РѕРЅ С‡РµСЂРµР· "-"
+'   РЅР°РїСЂРёРјРµСЂ: "2,4-5,7-" - РїСЂРё СЃРєР»РѕРЅРµРЅРёРё Р±СѓРґСѓС‚ РїСЂРѕРїСѓС‰РµРЅС‹ РІСЃРµ СЃР»РѕРІР° РєСЂРѕРјРµ 1,3 Рё 6
 '-------------------------
-' для лучших результатов пользуйтесь Morpher'ом с http://morpher.ru
-' или Padej'ом http://www.delphikingdom.com/asp/viewitem.asp?catalogid=412
-' или модифицируйте правила и добавляйте мсключения под себя
+' РґР»СЏ Р»СѓС‡С€РёС… СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РїРѕР»СЊР·СѓР№С‚РµСЃСЊ Morpher'РѕРј СЃ http://morpher.ru
+' РёР»Рё Padej'РѕРј http://www.delphikingdom.com/asp/viewitem.asp?catalogid=412
+' РёР»Рё РјРѕРґРёС„РёС†РёСЂСѓР№С‚Рµ РїСЂР°РІРёР»Р° Рё РґРѕР±Р°РІР»СЏР№С‚Рµ РјСЃРєР»СЋС‡РµРЅРёСЏ РїРѕРґ СЃРµР±СЏ
 '-------------------------
-' v.1.0.2       : 06.07.2019 - в SkipWords добавлена возможноость задавать диапазоны
-' v.1.0.1       : 05.07.2019 - исправлена ошибка при пересборке строки старый способ с Replace приводил к ошибка при наличии повторов в строке
+' v.1.0.2       : 06.07.2019 - РІ SkipWords РґРѕР±Р°РІР»РµРЅР° РІРѕР·РјРѕР¶РЅРѕРѕСЃС‚СЊ Р·Р°РґР°РІР°С‚СЊ РґРёР°РїР°Р·РѕРЅС‹
+' v.1.0.1       : 05.07.2019 - РёСЃРїСЂР°РІР»РµРЅР° РѕС€РёР±РєР° РїСЂРё РїРµСЂРµСЃР±РѕСЂРєРµ СЃС‚СЂРѕРєРё СЃС‚Р°СЂС‹Р№ СЃРїРѕСЃРѕР± СЃ Replace РїСЂРёРІРѕРґРёР» Рє РѕС€РёР±РєР° РїСЂРё РЅР°Р»РёС‡РёРё РїРѕРІС‚РѕСЂРѕРІ РІ СЃС‚СЂРѕРєРµ
 '-------------------------
 Const cstrListDelim = ",", cstrDiapDelim = "-"
 Dim strWord As String, strTail As String, aWords() As String, aSkip() As String
-Dim i As Long, iMax As Long ' позиция в строке
-Dim j As Long, jMin As Long ' номер склоняемого слова
-Dim n As Long, nMin As Long ' номер элемента в списке исключаемых слов
-Dim s As String, sArr() As String ' элемент списка исключаемых слов
-Dim sNum As Byte, sMin As Byte ' индексы границ элемента списка
-Dim S1 As Long, S2 As Long  ' границы элемента списка
+Dim i As Long, iMax As Long ' РїРѕР·РёС†РёСЏ РІ СЃС‚СЂРѕРєРµ
+Dim j As Long, jMin As Long ' РЅРѕРјРµСЂ СЃРєР»РѕРЅСЏРµРјРѕРіРѕ СЃР»РѕРІР°
+Dim n As Long, nMin As Long ' РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° РІ СЃРїРёСЃРєРµ РёСЃРєР»СЋС‡Р°РµРјС‹С… СЃР»РѕРІ
+Dim s As String, sArr() As String ' СЌР»РµРјРµРЅС‚ СЃРїРёСЃРєР° РёСЃРєР»СЋС‡Р°РµРјС‹С… СЃР»РѕРІ
+Dim sNum As Byte, sMin As Byte ' РёРЅРґРµРєСЃС‹ РіСЂР°РЅРёС† СЌР»РµРјРµРЅС‚Р° СЃРїРёСЃРєР°
+Dim S1 As Long, S2 As Long  ' РіСЂР°РЅРёС†С‹ СЌР»РµРјРµРЅС‚Р° СЃРїРёСЃРєР°
 Dim tmpGender As DeclineGend
 Dim Result As String
 '
@@ -5368,78 +5378,78 @@ Dim Result As String
     If IsMissing(IsFio) Then IsFio = p_GetFIOAttr(Words, tmpGender): If NewGend = DeclineGendUndef And IsFio Then NewGend = tmpGender ' False
     strTail = Trim$(Words): iMax = Len(strTail)
     Call Tokenize(Words, aWords): jMin = LBound(aWords): j = UBound(aWords)
-    ' получаем список слов которые необходимо пропустить
+    ' РїРѕР»СѓС‡Р°РµРј СЃРїРёСЃРѕРє СЃР»РѕРІ РєРѕС‚РѕСЂС‹Рµ РЅРµРѕР±С…РѕРґРёРјРѕ РїСЂРѕРїСѓСЃС‚РёС‚СЊ
     n = -1: SkipWords = Trim$(SkipWords)
     If Len(SkipWords) > 0 Then aSkip = Split(SkipWords, cstrListDelim): nMin = LBound(aSkip): n = UBound(aSkip) + 1
     'If Len(SkipWords) > 0 Then Call xSplit(SkipWords, aSkip, cstrListDelim): nMin = LBound(aSkip): n = UBound(aSkip) + 1
     S1 = j - jMin + 1: S2 = 0
     Do While j >= jMin
-    ' перебираем слова от конца к началу
-    ' проверяем принадлежность слова текущему диапазону
+    ' РїРµСЂРµР±РёСЂР°РµРј СЃР»РѕРІР° РѕС‚ РєРѕРЅС†Р° Рє РЅР°С‡Р°Р»Сѓ
+    ' РїСЂРѕРІРµСЂСЏРµРј РїСЂРёРЅР°РґР»РµР¶РЅРѕСЃС‚СЊ СЃР»РѕРІР° С‚РµРєСѓС‰РµРјСѓ РґРёР°РїР°Р·РѕРЅСѓ
         If n < nMin Then GoTo HandleText
         If (S1 <= (j - jMin + 1)) And (S1 <> 0) And (S2 <> 0) Then GoTo HandleText
 HandleDiap:
         n = n - 1: If n < nMin Then S1 = 0: S2 = 0: GoTo HandleText
-    ' получаем элемент списка диапазона пропуска
-        ' проверяем в элементе списка пропуска наличие символа диапазона
+    ' РїРѕР»СѓС‡Р°РµРј СЌР»РµРјРµРЅС‚ СЃРїРёСЃРєР° РґРёР°РїР°Р·РѕРЅР° РїСЂРѕРїСѓСЃРєР°
+        ' РїСЂРѕРІРµСЂСЏРµРј РІ СЌР»РµРјРµРЅС‚Рµ СЃРїРёСЃРєР° РїСЂРѕРїСѓСЃРєР° РЅР°Р»РёС‡РёРµ СЃРёРјРІРѕР»Р° РґРёР°РїР°Р·РѕРЅР°
         s = Trim$(aSkip(n))
         sArr() = Split(s, cstrDiapDelim) 'Call xSplit(S, sArr(), cstrDiapDelim)
         sMin = LBound(sArr): sNum = UBound(sArr) - sMin + 1
         Select Case sNum
         Case 1
-        ' "s1" - в диапазоне один числовой элемент
+        ' "s1" - РІ РґРёР°РїР°Р·РѕРЅРµ РѕРґРёРЅ С‡РёСЃР»РѕРІРѕР№ СЌР»РµРјРµРЅС‚
             If IsNumeric(sArr(sMin)) Then
                 If S1 <> 0 Then S2 = CLng(Trim$(sArr(sMin)))
                 S1 = CLng(Trim$(sArr(sMin)))
             End If
         Case 2 '
             If IsNumeric(sArr(sMin)) And IsNumeric(sArr(sMin + 1)) Then
-        ' "s1-s2" -  в диапазоне два числовых элемента
-            ' берем численные значения верхней и нижней границы
+        ' "s1-s2" -  РІ РґРёР°РїР°Р·РѕРЅРµ РґРІР° С‡РёСЃР»РѕРІС‹С… СЌР»РµРјРµРЅС‚Р°
+            ' Р±РµСЂРµРј С‡РёСЃР»РµРЅРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РІРµСЂС…РЅРµР№ Рё РЅРёР¶РЅРµР№ РіСЂР°РЅРёС†С‹
                 If S1 <> 0 Then S2 = CLng(Trim$(sArr(sMin + 1)))
                 S1 = CLng(Trim$(sArr(sMin)))
             ElseIf IsNumeric(sArr(sMin)) Then
-        ' "s1-" -    в диапазоне один числовой элемент, верхняя граница открыта
-            ' новая верхняя граница равна предыдущей нижней
+        ' "s1-" -    РІ РґРёР°РїР°Р·РѕРЅРµ РѕРґРёРЅ С‡РёСЃР»РѕРІРѕР№ СЌР»РµРјРµРЅС‚, РІРµСЂС…РЅСЏСЏ РіСЂР°РЅРёС†Р° РѕС‚РєСЂС‹С‚Р°
+            ' РЅРѕРІР°СЏ РІРµСЂС…РЅСЏСЏ РіСЂР°РЅРёС†Р° СЂР°РІРЅР° РїСЂРµРґС‹РґСѓС‰РµР№ РЅРёР¶РЅРµР№
                 If S1 <> 0 Then S2 = S1
                 S1 = CLng(Trim$(sArr(sMin)))
             ElseIf IsNumeric(sArr(sMin + 1)) Then
-        ' "-s2" -    в диапазоне один числовой элемент, нижняя граница открыта
-            ' ищем нижнюю границу перебираем диапазоны к началу
-            ' пока не найдем диапазон с численным началом или не исчерпаем список
+        ' "-s2" -    РІ РґРёР°РїР°Р·РѕРЅРµ РѕРґРёРЅ С‡РёСЃР»РѕРІРѕР№ СЌР»РµРјРµРЅС‚, РЅРёР¶РЅСЏСЏ РіСЂР°РЅРёС†Р° РѕС‚РєСЂС‹С‚Р°
+            ' РёС‰РµРј РЅРёР¶РЅСЋСЋ РіСЂР°РЅРёС†Сѓ РїРµСЂРµР±РёСЂР°РµРј РґРёР°РїР°Р·РѕРЅС‹ Рє РЅР°С‡Р°Р»Сѓ
+            ' РїРѕРєР° РЅРµ РЅР°Р№РґРµРј РґРёР°РїР°Р·РѕРЅ СЃ С‡РёСЃР»РµРЅРЅС‹Рј РЅР°С‡Р°Р»РѕРј РёР»Рё РЅРµ РёСЃС‡РµСЂРїР°РµРј СЃРїРёСЃРѕРє
                 S2 = CLng(Trim$(sArr(sMin + 1)))
                 If n = nMin Then S1 = 1 Else S1 = 0: GoTo HandleDiap
             Else
-        ' неведома фигня
+        ' РЅРµРІРµРґРѕРјР° С„РёРіРЅСЏ
                 Stop
             End If
-        Case Else: Stop ' "-n-","--n" и т.п. в диапазоне нет элементов или больше 2 ???
+        Case Else: Stop ' "-n-","--n" Рё С‚.Рї. РІ РґРёР°РїР°Р·РѕРЅРµ РЅРµС‚ СЌР»РµРјРµРЅС‚РѕРІ РёР»Рё Р±РѕР»СЊС€Рµ 2 ???
         End Select
 HandleText:
-    ' берём склоняемое слово
+    ' Р±РµСЂС‘Рј СЃРєР»РѕРЅСЏРµРјРѕРµ СЃР»РѕРІРѕ
         strWord = aWords(j)
-    ' ищем начало склоняемого слова в строке (с конца строки)
+    ' РёС‰РµРј РЅР°С‡Р°Р»Рѕ СЃРєР»РѕРЅСЏРµРјРѕРіРѕ СЃР»РѕРІР° РІ СЃС‚СЂРѕРєРµ (СЃ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё)
         i = InStrRev(strTail, strWord)
-    ' добавляем в начало строки разделители из исходной строки
+    ' РґРѕР±Р°РІР»СЏРµРј РІ РЅР°С‡Р°Р»Рѕ СЃС‚СЂРѕРєРё СЂР°Р·РґРµР»РёС‚РµР»Рё РёР· РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё
         Result = Right$(strTail, iMax - i - Len(strWord) + 1) & Result
-    ' обрезаем исходную строку по началу склоняемого слова
+    ' РѕР±СЂРµР·Р°РµРј РёСЃС…РѕРґРЅСѓСЋ СЃС‚СЂРѕРєСѓ РїРѕ РЅР°С‡Р°Р»Сѓ СЃРєР»РѕРЅСЏРµРјРѕРіРѕ СЃР»РѕРІР°
         iMax = i - 1: strTail = Left$(strTail, iMax)
-    ' проверяем номер слова по списку пропуска
-        Select Case j - jMin + 1 ' номера текущего слова
-        Case S1 To S2:  ' попадает в границы диапазона пропуска - пропускаем
+    ' РїСЂРѕРІРµСЂСЏРµРј РЅРѕРјРµСЂ СЃР»РѕРІР° РїРѕ СЃРїРёСЃРєСѓ РїСЂРѕРїСѓСЃРєР°
+        Select Case j - jMin + 1 ' РЅРѕРјРµСЂР° С‚РµРєСѓС‰РµРіРѕ СЃР»РѕРІР°
+        Case S1 To S2:  ' РїРѕРїР°РґР°РµС‚ РІ РіСЂР°РЅРёС†С‹ РґРёР°РїР°Р·РѕРЅР° РїСЂРѕРїСѓСЃРєР° - РїСЂРѕРїСѓСЃРєР°РµРј
             'newWord = strWord
-        Case Else:      ' не попадает - склоняем слово в строке
+        Case Else:      ' РЅРµ РїРѕРїР°РґР°РµС‚ - СЃРєР»РѕРЅСЏРµРј СЃР»РѕРІРѕ РІ СЃС‚СЂРѕРєРµ
             tmpGender = NewGend
             'newWord = DeclineWord(strWord, NewCase, NewNumb, tmpGender, Animate, IsFio:=IIf(IsFio, j - jMin + 1, 0))
             strWord = DeclineWord(strWord, NewCase, NewNumb, tmpGender, Animate, IsFio:=IIf(IsFio, j - jMin + 1, 0))
         End Select
-    ' добавляем в начало строки слово получившееся после склонения исходного
+    ' РґРѕР±Р°РІР»СЏРµРј РІ РЅР°С‡Р°Р»Рѕ СЃС‚СЂРѕРєРё СЃР»РѕРІРѕ РїРѕР»СѓС‡РёРІС€РµРµСЃСЏ РїРѕСЃР»Рµ СЃРєР»РѕРЅРµРЅРёСЏ РёСЃС…РѕРґРЅРѕРіРѕ
         Result = strWord & Result 'Result = newWord & Result
-    ' переходим к следующему слову
+    ' РїРµСЂРµС…РѕРґРёРј Рє СЃР»РµРґСѓСЋС‰РµРјСѓ СЃР»РѕРІСѓ
 HandleNext:
         j = j - 1
     Loop
-    ' добавляем оставшиеся разделители
+    ' РґРѕР±Р°РІР»СЏРµРј РѕСЃС‚Р°РІС€РёРµСЃСЏ СЂР°Р·РґРµР»РёС‚РµР»Рё
     Result = strTail & Result
     Erase aWords: Erase aSkip
 HandleExit:  DeclineWords = Result: Exit Function
@@ -5456,24 +5466,24 @@ Private Function p_NumDecline( _
     Optional ByRef SymbCase As Integer = 0, Optional ByRef Template As String, _
     Optional ByRef NumbRest As Integer = 0 _
     ) As String
-' вспомогательная для склонение слов основных числительных: 0-9,10-19,x0,x00,1000,100000...
+' РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅР°СЏ РґР»СЏ СЃРєР»РѕРЅРµРЅРёРµ СЃР»РѕРІ РѕСЃРЅРѕРІРЅС‹С… С‡РёСЃР»РёС‚РµР»СЊРЅС‹С…: 0-9,10-19,x0,x00,1000,100000...
 '-------------------------
-' Numb - строка содержащая целое число (без пробелов и пр.символов), либо одна из текстовых констант чисел (см.p_NumWordsArray)
-' NewCase - падеж ("и","р","д","в","т","п")
-' NewNumb - число ("ед","мн")
-' NewGend - род ("м","ж")
-' NewNumeralType - тип числительного ("кол","пор") - применимо только для числительных
-' Animate - признак одушевленности, нужен для правильного склонения в вин.п.
-' SymbCase, Template - состояние регистра символов исходного слова и шаблон
-' Triplet - номер анализируемого триплета. если =0 или >len(Numb)\3-1 - анализируется младший триплет
-' NumbRest - если входной параметр был задан числовой строкой,- возвращает неразобранный остаток анализируемого триплета
+' Numb - СЃС‚СЂРѕРєР° СЃРѕРґРµСЂР¶Р°С‰Р°СЏ С†РµР»РѕРµ С‡РёСЃР»Рѕ (Р±РµР· РїСЂРѕР±РµР»РѕРІ Рё РїСЂ.СЃРёРјРІРѕР»РѕРІ), Р»РёР±Рѕ РѕРґРЅР° РёР· С‚РµРєСЃС‚РѕРІС‹С… РєРѕРЅСЃС‚Р°РЅС‚ С‡РёСЃРµР» (СЃРј.p_NumWordsArray)
+' NewCase - РїР°РґРµР¶ ("Рё","СЂ","Рґ","РІ","С‚","Рї")
+' NewNumb - С‡РёСЃР»Рѕ ("РµРґ","РјРЅ")
+' NewGend - СЂРѕРґ ("Рј","Р¶")
+' NewNumeralType - С‚РёРї С‡РёСЃР»РёС‚РµР»СЊРЅРѕРіРѕ ("РєРѕР»","РїРѕСЂ") - РїСЂРёРјРµРЅРёРјРѕ С‚РѕР»СЊРєРѕ РґР»СЏ С‡РёСЃР»РёС‚РµР»СЊРЅС‹С…
+' Animate - РїСЂРёР·РЅР°Рє РѕРґСѓС€РµРІР»РµРЅРЅРѕСЃС‚Рё, РЅСѓР¶РµРЅ РґР»СЏ РїСЂР°РІРёР»СЊРЅРѕРіРѕ СЃРєР»РѕРЅРµРЅРёСЏ РІ РІРёРЅ.Рї.
+' SymbCase, Template - СЃРѕСЃС‚РѕСЏРЅРёРµ СЂРµРіРёСЃС‚СЂР° СЃРёРјРІРѕР»РѕРІ РёСЃС…РѕРґРЅРѕРіРѕ СЃР»РѕРІР° Рё С€Р°Р±Р»РѕРЅ
+' Triplet - РЅРѕРјРµСЂ Р°РЅР°Р»РёР·РёСЂСѓРµРјРѕРіРѕ С‚СЂРёРїР»РµС‚Р°. РµСЃР»Рё =0 РёР»Рё >len(Numb)\3-1 - Р°РЅР°Р»РёР·РёСЂСѓРµС‚СЃСЏ РјР»Р°РґС€РёР№ С‚СЂРёРїР»РµС‚
+' NumbRest - РµСЃР»Рё РІС…РѕРґРЅРѕР№ РїР°СЂР°РјРµС‚СЂ Р±С‹Р» Р·Р°РґР°РЅ С‡РёСЃР»РѕРІРѕР№ СЃС‚СЂРѕРєРѕР№,- РІРѕР·РІСЂР°С‰Р°РµС‚ РЅРµСЂР°Р·РѕР±СЂР°РЅРЅС‹Р№ РѕСЃС‚Р°С‚РѕРє Р°РЅР°Р»РёР·РёСЂСѓРµРјРѕРіРѕ С‚СЂРёРїР»РµС‚Р°
 '-------------------------
-' выделяем в отдельную функцию чтобы сократить количество проверок когда нужно только число (например при вызове из NumToWords)
-' функция возвращает распознаваемое число в текстовом виде, в соотв склонении
-' Результат работы функции:
-'   Numb=123, Triplet=0 - разбираем число 123       >> Result="сто",NumbRest=23
-'   Numb=123, Triplet=1 - разбираем число 123000    >> Result="тысяча",NumbRest=123
-'   Numb=123000 - разбираем число 123000            >> Result="тысяча",Triplet=1,NumbRest=123
+' РІС‹РґРµР»СЏРµРј РІ РѕС‚РґРµР»СЊРЅСѓСЋ С„СѓРЅРєС†РёСЋ С‡С‚РѕР±С‹ СЃРѕРєСЂР°С‚РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРІРµСЂРѕРє РєРѕРіРґР° РЅСѓР¶РЅРѕ С‚РѕР»СЊРєРѕ С‡РёСЃР»Рѕ (РЅР°РїСЂРёРјРµСЂ РїСЂРё РІС‹Р·РѕРІРµ РёР· NumToWords)
+' С„СѓРЅРєС†РёСЏ РІРѕР·РІСЂР°С‰Р°РµС‚ СЂР°СЃРїРѕР·РЅР°РІР°РµРјРѕРµ С‡РёСЃР»Рѕ РІ С‚РµРєСЃС‚РѕРІРѕРј РІРёРґРµ, РІ СЃРѕРѕС‚РІ СЃРєР»РѕРЅРµРЅРёРё
+' Р РµР·СѓР»СЊС‚Р°С‚ СЂР°Р±РѕС‚С‹ С„СѓРЅРєС†РёРё:
+'   Numb=123, Triplet=0 - СЂР°Р·Р±РёСЂР°РµРј С‡РёСЃР»Рѕ 123       >> Result="СЃС‚Рѕ",NumbRest=23
+'   Numb=123, Triplet=1 - СЂР°Р·Р±РёСЂР°РµРј С‡РёСЃР»Рѕ 123000    >> Result="С‚С‹СЃСЏС‡Р°",NumbRest=123
+'   Numb=123000 - СЂР°Р·Р±РёСЂР°РµРј С‡РёСЃР»Рѕ 123000            >> Result="С‚С‹СЃСЏС‡Р°",Triplet=1,NumbRest=123
 '-------------------------
 Dim WordWhole As String, WordBeg As String, WordEnd As String
 Dim i As Long, iMax As Long
@@ -5483,215 +5493,215 @@ Dim Result As String
     If NewGend = DeclineGendNeut Then Animate = False
     If NewNumeralType = NumeralUndef Then NewNumeralType = NumeralOrdinal
     If IsNumeric(Numb) Then
-' если передано число цифрами - получаем индекс в массиве и соответствующее слово
+' РµСЃР»Рё РїРµСЂРµРґР°РЅРѕ С‡РёСЃР»Рѕ С†РёС„СЂР°РјРё - РїРѕР»СѓС‡Р°РµРј РёРЅРґРµРєСЃ РІ РјР°СЃСЃРёРІРµ Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРµ СЃР»РѕРІРѕ
     On Error Resume Next
         NumbRest = CLng(Numb): i = Err.Number: Err.Clear
     On Error GoTo HandleError
         If i = 0 And NumbRest < 1000 And Triplet = 0 Then
-        ' нет ошибки, число в диапазоне 0..999 и номер триплета не задан
-'    ' разбор триплета слева направо (сотни>десятки>единицы)
+        ' РЅРµС‚ РѕС€РёР±РєРё, С‡РёСЃР»Рѕ РІ РґРёР°РїР°Р·РѕРЅРµ 0..999 Рё РЅРѕРјРµСЂ С‚СЂРёРїР»РµС‚Р° РЅРµ Р·Р°РґР°РЅ
+'    ' СЂР°Р·Р±РѕСЂ С‚СЂРёРїР»РµС‚Р° СЃР»РµРІР° РЅР°РїСЂР°РІРѕ (СЃРѕС‚РЅРё>РґРµСЃСЏС‚РєРё>РµРґРёРЅРёС†С‹)
 '            Select Case NumbRest
 '            Case 0 To 19:       i = NumbRest:               NumbRest = 0
 '            Case 20 To 99:      i = 18 + NumbRest \ 10:     NumbRest = NumbRest Mod 10
 '            Case 100 To 999:    i = 27 + NumbRest \ 100:    NumbRest = NumbRest Mod 100
 '            End Select
-    ' разбор триплета справа налево (единицы>десятки>сотни)
+    ' СЂР°Р·Р±РѕСЂ С‚СЂРёРїР»РµС‚Р° СЃРїСЂР°РІР° РЅР°Р»РµРІРѕ (РµРґРёРЅРёС†С‹>РґРµСЃСЏС‚РєРё>СЃРѕС‚РЅРё)
             i = NumbRest
-            If i > 0 Then ' не пустой триплет
-                i = NumbRest Mod 100 ' смотрим хвост
-            If i = 0 Then                                   ' x00 - сотни (x=1-9)
+            If i > 0 Then ' РЅРµ РїСѓСЃС‚РѕР№ С‚СЂРёРїР»РµС‚
+                i = NumbRest Mod 100 ' СЃРјРѕС‚СЂРёРј С…РІРѕСЃС‚
+            If i = 0 Then                                   ' x00 - СЃРѕС‚РЅРё (x=1-9)
                 i = 27 + NumbRest \ 100: NumbRest = 0
-            ElseIf i >= 20 And (i Mod 10 = 0) Then     ' xy0 - десятки (y=2-9)
+            ElseIf i >= 20 And (i Mod 10 = 0) Then     ' xy0 - РґРµСЃСЏС‚РєРё (y=2-9)
                 i = 18 + i \ 10:  NumbRest = 100 * (NumbRest \ 100)
-            ElseIf i < 20 Then                              ' x1z - второй десяток (z=0-9)
+            ElseIf i < 20 Then                              ' x1z - РІС‚РѕСЂРѕР№ РґРµСЃСЏС‚РѕРє (z=0-9)
                 NumbRest = 100 * (NumbRest \ 100)
-            Else                                            ' xyz - первый десяток (z=1-9)
+            Else                                            ' xyz - РїРµСЂРІС‹Р№ РґРµСЃСЏС‚РѕРє (z=1-9)
                 i = i Mod 10: NumbRest = 10 * (NumbRest \ 10)
             End If
             End If
         Else
-        ' число >1000 ( >Long, >1000 и <Long, указан триплет)
+        ' С‡РёСЃР»Рѕ >1000 ( >Long, >1000 Рё <Long, СѓРєР°Р·Р°РЅ С‚СЂРёРїР»РµС‚)
             iMax = Len(Numb)
-            If Triplet = 0 Then Triplet = (iMax - 1) \ 3    ' номер старшего триплета
+            If Triplet = 0 Then Triplet = (iMax - 1) \ 3    ' РЅРѕРјРµСЂ СЃС‚Р°СЂС€РµРіРѕ С‚СЂРёРїР»РµС‚Р°
             i = iMax - 3 * Triplet: If i < 1 Then i = iMax  '
-            NumbRest = Right$(Left$(Numb, i), 3)                 ' численное значение соотв триплета
-            i = 36 + Triplet  ' индекс текстового значения (порядка триплета) в массиве текстовых констант
+            NumbRest = Right$(Left$(Numb, i), 3)                 ' С‡РёСЃР»РµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ СЃРѕРѕС‚РІ С‚СЂРёРїР»РµС‚Р°
+            i = 36 + Triplet  ' РёРЅРґРµРєСЃ С‚РµРєСЃС‚РѕРІРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ (РїРѕСЂСЏРґРєР° С‚СЂРёРїР»РµС‚Р°) РІ РјР°СЃСЃРёРІРµ С‚РµРєСЃС‚РѕРІС‹С… РєРѕРЅСЃС‚Р°РЅС‚
         End If
-    ' получаем значение текстовой константы соответствующей части числа
+    ' РїРѕР»СѓС‡Р°РµРј Р·РЅР°С‡РµРЅРёРµ С‚РµРєСЃС‚РѕРІРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµР№ С‡Р°СЃС‚Рё С‡РёСЃР»Р°
         Result = p_NumWordsArray(i): WordWhole = Result: iMax = Len(Result)
     Else
-' если передано слово - получаем индекс в массиве
-        Result = Trim$(Numb): WordWhole = LCase$(Result) ': WordWhole = Replace(WordWhole, "ё", "е")
+' РµСЃР»Рё РїРµСЂРµРґР°РЅРѕ СЃР»РѕРІРѕ - РїРѕР»СѓС‡Р°РµРј РёРЅРґРµРєСЃ РІ РјР°СЃСЃРёРІРµ
+        Result = Trim$(Numb): WordWhole = LCase$(Result) ': WordWhole = Replace(WordWhole, "С‘", "Рµ")
         If SymbCase = 0 Then SymbCase = p_GetSymbCase(Result, Template)
         i = 0: iMax = Len(Result)
         Do Until p_NumWordsArray(i) = WordWhole
             If i <= UBound(p_NumWordsArray) Then i = i + 1 Else Err.Raise 6
         Loop
     End If
-' Подготавливаем слово к склонению
+' РџРѕРґРіРѕС‚Р°РІР»РёРІР°РµРј СЃР»РѕРІРѕ Рє СЃРєР»РѕРЅРµРЅРёСЋ
     If NewCase > DeclineCasePred Then Err.Raise vbObjectError + 512
     If NewNumb = DeclineNumbUndef Then NewNumb = DeclineNumbSingle
     If NewGend = DeclineGendUndef Then NewGend = DeclineGendMale
     If NewNumeralType = NumeralOrdinal Then
-    ' количественные числительные
+    ' РєРѕР»РёС‡РµСЃС‚РІРµРЅРЅС‹Рµ С‡РёСЃР»РёС‚РµР»СЊРЅС‹Рµ
         Select Case i
         Case 0
         Select Case NewCase
-        Case DeclineCaseImen, DeclineCaseVin: WordEnd = Choose(NewNumb, "ь", "и")
-        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "я", "ей")
-        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "ю", "ям")
-        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ём", "ями")
-        Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ях")
+        Case DeclineCaseImen, DeclineCaseVin: WordEnd = Choose(NewNumb, "СЊ", "Рё")
+        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "СЏ", "РµР№")
+        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "СЋ", "СЏРј")
+        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "С‘Рј", "СЏРјРё")
+        Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "СЏС…")
         End Select
         i = Len(Result) - 1: GoTo HandleExit
         Case 1
         Select Case NewCase
-        Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "ин", "на", "но"), "ни")
-        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, Choose(NewGend, "ного", "ной", "ного"), "них")
-        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, Choose(NewGend, "ному", "ной", "ному"), "ним")
-        Case DeclineCaseVin:  WordEnd = Choose(NewNumb, Choose(NewGend, IIf(Animate, "ного", "ин"), "ну", "но"), "них")
-        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, Choose(NewGend, "ним", "ной", "ним"), "ними")
-        Case DeclineCasePred: WordEnd = Choose(NewNumb, Choose(NewGend, "ном", "ной", "ном"), "них")
+        Case DeclineCaseImen: WordEnd = Choose(NewNumb, Choose(NewGend, "РёРЅ", "РЅР°", "РЅРѕ"), "РЅРё")
+        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, Choose(NewGend, "РЅРѕРіРѕ", "РЅРѕР№", "РЅРѕРіРѕ"), "РЅРёС…")
+        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, Choose(NewGend, "РЅРѕРјСѓ", "РЅРѕР№", "РЅРѕРјСѓ"), "РЅРёРј")
+        Case DeclineCaseVin:  WordEnd = Choose(NewNumb, Choose(NewGend, IIf(Animate, "РЅРѕРіРѕ", "РёРЅ"), "РЅСѓ", "РЅРѕ"), "РЅРёС…")
+        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, Choose(NewGend, "РЅРёРј", "РЅРѕР№", "РЅРёРј"), "РЅРёРјРё")
+        Case DeclineCasePred: WordEnd = Choose(NewNumb, Choose(NewGend, "РЅРѕРј", "РЅРѕР№", "РЅРѕРј"), "РЅРёС…")
         End Select
         i = Len(Result) - 2: GoTo HandleExit
         Case 2
         Select Case NewCase
-        Case DeclineCaseImen: WordEnd = Choose(NewGend, "а", "е", "а")
-        Case DeclineCaseRod, DeclineCasePred: WordEnd = "ух"
-        Case DeclineCaseVin:  WordEnd = IIf(Animate, "ух", Choose(NewGend, "а", "е", "а"))
-        Case DeclineCaseDat: WordEnd = "ум"
-        Case DeclineCaseTvor: WordEnd = "умя"
+        Case DeclineCaseImen: WordEnd = Choose(NewGend, "Р°", "Рµ", "Р°")
+        Case DeclineCaseRod, DeclineCasePred: WordEnd = "СѓС…"
+        Case DeclineCaseVin:  WordEnd = IIf(Animate, "СѓС…", Choose(NewGend, "Р°", "Рµ", "Р°"))
+        Case DeclineCaseDat: WordEnd = "СѓРј"
+        Case DeclineCaseTvor: WordEnd = "СѓРјСЏ"
         End Select
         i = Len(Result) - 1: GoTo HandleExit
         Case 3
         Select Case NewCase
-        Case DeclineCaseImen: WordEnd = "и"
-        Case DeclineCaseRod, DeclineCasePred: WordEnd = "ёх"
-        Case DeclineCaseVin: WordEnd = IIf(Animate, "ёх", "и")
-        Case DeclineCaseDat: WordEnd = "ём"
-        Case DeclineCaseTvor: WordEnd = "емя"
+        Case DeclineCaseImen: WordEnd = "Рё"
+        Case DeclineCaseRod, DeclineCasePred: WordEnd = "С‘С…"
+        Case DeclineCaseVin: WordEnd = IIf(Animate, "С‘С…", "Рё")
+        Case DeclineCaseDat: WordEnd = "С‘Рј"
+        Case DeclineCaseTvor: WordEnd = "РµРјСЏ"
         End Select
         i = Len(Result) - 1: GoTo HandleExit
         Case 4
         Select Case NewCase
-        Case DeclineCaseImen: WordEnd = "е"
-        Case DeclineCaseRod, DeclineCasePred: WordEnd = "ёх"
-        Case DeclineCaseVin: WordEnd = IIf(Animate, "ёх", "е")
-        Case DeclineCaseDat: WordEnd = "ём"
-        Case DeclineCaseTvor: WordEnd = "ьмя"
+        Case DeclineCaseImen: WordEnd = "Рµ"
+        Case DeclineCaseRod, DeclineCasePred: WordEnd = "С‘С…"
+        Case DeclineCaseVin: WordEnd = IIf(Animate, "С‘С…", "Рµ")
+        Case DeclineCaseDat: WordEnd = "С‘Рј"
+        Case DeclineCaseTvor: WordEnd = "СЊРјСЏ"
         End Select
         i = Len(Result) - 1: GoTo HandleExit
         Case 5 To 7, 9, 10 To 21 '5-7,9,10-20,30
         Select Case NewCase
-        Case DeclineCaseImen, DeclineCaseVin: WordEnd = "ь"
-        Case DeclineCaseRod, DeclineCaseDat, DeclineCasePred: WordEnd = "и"
-        Case DeclineCaseTvor: WordEnd = "ью"
+        Case DeclineCaseImen, DeclineCaseVin: WordEnd = "СЊ"
+        Case DeclineCaseRod, DeclineCaseDat, DeclineCasePred: WordEnd = "Рё"
+        Case DeclineCaseTvor: WordEnd = "СЊСЋ"
         End Select
         i = Len(Result) - 1: GoTo HandleExit
         Case 8
         Select Case NewCase
-        Case DeclineCaseImen, DeclineCaseVin: WordEnd = "емь"
-        Case DeclineCaseRod, DeclineCaseDat, DeclineCasePred: WordEnd = "ьми"
-        Case DeclineCaseTvor: WordEnd = "ьмью"
+        Case DeclineCaseImen, DeclineCaseVin: WordEnd = "РµРјСЊ"
+        Case DeclineCaseRod, DeclineCaseDat, DeclineCasePred: WordEnd = "СЊРјРё"
+        Case DeclineCaseTvor: WordEnd = "СЊРјСЊСЋ"
         End Select
         i = Len(Result) - 3: GoTo HandleExit
         Case 22 '40
         Select Case NewCase
         Case DeclineCaseImen, DeclineCaseVin: WordEnd = ""
-        Case DeclineCaseRod, DeclineCaseDat, DeclineCaseTvor, DeclineCasePred: WordEnd = "а"
+        Case DeclineCaseRod, DeclineCaseDat, DeclineCaseTvor, DeclineCasePred: WordEnd = "Р°"
         End Select
         i = Len(Result): GoTo HandleExit
-        Case 23 To 26 '50-80 (для 80 - чередование -е-/-ь-)
+        Case 23 To 26 '50-80 (РґР»СЏ 80 - С‡РµСЂРµРґРѕРІР°РЅРёРµ -Рµ-/-СЊ-)
         Select Case NewCase
-        Case DeclineCaseImen, DeclineCaseVin: WordEnd = "ьдесят"
-        Case DeclineCaseRod, DeclineCaseDat, DeclineCasePred: WordEnd = "идесяти":  If i = 26 Then Mid$(Result, 4, 1) = "ь"
-        Case DeclineCaseTvor: WordEnd = "ьюдесятью":      If i = 26 Then Mid$(Result, 4, 1) = "ь"
+        Case DeclineCaseImen, DeclineCaseVin: WordEnd = "СЊРґРµСЃСЏС‚"
+        Case DeclineCaseRod, DeclineCaseDat, DeclineCasePred: WordEnd = "РёРґРµСЃСЏС‚Рё":  If i = 26 Then Mid$(Result, 4, 1) = "СЊ"
+        Case DeclineCaseTvor: WordEnd = "СЊСЋРґРµСЃСЏС‚СЊСЋ":      If i = 26 Then Mid$(Result, 4, 1) = "СЊ"
         End Select
         i = Len(Result) - 6: GoTo HandleExit
         Case 27, 28 '90,100
         Select Case NewCase
-        Case DeclineCaseImen, DeclineCaseVin: WordEnd = "о"
-        Case DeclineCaseRod, DeclineCaseDat, DeclineCaseTvor, DeclineCasePred: WordEnd = "а"
+        Case DeclineCaseImen, DeclineCaseVin: WordEnd = "Рѕ"
+        Case DeclineCaseRod, DeclineCaseDat, DeclineCaseTvor, DeclineCasePred: WordEnd = "Р°"
         End Select
         i = Len(Result) - 1: GoTo HandleExit
         Case 29 '200
         Select Case NewCase
-        Case DeclineCaseImen, DeclineCaseVin: WordEnd = "ести"
-        Case DeclineCaseRod:  WordEnd = "ухсот"
-        Case DeclineCaseDat:  WordEnd = "умстам"
-        Case DeclineCaseTvor: WordEnd = "умястами"
-        Case DeclineCasePred: WordEnd = "ухстах"
+        Case DeclineCaseImen, DeclineCaseVin: WordEnd = "РµСЃС‚Рё"
+        Case DeclineCaseRod:  WordEnd = "СѓС…СЃРѕС‚"
+        Case DeclineCaseDat:  WordEnd = "СѓРјСЃС‚Р°Рј"
+        Case DeclineCaseTvor: WordEnd = "СѓРјСЏСЃС‚Р°РјРё"
+        Case DeclineCasePred: WordEnd = "СѓС…СЃС‚Р°С…"
         End Select
         i = Len(Result) - 4: GoTo HandleExit
         Case 30, 31 '300,400
         Select Case NewCase
         Case DeclineCaseImen, DeclineCaseVin: WordEnd = VBA.Right$(Result, 4)
-        Case DeclineCaseRod:  WordEnd = "ёхсот"
-        Case DeclineCaseDat:  WordEnd = "ёмстам"
-        Case DeclineCaseTvor: WordEnd = IIf(i = 30, "е", "ь") & "мястами"
-        Case DeclineCasePred: WordEnd = "ёхстах"
+        Case DeclineCaseRod:  WordEnd = "С‘С…СЃРѕС‚"
+        Case DeclineCaseDat:  WordEnd = "С‘РјСЃС‚Р°Рј"
+        Case DeclineCaseTvor: WordEnd = IIf(i = 30, "Рµ", "СЊ") & "РјСЏСЃС‚Р°РјРё"
+        Case DeclineCasePred: WordEnd = "С‘С…СЃС‚Р°С…"
         End Select
         i = Len(Result) - 4: GoTo HandleExit
-        Case 32 To 36 '500-900 (для 800 - чередование -е-/-ь-)
+        Case 32 To 36 '500-900 (РґР»СЏ 800 - С‡РµСЂРµРґРѕРІР°РЅРёРµ -Рµ-/-СЊ-)
         Select Case NewCase
-        Case DeclineCaseImen, DeclineCaseVin: WordEnd = "ьсот"
-        Case DeclineCaseRod:  WordEnd = "исот":    If i = 35 Then Mid$(Result, 4, 1) = "ь"
-        Case DeclineCaseDat:  WordEnd = "истам":   If i = 35 Then Mid$(Result, 4, 1) = "ь"
-        Case DeclineCaseTvor: WordEnd = "ьюстами": If i = 35 Then Mid$(Result, 4, 1) = "ь"
-        Case DeclineCasePred: WordEnd = "истах":   If i = 35 Then Mid$(Result, 4, 1) = "ь"
+        Case DeclineCaseImen, DeclineCaseVin: WordEnd = "СЊСЃРѕС‚"
+        Case DeclineCaseRod:  WordEnd = "РёСЃРѕС‚":    If i = 35 Then Mid$(Result, 4, 1) = "СЊ"
+        Case DeclineCaseDat:  WordEnd = "РёСЃС‚Р°Рј":   If i = 35 Then Mid$(Result, 4, 1) = "СЊ"
+        Case DeclineCaseTvor: WordEnd = "СЊСЋСЃС‚Р°РјРё": If i = 35 Then Mid$(Result, 4, 1) = "СЊ"
+        Case DeclineCasePred: WordEnd = "РёСЃС‚Р°С…":   If i = 35 Then Mid$(Result, 4, 1) = "СЊ"
         End Select
         i = Len(Result) - 4: GoTo HandleExit
-        ' в принципе 1E3,1E6 и т.д. нормально склоняются DeclineWord
+        ' РІ РїСЂРёРЅС†РёРїРµ 1E3,1E6 Рё С‚.Рґ. РЅРѕСЂРјР°Р»СЊРЅРѕ СЃРєР»РѕРЅСЏСЋС‚СЃСЏ DeclineWord
         Case 37 '1000
         NewGend = DeclineGendFem
         Select Case NewCase
-        Case DeclineCaseImen: WordEnd = Choose(NewNumb, "а", "и")
-        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "и", "")
-        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "е", "ам")
-        Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "у", "и")
-        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ей", "ами") ', "ью", "ами")
-        Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+        Case DeclineCaseImen: WordEnd = Choose(NewNumb, "Р°", "Рё")
+        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "Рё", "")
+        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Рµ", "Р°Рј")
+        Case DeclineCaseVin:  WordEnd = Choose(NewNumb, "Сѓ", "Рё")
+        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РµР№", "Р°РјРё") ', "СЊСЋ", "Р°РјРё")
+        Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "Р°С…")
         End Select
         i = Len(Result) - 1: GoTo HandleExit
         Case 38 To 47 '1E6,1E9,...
         NewGend = DeclineGendMale
         Select Case NewCase
-        Case DeclineCaseImen, DeclineCaseVin: WordEnd = Choose(NewNumb, "", "ы")
-        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "а", "ов")
-        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "у", "ам")
-        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "ом", "ами")
-        Case DeclineCasePred: WordEnd = Choose(NewNumb, "е", "ах")
+        Case DeclineCaseImen, DeclineCaseVin: WordEnd = Choose(NewNumb, "", "С‹")
+        Case DeclineCaseRod:  WordEnd = Choose(NewNumb, "Р°", "РѕРІ")
+        Case DeclineCaseDat:  WordEnd = Choose(NewNumb, "Сѓ", "Р°Рј")
+        Case DeclineCaseTvor: WordEnd = Choose(NewNumb, "РѕРј", "Р°РјРё")
+        Case DeclineCasePred: WordEnd = Choose(NewNumb, "Рµ", "Р°С…")
         End Select
         i = Len(Result): GoTo HandleExit
         Case Else: Err.Raise 6
         End Select
         Result = p_SetSymbCase(Left$(Result, i) & WordEnd, SymbCase, Template)
     Else
-    ' порядковые числительные
-        ' преобразуем в порядковое и склоняем как прилагательное
+    ' РїРѕСЂСЏРґРєРѕРІС‹Рµ С‡РёСЃР»РёС‚РµР»СЊРЅС‹Рµ
+        ' РїСЂРµРѕР±СЂР°Р·СѓРµРј РІ РїРѕСЂСЏРґРєРѕРІРѕРµ Рё СЃРєР»РѕРЅСЏРµРј РєР°Рє РїСЂРёР»Р°РіР°С‚РµР»СЊРЅРѕРµ
         Select Case i
-        Case 0: WordEnd = "нулевой":    i = 0: Result = vbNullString
-        Case 1: WordEnd = "первый":     i = 0: Result = vbNullString
-        Case 2: WordEnd = "второй":     i = 0: Result = vbNullString
-        Case 3: WordEnd = "етий":       i = 2
-        Case 4: WordEnd = "вёртый":     i = 3
-        Case 6: WordEnd = "ой":         i = Len(Result) - 1
-        Case 7: WordEnd = "дьмой":      i = 2
-        Case 8: WordEnd = "ьмой":       i = 3
-        Case 5, 9 To 21, 27: WordEnd = "ый": i = Len(Result) - 1        ' 5,9-19,20,30,90
-        Case 22: WordEnd = "овой":      i = Len(Result)                 ' 40
-        Case 23 To 26: WordEnd = "ый":  i = Len(Result)                 ' 50-80
-        Case 28: WordEnd = "отый":      i = 1                           ' 100
-        Case 29: WordEnd = "ухсотый":   i = 2                           ' 200
-        Case 30, 31: WordEnd = "ёхсотый":   i = Len(Result) - 4         ' 300,400
-        Case 32 To 34, 36: WordEnd = "исотый":   i = Len(Result) - 4    ' 500-700,900
-        Case 35: WordEnd = "ьмисотый":  i = 3                           ' 800
-        Case 37: WordEnd = "ный":       i = Len(Result) - 1             ' 1000
-        Case 38 To 47:  WordEnd = "ный": i = Len(Result)                ' 10^6, 10^9 etc
+        Case 0: WordEnd = "РЅСѓР»РµРІРѕР№":    i = 0: Result = vbNullString
+        Case 1: WordEnd = "РїРµСЂРІС‹Р№":     i = 0: Result = vbNullString
+        Case 2: WordEnd = "РІС‚РѕСЂРѕР№":     i = 0: Result = vbNullString
+        Case 3: WordEnd = "РµС‚РёР№":       i = 2
+        Case 4: WordEnd = "РІС‘СЂС‚С‹Р№":     i = 3
+        Case 6: WordEnd = "РѕР№":         i = Len(Result) - 1
+        Case 7: WordEnd = "РґСЊРјРѕР№":      i = 2
+        Case 8: WordEnd = "СЊРјРѕР№":       i = 3
+        Case 5, 9 To 21, 27: WordEnd = "С‹Р№": i = Len(Result) - 1        ' 5,9-19,20,30,90
+        Case 22: WordEnd = "РѕРІРѕР№":      i = Len(Result)                 ' 40
+        Case 23 To 26: WordEnd = "С‹Р№":  i = Len(Result)                 ' 50-80
+        Case 28: WordEnd = "РѕС‚С‹Р№":      i = 1                           ' 100
+        Case 29: WordEnd = "СѓС…СЃРѕС‚С‹Р№":   i = 2                           ' 200
+        Case 30, 31: WordEnd = "С‘С…СЃРѕС‚С‹Р№":   i = Len(Result) - 4         ' 300,400
+        Case 32 To 34, 36: WordEnd = "РёСЃРѕС‚С‹Р№":   i = Len(Result) - 4    ' 500-700,900
+        Case 35: WordEnd = "СЊРјРёСЃРѕС‚С‹Р№":  i = 3                           ' 800
+        Case 37: WordEnd = "РЅС‹Р№":       i = Len(Result) - 1             ' 1000
+        Case 38 To 47:  WordEnd = "РЅС‹Р№": i = Len(Result)                ' 10^6, 10^9 etc
         Case Else: Err.Raise 6
         End Select
         Result = p_SetSymbCase(Left$(Result, i) & WordEnd, SymbCase, Template)
-    ' склоняем как прилагательное
+    ' СЃРєР»РѕРЅСЏРµРј РєР°Рє РїСЂРёР»Р°РіР°С‚РµР»СЊРЅРѕРµ
         Result = DeclineWord(Result, NewCase, NewNumb, NewGend, Animate)  ', SymbCase:=SymbCase, Template:=Template)
         WordEnd = vbNullString: i = Len(Result)
     End If
@@ -5699,43 +5709,43 @@ HandleExit:  p_NumDecline = Left$(Result, i) & WordEnd: Exit Function
 HandleError: i = iMax: WordEnd = vbNullString: Err.Clear: Resume HandleExit
 End Function
 Private Function p_NumWordsArray()
-' массив текстовых констант для числительных
+' РјР°СЃСЃРёРІ С‚РµРєСЃС‚РѕРІС‹С… РєРѕРЅСЃС‚Р°РЅС‚ РґР»СЏ С‡РёСЃР»РёС‚РµР»СЊРЅС‹С…
 '-------------------------
-' i = 00..09    -   единицы      x,     где x=0-9
-' i = 10..19    -   1й десяток  1x,     где x=0-9
-' i = 20..27    -   десятки     x0,     где x=2-9
-' i = 28..36    -   сотни       x00,    где x=1-9
-' i = 37..47    -   тысячи и д. 10^(3*x), где x=1-11
+' i = 00..09    -   РµРґРёРЅРёС†С‹      x,     РіРґРµ x=0-9
+' i = 10..19    -   1Р№ РґРµСЃСЏС‚РѕРє  1x,     РіРґРµ x=0-9
+' i = 20..27    -   РґРµСЃСЏС‚РєРё     x0,     РіРґРµ x=2-9
+' i = 28..36    -   СЃРѕС‚РЅРё       x00,    РіРґРµ x=1-9
+' i = 37..47    -   С‚С‹СЃСЏС‡Рё Рё Рґ. 10^(3*x), РіРґРµ x=1-11
 '-------------------------
 On Error Resume Next
 Static arrData(), iMin As Long: iMin = LBound(arrData): If Err Then Err.Clear Else p_NumWordsArray = arrData: Exit Function
     arrData = Array( _
-        "ноль", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять", _
-        "десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать", _
-        "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто", _
-        "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот", _
-        "тысяча", "миллион", "миллиард", "триллион", "квадриллион", "квинтиллион", "секстиллион", "септиллион", "октиллион", "нониллион", "дециллион")
+        "РЅРѕР»СЊ", "РѕРґРёРЅ", "РґРІР°", "С‚СЂРё", "С‡РµС‚С‹СЂРµ", "РїСЏС‚СЊ", "С€РµСЃС‚СЊ", "СЃРµРјСЊ", "РІРѕСЃРµРјСЊ", "РґРµРІСЏС‚СЊ", _
+        "РґРµСЃСЏС‚СЊ", "РѕРґРёРЅРЅР°РґС†Р°С‚СЊ", "РґРІРµРЅР°РґС†Р°С‚СЊ", "С‚СЂРёРЅР°РґС†Р°С‚СЊ", "С‡РµС‚С‹СЂРЅР°РґС†Р°С‚СЊ", "РїСЏС‚РЅР°РґС†Р°С‚СЊ", "С€РµСЃС‚РЅР°РґС†Р°С‚СЊ", "СЃРµРјРЅР°РґС†Р°С‚СЊ", "РІРѕСЃРµРјРЅР°РґС†Р°С‚СЊ", "РґРµРІСЏС‚РЅР°РґС†Р°С‚СЊ", _
+        "РґРІР°РґС†Р°С‚СЊ", "С‚СЂРёРґС†Р°С‚СЊ", "СЃРѕСЂРѕРє", "РїСЏС‚СЊРґРµСЃСЏС‚", "С€РµСЃС‚СЊРґРµСЃСЏС‚", "СЃРµРјСЊРґРµСЃСЏС‚", "РІРѕСЃРµРјСЊРґРµСЃСЏС‚", "РґРµРІСЏРЅРѕСЃС‚Рѕ", _
+        "СЃС‚Рѕ", "РґРІРµСЃС‚Рё", "С‚СЂРёСЃС‚Р°", "С‡РµС‚С‹СЂРµСЃС‚Р°", "РїСЏС‚СЊСЃРѕС‚", "С€РµСЃС‚СЊСЃРѕС‚", "СЃРµРјСЊСЃРѕС‚", "РІРѕСЃРµРјСЊСЃРѕС‚", "РґРµРІСЏС‚СЊСЃРѕС‚", _
+        "С‚С‹СЃСЏС‡Р°", "РјРёР»Р»РёРѕРЅ", "РјРёР»Р»РёР°СЂРґ", "С‚СЂРёР»Р»РёРѕРЅ", "РєРІР°РґСЂРёР»Р»РёРѕРЅ", "РєРІРёРЅС‚РёР»Р»РёРѕРЅ", "СЃРµРєСЃС‚РёР»Р»РёРѕРЅ", "СЃРµРїС‚РёР»Р»РёРѕРЅ", "РѕРєС‚РёР»Р»РёРѕРЅ", "РЅРѕРЅРёР»Р»РёРѕРЅ", "РґРµС†РёР»Р»РёРѕРЅ")
 HandleExit: p_NumWordsArray = arrData
 End Function
 Private Function p_GetWordTemplate(ByVal Word As String, Optional CheckCase As Boolean = False) As String
-' Создает на шаблон слова для последующего анализа
+' РЎРѕР·РґР°РµС‚ РЅР° С€Р°Р±Р»РѕРЅ СЃР»РѕРІР° РґР»СЏ РїРѕСЃР»РµРґСѓСЋС‰РµРіРѕ Р°РЅР°Р»РёР·Р°
 '-------------------------
-' CheckCase - определяет будет ли при создании шаблона учитываться регистр символа
+' CheckCase - РѕРїСЂРµРґРµР»СЏРµС‚ Р±СѓРґРµС‚ Р»Рё РїСЂРё СЃРѕР·РґР°РЅРёРё С€Р°Р±Р»РѕРЅР° СѓС‡РёС‚С‹РІР°С‚СЊСЃСЏ СЂРµРіРёСЃС‚СЂ СЃРёРјРІРѕР»Р°
 '-------------------------
 Dim Result As String: Result = vbNullString
     On Error GoTo HandleError
 Dim sArr:   sArr = Array(c_strSymbRusSign & c_strSymbEngSign, c_strSymbRusVowel & c_strSymbEngVowel, c_strSymbRusConson & c_strSymbEngConson)
-' заменяем символы исходной строки их обозначениями в паттерне (x, g, s)
+' Р·Р°РјРµРЅСЏРµРј СЃРёРјРІРѕР»С‹ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё РёС… РѕР±РѕР·РЅР°С‡РµРЅРёСЏРјРё РІ РїР°С‚С‚РµСЂРЅРµ (x, g, s)
 Dim i As Long, j As Long, m As String, s As String
-    s = "xgs" ' символы для подстановки
+    s = "xgs" ' СЃРёРјРІРѕР»С‹ РґР»СЏ РїРѕРґСЃС‚Р°РЅРѕРІРєРё
     For i = 1 To Len(Word)
-    ' перебор символов слова
+    ' РїРµСЂРµР±РѕСЂ СЃРёРјРІРѕР»РѕРІ СЃР»РѕРІР°
         m = Mid$(Word, i, 1)
-        ' если учитываем регистр символа меняем регистр символов подстановки в соответствии с регистром символа
+        ' РµСЃР»Рё СѓС‡РёС‚С‹РІР°РµРј СЂРµРіРёСЃС‚СЂ СЃРёРјРІРѕР»Р° РјРµРЅСЏРµРј СЂРµРіРёСЃС‚СЂ СЃРёРјРІРѕР»РѕРІ РїРѕРґСЃС‚Р°РЅРѕРІРєРё РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃ СЂРµРіРёСЃС‚СЂРѕРј СЃРёРјРІРѕР»Р°
         If CheckCase Then If m = LCase(m) Then s = LCase(s) Else s = UCase(s)
         m = LCase$(m)
         For j = 0 To UBound(sArr)
-        ' перебор элементов массива подстановки
+        ' РїРµСЂРµР±РѕСЂ СЌР»РµРјРµРЅС‚РѕРІ РјР°СЃСЃРёРІР° РїРѕРґСЃС‚Р°РЅРѕРІРєРё
             If InStr(sArr(j), m) Then Mid$(Word, i, 1) = Mid$(s, j + 1, 1): Exit For
     Next j, i
     Result = Word
@@ -5746,14 +5756,14 @@ End Function
 Private Function p_GetWordParts(ByVal Word As String, _
     Optional ByRef WordBeg As String, Optional ByRef WordEnd As String, _
     Optional ByRef Template As String) As Boolean
-' выделяет в слове начало и окончание (условно)
+' РІС‹РґРµР»СЏРµС‚ РІ СЃР»РѕРІРµ РЅР°С‡Р°Р»Рѕ Рё РѕРєРѕРЅС‡Р°РЅРёРµ (СѓСЃР»РѕРІРЅРѕ)
 '-------------------------
 Dim Result As Boolean ' Result = False
     On Error GoTo HandleError
     If Len(Template) = 0 Then Template = p_GetWordTemplate(Word)
     Dim i As Long: i = Len(Template)
-' окончанием считаем все что идет справа от первой (кроме
-' согласной, стоящей в самом конце слова) согласной с конца
+' РѕРєРѕРЅС‡Р°РЅРёРµРј СЃС‡РёС‚Р°РµРј РІСЃРµ С‡С‚Рѕ РёРґРµС‚ СЃРїСЂР°РІР° РѕС‚ РїРµСЂРІРѕР№ (РєСЂРѕРјРµ
+' СЃРѕРіР»Р°СЃРЅРѕР№, СЃС‚РѕСЏС‰РµР№ РІ СЃР°РјРѕРј РєРѕРЅС†Рµ СЃР»РѕРІР°) СЃРѕРіР»Р°СЃРЅРѕР№ СЃ РєРѕРЅС†Р°
     i = InStrRev(LCase$(Template), "s", i - 1)
     WordBeg = Left$(Word, i): WordEnd = Mid$(Word, i + 1)
     Result = True
@@ -5764,7 +5774,7 @@ End Function
 Public Function p_GetWordParts2(ByVal Word As String, _
     Optional ByRef WordBeg As String, Optional ByRef WordEnd As String _
     ) As Boolean
-' выделяет в слове начало и окончание (старый вариант)
+' РІС‹РґРµР»СЏРµС‚ РІ СЃР»РѕРІРµ РЅР°С‡Р°Р»Рѕ Рё РѕРєРѕРЅС‡Р°РЅРёРµ (СЃС‚Р°СЂС‹Р№ РІР°СЂРёР°РЅС‚)
 '-------------------------
 Dim sChar As String * 1
 Dim fStop As Boolean, c As Long, v As Long
@@ -5793,16 +5803,16 @@ HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
 
 Private Function p_GetFIOAttr(ByVal Words As String, Optional ByRef Gend As DeclineGend = DeclineGendUndef) As Boolean
-' определяет признак ФИО
+' РѕРїСЂРµРґРµР»СЏРµС‚ РїСЂРёР·РЅР°Рє Р¤РРћ
 '-------------------------
-' весьма условно: признак ФИО - 3 слова, 3 оканчивается на -вич или -вна
+' РІРµСЃСЊРјР° СѓСЃР»РѕРІРЅРѕ: РїСЂРёР·РЅР°Рє Р¤РРћ - 3 СЃР»РѕРІР°, 3 РѕРєР°РЅС‡РёРІР°РµС‚СЃСЏ РЅР° -РІРёС‡ РёР»Рё -РІРЅР°
 Dim Result As Boolean
     On Error GoTo HandleError
 Dim aWord() As String
     If Tokenize(LCase$(Words), aWord()) = 3 Then
     Select Case Right(aWord(2), 3)
-    Case "вич": Result = True: Gend = DeclineGendMale
-    Case "вна": Result = True: Gend = DeclineGendFem
+    Case "РІРёС‡": Result = True: Gend = DeclineGendMale
+    Case "РІРЅР°": Result = True: Gend = DeclineGendFem
     End Select
     End If
 HandleExit:  p_GetFIOAttr = Result: Exit Function
@@ -5810,7 +5820,7 @@ HandleError: Err.Clear: Resume HandleExit
 End Function
 
 Private Function p_GetWordGender(ByVal Word As String, Optional ByRef WordEnd As String) As DeclineGend
-' определяет род по окончанию слова (условно)
+' РѕРїСЂРµРґРµР»СЏРµС‚ СЂРѕРґ РїРѕ РѕРєРѕРЅС‡Р°РЅРёСЋ СЃР»РѕРІР° (СѓСЃР»РѕРІРЅРѕ)
 '-------------------------
 Dim Result As DeclineGend
 
@@ -5819,41 +5829,41 @@ Dim Result As DeclineGend
     Word = LCase$(Word)
     If Len(WordEnd) = 0 Then Call p_GetWordParts(Word, WordEnd:=WordEnd)
     Select Case WordEnd
-    'Мужской имеют окончания -а, -я, и нулевое (папа, дядя, нож, стол, ястреб)
-    'Женский имеют окончания -а, -я, и нулевое (жена, няня, ночь, слава, пустыня)
-    Case "ь"
+    'РњСѓР¶СЃРєРѕР№ РёРјРµСЋС‚ РѕРєРѕРЅС‡Р°РЅРёСЏ -Р°, -СЏ, Рё РЅСѓР»РµРІРѕРµ (РїР°РїР°, РґСЏРґСЏ, РЅРѕР¶, СЃС‚РѕР», СЏСЃС‚СЂРµР±)
+    'Р–РµРЅСЃРєРёР№ РёРјРµСЋС‚ РѕРєРѕРЅС‡Р°РЅРёСЏ -Р°, -СЏ, Рё РЅСѓР»РµРІРѕРµ (Р¶РµРЅР°, РЅСЏРЅСЏ, РЅРѕС‡СЊ, СЃР»Р°РІР°, РїСѓСЃС‚С‹РЅСЏ)
+    Case "СЊ"
         Select Case LCase$(Word)
-        Case "ноль", "рубль", "конь", _
-             "огонь", "уголь", "февраль": Result = 1   'мужской род
-        Case "лень", "тень", "сень", _
-             "сажень": Result = 2           'женский род
+        Case "РЅРѕР»СЊ", "СЂСѓР±Р»СЊ", "РєРѕРЅСЊ", _
+             "РѕРіРѕРЅСЊ", "СѓРіРѕР»СЊ", "С„РµРІСЂР°Р»СЊ": Result = 1   'РјСѓР¶СЃРєРѕР№ СЂРѕРґ
+        Case "Р»РµРЅСЊ", "С‚РµРЅСЊ", "СЃРµРЅСЊ", _
+             "СЃР°Р¶РµРЅСЊ": Result = 2           'Р¶РµРЅСЃРєРёР№ СЂРѕРґ
         Case Else:
             Select Case VBA.Left$(VBA.Right$(Word, 2), 1)
-            Case "з", "ч", "ш", "ж":    Result = 2  'женский род (бязь,ночь,брешь,рожь...)
-            Case "б", "п", "л":         Result = 2  'женский род (рябь,выпь,боль но - ноль)
-            Case "н":
+            Case "Р·", "С‡", "С€", "Р¶":    Result = 2  'Р¶РµРЅСЃРєРёР№ СЂРѕРґ (Р±СЏР·СЊ,РЅРѕС‡СЊ,Р±СЂРµС€СЊ,СЂРѕР¶СЊ...)
+            Case "Р±", "Рї", "Р»":         Result = 2  'Р¶РµРЅСЃРєРёР№ СЂРѕРґ (СЂСЏР±СЊ,РІС‹РїСЊ,Р±РѕР»СЊ РЅРѕ - РЅРѕР»СЊ)
+            Case "РЅ":
                 Select Case VBA.Left$(VBA.Right$(Word, 3), 1)
-                Case "е":               Result = 1  'мужской род (-ень)
-                Case "о":               Result = 2  'женский род (-онь)
-                Case Else:              Result = 1  'мужской род
+                Case "Рµ":               Result = 1  'РјСѓР¶СЃРєРѕР№ СЂРѕРґ (-РµРЅСЊ)
+                Case "Рѕ":               Result = 2  'Р¶РµРЅСЃРєРёР№ СЂРѕРґ (-РѕРЅСЊ)
+                Case Else:              Result = 1  'РјСѓР¶СЃРєРѕР№ СЂРѕРґ
                 End Select
-            Case Else:                  Result = 1  'мужской род (конь,пень...)
+            Case Else:                  Result = 1  'РјСѓР¶СЃРєРѕР№ СЂРѕРґ (РєРѕРЅСЊ,РїРµРЅСЊ...)
             End Select
         End Select
-    Case "а", "я"
+    Case "Р°", "СЏ"
         Select Case Word
-        Case "папа", "дядя", "дедушка": Result = 1  'мужской род
-        Case Else:                      Result = 2  'женский род
+        Case "РїР°РїР°", "РґСЏРґСЏ", "РґРµРґСѓС€РєР°": Result = 1  'РјСѓР¶СЃРєРѕР№ СЂРѕРґ
+        Case Else:                      Result = 2  'Р¶РµРЅСЃРєРёР№ СЂРѕРґ
         End Select
-'    ''Общий род - в зависимости от контекста, могут употребляться и в мужском, и в женском роде
-'    ''    (зануда, неженка, плакса, умница, жадина).
-'    Case "ий", "ый":                    NewGend = 1 'мужской род
-    Case "ая", "яя":                    Result = 2  'женский род
-    Case "ова", "ева", "ёва":           Result = 2  'женский род
-    Case "о", "е", "ое", "ее", _
-         "ё", "оё", "её": Result = 3               'средний род
+'    ''РћР±С‰РёР№ СЂРѕРґ - РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РєРѕРЅС‚РµРєСЃС‚Р°, РјРѕРіСѓС‚ СѓРїРѕС‚СЂРµР±Р»СЏС‚СЊСЃСЏ Рё РІ РјСѓР¶СЃРєРѕРј, Рё РІ Р¶РµРЅСЃРєРѕРј СЂРѕРґРµ
+'    ''    (Р·Р°РЅСѓРґР°, РЅРµР¶РµРЅРєР°, РїР»Р°РєСЃР°, СѓРјРЅРёС†Р°, Р¶Р°РґРёРЅР°).
+'    Case "РёР№", "С‹Р№":                    NewGend = 1 'РјСѓР¶СЃРєРѕР№ СЂРѕРґ
+    Case "Р°СЏ", "СЏСЏ":                    Result = 2  'Р¶РµРЅСЃРєРёР№ СЂРѕРґ
+    Case "РѕРІР°", "РµРІР°", "С‘РІР°":           Result = 2  'Р¶РµРЅСЃРєРёР№ СЂРѕРґ
+    Case "Рѕ", "Рµ", "РѕРµ", "РµРµ", _
+         "С‘", "РѕС‘", "РµС‘": Result = 3               'СЃСЂРµРґРЅРёР№ СЂРѕРґ
     Case Else
-'    ''мужской род (последняя согласная)
+'    ''РјСѓР¶СЃРєРѕР№ СЂРѕРґ (РїРѕСЃР»РµРґРЅСЏСЏ СЃРѕРіР»Р°СЃРЅР°СЏ)
         If GetCharType(Right$(WordEnd, 1)) = SymbolTypeCons Then Result = 1
     End Select
 HandleExit:  p_GetWordGender = Result: Exit Function
@@ -5861,49 +5871,49 @@ HandleError: Result = DeclineGendUndef: Err.Clear: Resume HandleExit
 End Function
 
 Private Function p_GetWordSpeechPartType(ByVal Word As String) As SpeechPartType
-' определяет часть речи по окончанию слова (условно)
+' РѕРїСЂРµРґРµР»СЏРµС‚ С‡Р°СЃС‚СЊ СЂРµС‡Рё РїРѕ РѕРєРѕРЅС‡Р°РЅРёСЋ СЃР»РѕРІР° (СѓСЃР»РѕРІРЅРѕ)
 '-------------------------
-' не знаю зачем я это сделал, - разве так, на будущее...
-' может когда и перепишу процедуру склонения с учётом части речи
+' РЅРµ Р·РЅР°СЋ Р·Р°С‡РµРј СЏ СЌС‚Рѕ СЃРґРµР»Р°Р», - СЂР°Р·РІРµ С‚Р°Рє, РЅР° Р±СѓРґСѓС‰РµРµ...
+' РјРѕР¶РµС‚ РєРѕРіРґР° Рё РїРµСЂРµРїРёС€Сѓ РїСЂРѕС†РµРґСѓСЂСѓ СЃРєР»РѕРЅРµРЅРёСЏ СЃ СѓС‡С‘С‚РѕРј С‡Р°СЃС‚Рё СЂРµС‡Рё
 '-------------------------
 Dim Result As SpeechPartType
 
     On Error GoTo HandleError
     Select Case Word
-    ' местоимения
-    Case "я", "ты", "он", "она", "оно", "то", "это", "тот", "этот", _
-        "вы", "мы", "они", "те", "эти":
+    ' РјРµСЃС‚РѕРёРјРµРЅРёСЏ
+    Case "СЏ", "С‚С‹", "РѕРЅ", "РѕРЅР°", "РѕРЅРѕ", "С‚Рѕ", "СЌС‚Рѕ", "С‚РѕС‚", "СЌС‚РѕС‚", _
+        "РІС‹", "РјС‹", "РѕРЅРё", "С‚Рµ", "СЌС‚Рё":
             Result = SpeechPartTypePronoun
-    ' предлоги
-    Case "в", "с", "к", "у", "а", "и", "о", "об", "на", "по", "во", "за", "от", "не", "ни", "ли", _
-         "или", "еле", "над", "при", "под", "для", "через", "перед", "ввиду", "наподобие", "вроде", _
-         "вблизи", "вглубь", "вдоль", "возле", "около", "среди", "вокруг", "внутри", "впереди", "после", _
-         "насчет", "навстречу", "вслед", "вместо", "ввиду", "благодаря", "вследствие"
+    ' РїСЂРµРґР»РѕРіРё
+    Case "РІ", "СЃ", "Рє", "Сѓ", "Р°", "Рё", "Рѕ", "РѕР±", "РЅР°", "РїРѕ", "РІРѕ", "Р·Р°", "РѕС‚", "РЅРµ", "РЅРё", "Р»Рё", _
+         "РёР»Рё", "РµР»Рµ", "РЅР°Рґ", "РїСЂРё", "РїРѕРґ", "РґР»СЏ", "С‡РµСЂРµР·", "РїРµСЂРµРґ", "РІРІРёРґСѓ", "РЅР°РїРѕРґРѕР±РёРµ", "РІСЂРѕРґРµ", _
+         "РІР±Р»РёР·Рё", "РІРіР»СѓР±СЊ", "РІРґРѕР»СЊ", "РІРѕР·Р»Рµ", "РѕРєРѕР»Рѕ", "СЃСЂРµРґРё", "РІРѕРєСЂСѓРі", "РІРЅСѓС‚СЂРё", "РІРїРµСЂРµРґРё", "РїРѕСЃР»Рµ", _
+         "РЅР°СЃС‡РµС‚", "РЅР°РІСЃС‚СЂРµС‡Сѓ", "РІСЃР»РµРґ", "РІРјРµСЃС‚Рѕ", "РІРІРёРґСѓ", "Р±Р»Р°РіРѕРґР°СЂСЏ", "РІСЃР»РµРґСЃС‚РІРёРµ"
             Result = SpeechPartTypePreposition
-    ' существительные на -ть и ая,ие и т.п.
-    Case "мать", "рать", "тать", "зять", "суть", "путь", "муть", "нежить", "пажить", "сыть", "нить", "лапоть", "копоть", _
-         "стая" ', "событие", "предложение", "поручение", "последствие", "преследование", "лезвие", _
-         "сомнение"
+    ' СЃСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅС‹Рµ РЅР° -С‚СЊ Рё Р°СЏ,РёРµ Рё С‚.Рї.
+    Case "РјР°С‚СЊ", "СЂР°С‚СЊ", "С‚Р°С‚СЊ", "Р·СЏС‚СЊ", "СЃСѓС‚СЊ", "РїСѓС‚СЊ", "РјСѓС‚СЊ", "РЅРµР¶РёС‚СЊ", "РїР°Р¶РёС‚СЊ", "СЃС‹С‚СЊ", "РЅРёС‚СЊ", "Р»Р°РїРѕС‚СЊ", "РєРѕРїРѕС‚СЊ", _
+         "СЃС‚Р°СЏ" ', "СЃРѕР±С‹С‚РёРµ", "РїСЂРµРґР»РѕР¶РµРЅРёРµ", "РїРѕСЂСѓС‡РµРЅРёРµ", "РїРѕСЃР»РµРґСЃС‚РІРёРµ", "РїСЂРµСЃР»РµРґРѕРІР°РЅРёРµ", "Р»РµР·РІРёРµ", _
+         "СЃРѕРјРЅРµРЅРёРµ"
             Result = SpeechPartTypeNoun
     Case Else
 '        If Len(WordEnd) = 0 Then Call p_GetWordParts(Word, WordEnd:=WordEnd)
         Select Case Right$(Word, 2)
-    ' прилагательные
-        Case "ая", "яя", "ую", "юю", "ое", "ее", "оё", "её", "иё", "ий", "ый", "ой" ', "ие" ' - слишком много сущ. на -ие
+    ' РїСЂРёР»Р°РіР°С‚РµР»СЊРЅС‹Рµ
+        Case "Р°СЏ", "СЏСЏ", "СѓСЋ", "СЋСЋ", "РѕРµ", "РµРµ", "РѕС‘", "РµС‘", "РёС‘", "РёР№", "С‹Р№", "РѕР№" ', "РёРµ" ' - СЃР»РёС€РєРѕРј РјРЅРѕРіРѕ СЃСѓС‰. РЅР° -РёРµ
             Result = SpeechPartTypeAdject: GoTo HandleExit
         End Select
-    ' числительные
+    ' С‡РёСЃР»РёС‚РµР»СЊРЅС‹Рµ
         Dim tmp: For Each tmp In p_NumWordsArray
             If Word = tmp Then _
             Result = SpeechPartTypeNumeral: GoTo HandleExit
         Next tmp
         Select Case Right$(Word, 3)
-    ' глаголы
-        Case "ать", "ять", "уть", "оть", "еть", "ить", "ыть"
-        ' при этом: мать,рать и т.п. - сущ.,а пять и на -дцать - числительные
+    ' РіР»Р°РіРѕР»С‹
+        Case "Р°С‚СЊ", "СЏС‚СЊ", "СѓС‚СЊ", "РѕС‚СЊ", "РµС‚СЊ", "РёС‚СЊ", "С‹С‚СЊ"
+        ' РїСЂРё СЌС‚РѕРј: РјР°С‚СЊ,СЂР°С‚СЊ Рё С‚.Рї. - СЃСѓС‰.,Р° РїСЏС‚СЊ Рё РЅР° -РґС†Р°С‚СЊ - С‡РёСЃР»РёС‚РµР»СЊРЅС‹Рµ
             Result = SpeechPartTypeVerb: GoTo HandleExit
         End Select
-    ' остальные считаем существительными
+    ' РѕСЃС‚Р°Р»СЊРЅС‹Рµ СЃС‡РёС‚Р°РµРј СЃСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅС‹РјРё
             Result = SpeechPartTypeNoun
     End Select
 HandleExit:  p_GetWordSpeechPartType = Result: Exit Function
@@ -5911,24 +5921,24 @@ HandleError: Result = SpeechPartTypeUndef: Err.Clear: Resume HandleExit
 End Function
 
 Private Function p_GetSymbCase(Word As String, Optional Template As String) As Integer
-' возвращает состояние регистра символов слова
+' РІРѕР·РІСЂР°С‰Р°РµС‚ СЃРѕСЃС‚РѕСЏРЅРёРµ СЂРµРіРёСЃС‚СЂР° СЃРёРјРІРѕР»РѕРІ СЃР»РѕРІР°
 '-------------------------
 Dim Result As Integer
     Result = False
     On Error GoTo HandleError
-' 0 - не определено
+' 0 - РЅРµ РѕРїСЂРµРґРµР»РµРЅРѕ
     If Word = UCase$(Word) Then
-' 1 (vbUpperCase) - все символы в верхнем регистре
+' 1 (vbUpperCase) - РІСЃРµ СЃРёРјРІРѕР»С‹ РІ РІРµСЂС…РЅРµРј СЂРµРіРёСЃС‚СЂРµ
         Result = vbUpperCase
     ElseIf Word = LCase$(Word) Then
-' 2 (vbLowerCase) - все символы в нижнем регистре
+' 2 (vbLowerCase) - РІСЃРµ СЃРёРјРІРѕР»С‹ РІ РЅРёР¶РЅРµРј СЂРµРіРёСЃС‚СЂРµ
         Result = vbLowerCase
     ElseIf Word = StrConv(Word, vbProperCase) Then
-' 3 (vbProperCase) - первый символ в верхнем остальные, - в нижнем регистре
+' 3 (vbProperCase) - РїРµСЂРІС‹Р№ СЃРёРјРІРѕР» РІ РІРµСЂС…РЅРµРј РѕСЃС‚Р°Р»СЊРЅС‹Рµ, - РІ РЅРёР¶РЅРµРј СЂРµРіРёСЃС‚СЂРµ
         Result = vbProperCase
     Else
-'-1 - регистр символов определяется по шаблону (часть букв в верхнем, часть - в нижнем регистре)
-    ' формируем шаблон регистра по слову
+'-1 - СЂРµРіРёСЃС‚СЂ СЃРёРјРІРѕР»РѕРІ РѕРїСЂРµРґРµР»СЏРµС‚СЃСЏ РїРѕ С€Р°Р±Р»РѕРЅСѓ (С‡Р°СЃС‚СЊ Р±СѓРєРІ РІ РІРµСЂС…РЅРµРј, С‡Р°СЃС‚СЊ - РІ РЅРёР¶РЅРµРј СЂРµРіРёСЃС‚СЂРµ)
+    ' С„РѕСЂРјРёСЂСѓРµРј С€Р°Р±Р»РѕРЅ СЂРµРіРёСЃС‚СЂР° РїРѕ СЃР»РѕРІСѓ
         Template = p_GetWordTemplate(Word, True): Result = -1
     End If
 HandleExit:  p_GetSymbCase = Result: Exit Function
@@ -5936,7 +5946,7 @@ HandleError: Result = False: Err.Clear: Resume HandleExit
 End Function
 
 Private Function p_SetSymbCase(Word As String, SymbCase As Integer, Optional ByVal Template As String) As String
-' устанавливает состояние регистра символов слова
+' СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ СЃРѕСЃС‚РѕСЏРЅРёРµ СЂРµРіРёСЃС‚СЂР° СЃРёРјРІРѕР»РѕРІ СЃР»РѕРІР°
 '-------------------------
 Dim Result As String
     Result = Word
@@ -5945,17 +5955,17 @@ Dim Result As String
     Case vbUpperCase:   Result = UCase$(Word)
     Case vbLowerCase:   Result = LCase$(Word)
     Case vbProperCase:  Result = StrConv(Word, vbProperCase)
-    Case -1             ' форматируем по шаблону
-' нафига это?? - нууу... - просто эксперимент - сам не знаю, а вдруг? )
-' впрочем все равно это все пока сложно и неправильно,
-' а случай с разнокалиберными регистрами в слове можно просто игнорировать
-' в силу сильно упрощенного алгоритма определения окончаний часто работает не корректно
-        ' формируем шаблон текущего слова и сравниваем их
-        Dim s As String * 1, с As Integer
+    Case -1             ' С„РѕСЂРјР°С‚РёСЂСѓРµРј РїРѕ С€Р°Р±Р»РѕРЅСѓ
+' РЅР°С„РёРіР° СЌС‚Рѕ?? - РЅСѓСѓСѓ... - РїСЂРѕСЃС‚Рѕ СЌРєСЃРїРµСЂРёРјРµРЅС‚ - СЃР°Рј РЅРµ Р·РЅР°СЋ, Р° РІРґСЂСѓРі? )
+' РІРїСЂРѕС‡РµРј РІСЃРµ СЂР°РІРЅРѕ СЌС‚Рѕ РІСЃРµ РїРѕРєР° СЃР»РѕР¶РЅРѕ Рё РЅРµРїСЂР°РІРёР»СЊРЅРѕ,
+' Р° СЃР»СѓС‡Р°Р№ СЃ СЂР°Р·РЅРѕРєР°Р»РёР±РµСЂРЅС‹РјРё СЂРµРіРёСЃС‚СЂР°РјРё РІ СЃР»РѕРІРµ РјРѕР¶РЅРѕ РїСЂРѕСЃС‚Рѕ РёРіРЅРѕСЂРёСЂРѕРІР°С‚СЊ
+' РІ СЃРёР»Сѓ СЃРёР»СЊРЅРѕ СѓРїСЂРѕС‰РµРЅРЅРѕРіРѕ Р°Р»РіРѕСЂРёС‚РјР° РѕРїСЂРµРґРµР»РµРЅРёСЏ РѕРєРѕРЅС‡Р°РЅРёР№ С‡Р°СЃС‚Рѕ СЂР°Р±РѕС‚Р°РµС‚ РЅРµ РєРѕСЂСЂРµРєС‚РЅРѕ
+        ' С„РѕСЂРјРёСЂСѓРµРј С€Р°Р±Р»РѕРЅ С‚РµРєСѓС‰РµРіРѕ СЃР»РѕРІР° Рё СЃСЂР°РІРЅРёРІР°РµРј РёС…
+        Dim s As String * 1, СЃ As Integer
         Dim i As Long, iMax As Long: i = 1: iMax = Len(Template)
         Dim NewTemp As String: NewTemp = p_GetWordTemplate(Word, True)
         If LCase$(Template) = LCase$(NewTemp) Then
-        ' если совпадают - форматируем по шаблону
+        ' РµСЃР»Рё СЃРѕРІРїР°РґР°СЋС‚ - С„РѕСЂРјР°С‚РёСЂСѓРµРј РїРѕ С€Р°Р±Р»РѕРЅСѓ
             Do Until i > iMax
                 s = Mid$(Template, i, 1)
                 If LCase(s) = s Then
@@ -5966,15 +5976,15 @@ Dim Result As String
                 i = i + 1
             Loop
         Else
-        ' если нет приводим исходный шаблон к шаблону текущего слова
+        ' РµСЃР»Рё РЅРµС‚ РїСЂРёРІРѕРґРёРј РёСЃС…РѕРґРЅС‹Р№ С€Р°Р±Р»РѕРЅ Рє С€Р°Р±Р»РѕРЅСѓ С‚РµРєСѓС‰РµРіРѕ СЃР»РѕРІР°
         Dim j As Long, jMax As Long: j = 1: jMax = Len(NewTemp)
-        ' форматируем по следующему правилу
-            ' если тип символа (xgs) приводимого (исходного) шаблона совпадает
-            ' с типом шаблона нового слова форматируем как в приводимом шаблоне,
-            ' если не совпадает - повторяем регистр предыдущего символа
-            ' знаки ьъ форматируем как гласные
+        ' С„РѕСЂРјР°С‚РёСЂСѓРµРј РїРѕ СЃР»РµРґСѓСЋС‰РµРјСѓ РїСЂР°РІРёР»Сѓ
+            ' РµСЃР»Рё С‚РёРї СЃРёРјРІРѕР»Р° (xgs) РїСЂРёРІРѕРґРёРјРѕРіРѕ (РёСЃС…РѕРґРЅРѕРіРѕ) С€Р°Р±Р»РѕРЅР° СЃРѕРІРїР°РґР°РµС‚
+            ' СЃ С‚РёРїРѕРј С€Р°Р±Р»РѕРЅР° РЅРѕРІРѕРіРѕ СЃР»РѕРІР° С„РѕСЂРјР°С‚РёСЂСѓРµРј РєР°Рє РІ РїСЂРёРІРѕРґРёРјРѕРј С€Р°Р±Р»РѕРЅРµ,
+            ' РµСЃР»Рё РЅРµ СЃРѕРІРїР°РґР°РµС‚ - РїРѕРІС‚РѕСЂСЏРµРј СЂРµРіРёСЃС‚СЂ РїСЂРµРґС‹РґСѓС‰РµРіРѕ СЃРёРјРІРѕР»Р°
+            ' Р·РЅР°РєРё СЊСЉ С„РѕСЂРјР°С‚РёСЂСѓРµРј РєР°Рє РіР»Р°СЃРЅС‹Рµ
             Template = Replace$(Template, "x", "g"): NewTemp = Replace$(NewTemp, "x", "g")
-            ' первый символ берем в регистре исходного шаблона
+            ' РїРµСЂРІС‹Р№ СЃРёРјРІРѕР» Р±РµСЂРµРј РІ СЂРµРіРёСЃС‚СЂРµ РёСЃС…РѕРґРЅРѕРіРѕ С€Р°Р±Р»РѕРЅР°
             s = Mid$(Template, i, 1)
             If LCase$(s) = s Then
                 Mid$(Result, j, 1) = LCase(Left$(Result, 1))
@@ -5983,10 +5993,10 @@ Dim Result As String
             End If
             i = i + 1: j = j + 1
             Do Until j > jMax
-                If i > iMax Then i = 2 ' если центральная часть приводимого закончилась - начинаем сначала
+                If i > iMax Then i = 2 ' РµСЃР»Рё С†РµРЅС‚СЂР°Р»СЊРЅР°СЏ С‡Р°СЃС‚СЊ РїСЂРёРІРѕРґРёРјРѕРіРѕ Р·Р°РєРѕРЅС‡РёР»Р°СЃСЊ - РЅР°С‡РёРЅР°РµРј СЃРЅР°С‡Р°Р»Р°
                 s = Mid$(Template, i, 1)
-                ' если тип символа приводимого шаблона совпадает с типом шаблона нового слова
-                ' берем регистр символа приводимого шаблона и присваиваем символу нового
+                ' РµСЃР»Рё С‚РёРї СЃРёРјРІРѕР»Р° РїСЂРёРІРѕРґРёРјРѕРіРѕ С€Р°Р±Р»РѕРЅР° СЃРѕРІРїР°РґР°РµС‚ СЃ С‚РёРїРѕРј С€Р°Р±Р»РѕРЅР° РЅРѕРІРѕРіРѕ СЃР»РѕРІР°
+                ' Р±РµСЂРµРј СЂРµРіРёСЃС‚СЂ СЃРёРјРІРѕР»Р° РїСЂРёРІРѕРґРёРјРѕРіРѕ С€Р°Р±Р»РѕРЅР° Рё РїСЂРёСЃРІР°РёРІР°РµРј СЃРёРјРІРѕР»Сѓ РЅРѕРІРѕРіРѕ
                 If LCase(Mid$(NewTemp, j, 1)) = LCase(s) Then
                     i = i + 1
                     If LCase(s) = s Then
@@ -6001,18 +6011,18 @@ Dim Result As String
             Loop
             Template = NewTemp
         End If
-        ' собственно форматируем слово
-    Case Else ' оставляем как есть
+        ' СЃРѕР±СЃС‚РІРµРЅРЅРѕ С„РѕСЂРјР°С‚РёСЂСѓРµРј СЃР»РѕРІРѕ
+    Case Else ' РѕСЃС‚Р°РІР»СЏРµРј РєР°Рє РµСЃС‚СЊ
     End Select
 HandleExit:  p_SetSymbCase = Result: Exit Function
 HandleError: Result = Word: Err.Clear: Resume HandleExit
 End Function
 
 '=========================
-' Вспомогательные
+' Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ
 '=========================
 Private Function Pwr2(Index) As Long
-' возвращает степени числа 2. нужна для битовых операций
+' РІРѕР·РІСЂР°С‰Р°РµС‚ СЃС‚РµРїРµРЅРё С‡РёСЃР»Р° 2. РЅСѓР¶РЅР° РґР»СЏ Р±РёС‚РѕРІС‹С… РѕРїРµСЂР°С†РёР№
 '-------------------------
     On Error GoTo HandleError
     If Index < 0 Or Index > 31 Then Err.Raise vbObjectError
@@ -6056,9 +6066,9 @@ HandleError: Err.Clear: Resume HandleExit
 End Function
 
 Private Function p_GetLocaleInfo(LCType As Long) As String
-' возвращает региональные настройки
+' РІРѕР·РІСЂР°С‰Р°РµС‚ СЂРµРіРёРѕРЅР°Р»СЊРЅС‹Рµ РЅР°СЃС‚СЂРѕР№РєРё
 '-------------------------
-' lcType - константы LOCALE_
+' lcType - РєРѕРЅСЃС‚Р°РЅС‚С‹ LOCALE_
 Dim lpBuffer As String * 100
     On Error GoTo HandleError
     If GetLocaleInfo(LOCALE_USER_DEFAULT, LCType, lpBuffer, 99) = 0 Then Err.Raise vbObjectError + 512
@@ -6070,44 +6080,44 @@ HandleError: Err.Clear: Resume HandleExit
 '    End Select
 End Function
 Private Function p_GetCollKeys(oColl As Collection, Optional oIdxs) As String()
-' возвращает массив ключей коллекции (Base=1)
+' РІРѕР·РІСЂР°С‰Р°РµС‚ РјР°СЃСЃРёРІ РєР»СЋС‡РµР№ РєРѕР»Р»РµРєС†РёРё (Base=1)
 '-------------------------
-' оригинал взят отсюда: https://stackoverflow.com/questions/5702362/vba-collection-list-of-keys
+' РѕСЂРёРіРёРЅР°Р» РІР·СЏС‚ РѕС‚СЃСЋРґР°: https://stackoverflow.com/questions/5702362/vba-collection-list-of-keys
 '-------------------------
 Dim CollPtr As LongPtr, KeyPtr As LongPtr, ItemPtr As LongPtr, Address As LongPtr
 Dim bIdxs As Boolean: bIdxs = Not IsMissing(oIdxs): If bIdxs Then Set oIdxs = New Collection
 Dim Result() As String, Length As Long
 Dim i As Long, iMax As Long
-    CollPtr = VBA.ObjPtr(oColl)                             ' адрес коллекции в памяти
-    Address = CollPtr + 3 * PTR_LENGTH + 4                  ' адрес количества элементов коллекции
+    CollPtr = VBA.ObjPtr(oColl)                             ' Р°РґСЂРµСЃ РєРѕР»Р»РµРєС†РёРё РІ РїР°РјСЏС‚Рё
+    Address = CollPtr + 3 * PTR_LENGTH + 4                  ' Р°РґСЂРµСЃ РєРѕР»РёС‡РµСЃС‚РІР° СЌР»РµРјРµРЅС‚РѕРІ РєРѕР»Р»РµРєС†РёРё
     If Address <> 0 Then Call CopyMemory(ByVal VarPtr(iMax), ByVal Address, 4)
-    If iMax <> oColl.Count Then Stop                        ' не совпадает с количеством возвращаемым объектом - ошибка!
-    ReDim Result(1 To iMax)                                 ' объявляем массив для хранения ключей
-    Address = CollPtr + 4 * PTR_LENGTH + 8                  ' адрес первого элемента коллекции
+    If iMax <> oColl.Count Then Stop                        ' РЅРµ СЃРѕРІРїР°РґР°РµС‚ СЃ РєРѕР»РёС‡РµСЃС‚РІРѕРј РІРѕР·РІСЂР°С‰Р°РµРјС‹Рј РѕР±СЉРµРєС‚РѕРј - РѕС€РёР±РєР°!
+    ReDim Result(1 To iMax)                                 ' РѕР±СЉСЏРІР»СЏРµРј РјР°СЃСЃРёРІ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РєР»СЋС‡РµР№
+    Address = CollPtr + 4 * PTR_LENGTH + 8                  ' Р°РґСЂРµСЃ РїРµСЂРІРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РєРѕР»Р»РµРєС†РёРё
     If Address <> 0 Then Call CopyMemory(ByVal VarPtr(ItemPtr), ByVal Address, PTR_LENGTH)
     For i = 1 To iMax
         If ItemPtr = 0 Then Exit For
-        Address = ItemPtr + 2 * PTR_LENGTH + 8              ' адрес ключа элемента коллекции
+        Address = ItemPtr + 2 * PTR_LENGTH + 8              ' Р°РґСЂРµСЃ РєР»СЋС‡Р° СЌР»РµРјРµРЅС‚Р° РєРѕР»Р»РµРєС†РёРё
         If Address <> 0 Then Call CopyMemory(ByVal VarPtr(KeyPtr), ByVal Address, PTR_LENGTH)
-        If KeyPtr <> 0 Then                                 ' извлекаем ключ элемента коллекции
+        If KeyPtr <> 0 Then                                 ' РёР·РІР»РµРєР°РµРј РєР»СЋС‡ СЌР»РµРјРµРЅС‚Р° РєРѕР»Р»РµРєС†РёРё
         Call CopyMemory(ByVal VarPtr(Length), ByVal KeyPtr - 4, PTR_LENGTH)
         Result(i) = Space(Length \ 2)
         Call CopyMemory(ByVal StrPtr(Result(i)), ByVal KeyPtr, ByVal Length)
         End If
-        Address = ItemPtr + 4 * PTR_LENGTH + 8              ' адрес следующего элемента коллекции
+        Address = ItemPtr + 4 * PTR_LENGTH + 8              ' Р°РґСЂРµСЃ СЃР»РµРґСѓСЋС‰РµРіРѕ СЌР»РµРјРµРЅС‚Р° РєРѕР»Р»РµРєС†РёРё
         If Address <> 0 Then Call CopyMemory(ByVal VarPtr(ItemPtr), ByVal Address, PTR_LENGTH)
-        If bIdxs Then oIdxs.Add i, Result(i)                ' если также надо получить коллекцию соответствий тегов индексам
+        If bIdxs Then oIdxs.Add i, Result(i)                ' РµСЃР»Рё С‚Р°РєР¶Рµ РЅР°РґРѕ РїРѕР»СѓС‡РёС‚СЊ РєРѕР»Р»РµРєС†РёСЋ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёР№ С‚РµРіРѕРІ РёРЅРґРµРєСЃР°Рј
     Next i
     p_GetCollKeys = Result
 End Function
 Private Function p_HFontByControl(Optional ctl As Variant, Optional FontName, Optional FontSize, _
     Optional FontColor, Optional FontWeight, Optional FontUnderline, Optional FontStrikeOut, Optional FontItalic, Optional hdc As LongPtr = 0) As LongPtr
-' создает hFont из параметров контрола
+' СЃРѕР·РґР°РµС‚ hFont РёР· РїР°СЂР°РјРµС‚СЂРѕРІ РєРѕРЅС‚СЂРѕР»Р°
 '-------------------------
     'If Not TypeOf ctl Is Access.Control Then Err.Raise vbObjectError + 512
 Dim tDC As LongPtr, hFont As LongPtr
     If hdc = 0 Then tDC = GetDC(0) Else tDC = hdc
-' создаём шрифт
+' СЃРѕР·РґР°С‘Рј С€СЂРёС„С‚
 On Error Resume Next
 Dim fName As String:    fName = IIf(IsMissing(FontName), ctl.FontName, FontName): If Err Then fName = "Arial": Err.Clear
 Dim fSize As Long:      fSize = IIf(IsMissing(FontSize), ctl.FontSize, FontSize): If Err Then fSize = 10: Err.Clear
@@ -6128,10 +6138,10 @@ HandleExit:  p_HFontByControl = hFont: Exit Function
 HandleError: hFont = False: Err.Clear: Resume HandleExit
 End Function
 Private Function p_IsEvalutable(ByRef Expr As String, Optional ByRef Value) As Boolean
-' проверяет необходимость вычисления выражения, в Value возвращает результат вычисления
+' РїСЂРѕРІРµСЂСЏРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚СЊ РІС‹С‡РёСЃР»РµРЅРёСЏ РІС‹СЂР°Р¶РµРЅРёСЏ, РІ Value РІРѕР·РІСЂР°С‰Р°РµС‚ СЂРµР·СѓР»СЊС‚Р°С‚ РІС‹С‡РёСЃР»РµРЅРёСЏ
 '-------------------------
     On Error GoTo HandleError
-    If IsNumeric(Expr) Then p_IsEvalutable = False: Exit Function ' нет необходимости вычислять числа
+    If IsNumeric(Expr) Then p_IsEvalutable = False: Exit Function ' РЅРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РІС‹С‡РёСЃР»СЏС‚СЊ С‡РёСЃР»Р°
 #If APPTYPE = 0 Then ' Access
     Value = Application.Eval(Expr)
 #ElseIf APPTYPE = 1 Then ' Excel
@@ -6139,26 +6149,26 @@ Private Function p_IsEvalutable(ByRef Expr As String, Optional ByRef Value) As B
 #Else
     Err.Raise 2438
 #End If
-' для возможности последующего вычисления выражений с десятичными дробями
-' лучше получить региональные настройки
+' РґР»СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РїРѕСЃР»РµРґСѓСЋС‰РµРіРѕ РІС‹С‡РёСЃР»РµРЅРёСЏ РІС‹СЂР°Р¶РµРЅРёР№ СЃ РґРµСЃСЏС‚РёС‡РЅС‹РјРё РґСЂРѕР±СЏРјРё
+' Р»СѓС‡С€Рµ РїРѕР»СѓС‡РёС‚СЊ СЂРµРіРёРѕРЅР°Р»СЊРЅС‹Рµ РЅР°СЃС‚СЂРѕР№РєРё
     If IsNumeric(Value) Then
-'Dim cPosDelim As String * 1: cPosDelim = p_GetLocaleInfo(LOCALE_STHOUSAND)  ' Chr(160) - разделитель разрядов целой части
+'Dim cPosDelim As String * 1: cPosDelim = p_GetLocaleInfo(LOCALE_STHOUSAND)  ' Chr(160) - СЂР°Р·РґРµР»РёС‚РµР»СЊ СЂР°Р·СЂСЏРґРѕРІ С†РµР»РѕР№ С‡Р°СЃС‚Рё
 '        Value = Replace(Value, cPosDelim, vbNullString)
-Dim cDecDelim As String * 1: cDecDelim = "," ' p_GetLocaleInfo(LOCALE_SDECIMAL)   ' Chr(44)  - разделитель целой/дробной части десятичной дроби
+Dim cDecDelim As String * 1: cDecDelim = "," ' p_GetLocaleInfo(LOCALE_SDECIMAL)   ' Chr(44)  - СЂР°Р·РґРµР»РёС‚РµР»СЊ С†РµР»РѕР№/РґСЂРѕР±РЅРѕР№ С‡Р°СЃС‚Рё РґРµСЃСЏС‚РёС‡РЅРѕР№ РґСЂРѕР±Рё
         Value = Replace(Value, cDecDelim, ".")
     End If
 HandleExit:  p_IsEvalutable = True:  Exit Function
 HandleError: p_IsEvalutable = False: Err.Clear
 End Function
 Private Function p_IsExist(Key As String, Coll As Collection, Optional ByRef Value) As Boolean
-' проверяет наличие элемента в коллекции
+' РїСЂРѕРІРµСЂСЏРµС‚ РЅР°Р»РёС‡РёРµ СЌР»РµРјРµРЅС‚Р° РІ РєРѕР»Р»РµРєС†РёРё
 '-------------------------
     On Error GoTo HandleError
     Value = Coll(Key)
 HandleExit:  p_IsExist = True:  Exit Function
 HandleError: p_IsExist = False: Err.Clear
 End Function
-#If APPTYPE = 1 Then ' для Excel нужна замена Nz
+#If APPTYPE = 1 Then ' РґР»СЏ Excel РЅСѓР¶РЅР° Р·Р°РјРµРЅР° Nz
 Private Function Nz(p1, Optional p2) As Variant
     Select Case True
     Case Not IsNull(p1): Nz = p1
